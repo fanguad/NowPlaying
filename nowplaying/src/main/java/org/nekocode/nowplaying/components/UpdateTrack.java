@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2010, fanguad@nekocode.org
+ * Copyright (c) 2011, dan.clark@nekocode.org
+ *
+ * Licensed under FreeBSD license.  See README for details.
  */
 
 package org.nekocode.nowplaying.components;

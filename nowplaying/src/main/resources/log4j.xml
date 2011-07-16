@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2011, fanguad@nekocode.org
+  ~ Copyright (c) 2011, dan.clark@nekocode.org
+  ~
+  ~ Licensed under FreeBSD license.  See README for details.
   -->
 
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">

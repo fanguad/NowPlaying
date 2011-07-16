@@ -75,6 +75,9 @@ public class NowPlayingController
 //            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             // the font gets changed, and the tag editor look *terrible* if I change the UI...
 
+            if (mediaPlayerClassName == null) {
+                throw new RuntimeException("MediaPlayer was not supplied.  Cannot proceed");
+            }
             Class<?> mediaPlayerClass = Class.forName(mediaPlayerClassName);
             mediaPlayer = (MediaPlayer) mediaPlayerClass.newInstance();
 

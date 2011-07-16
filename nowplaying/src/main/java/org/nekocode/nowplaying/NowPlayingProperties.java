@@ -8,9 +8,11 @@ package org.nekocode.nowplaying;
 
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -21,10 +23,8 @@ import java.util.Properties;
 public enum NowPlayingProperties {
     ALBUM_ART_SIZE,
     TRANSPARENCY,
-//    ART_DIRECTORY,
     TAG_DATABASE,
     MEDIA_PLAYER,
-//    MEDIA_PLAYER_PATH,
     CORNER_RADIUS,
     MEDIA_PLAYER_GUID,
     REMOTE_MACHINE,
@@ -38,9 +38,21 @@ public enum NowPlayingProperties {
         if (properties == null) {
             properties = new Properties();
             try {
-                FileInputStream in = new FileInputStream(NowPlayingProperties.PROPERTIES_FILE);
-                properties.load(in);
-                in.close();
+                // first, try to load properties from a file in the current directory
+                File propertiesFile = new File(NowPlayingProperties.PROPERTIES_FILE);
+                InputStream in;
+                if (propertiesFile.exists()) {
+                    in = new FileInputStream(propertiesFile);
+                } else {
+                    // if that doesn't work - try to load it as a resource located at the root of the project
+                    in = NowPlayingProperties.class.getResourceAsStream("/" + PROPERTIES_FILE);
+                }
+                if (in != null) {
+                    properties.load(in);
+                    in.close();
+                } else {
+                    log.warn("Unable to load " + PROPERTIES_FILE + " from either file system or resource path");
+                }
             } catch (IOException e) {
                 log.warn("Could not load " + PROPERTIES_FILE, e);
             }

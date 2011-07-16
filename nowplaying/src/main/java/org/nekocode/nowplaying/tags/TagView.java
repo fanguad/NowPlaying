@@ -74,7 +74,7 @@ public class TagView extends JPanel
 		newTag = new JTextField();
 		newTag.setVisible(false);
 		newTag.setHorizontalAlignment(JTextField.CENTER);
-		newTag.addFocusListener(new NekoTextFieldFocusListener("new tag"));
+		newTag.addFocusListener(new NekoTextFieldFocusListener());
 
 		tagHolder = new TagCloud();
 
@@ -169,31 +169,16 @@ public class TagView extends JPanel
 	}
 
 	static class NekoTextFieldFocusListener implements FocusListener {
-		private String unfocused;
-
-		public NekoTextFieldFocusListener(String unfocused) {
-			this.unfocused = unfocused;
-		}
-		/* (non-Javadoc)
-		 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-		 */
 		@Override
 		public void focusGained(FocusEvent e) {
 			((JTextField)e.getComponent()).setText("");
 			e.getComponent().setForeground(Color.black);
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-		 */
-		@Override
-		public void focusLost(FocusEvent e) {
-//            if (((JTextField)e.getComponent()).getText().length() == 0) {
-//                ((JTextField)e.getComponent()).setText(unfocused);
-//                e.getComponent().setForeground(Color.lightGray);
-//            }
-		}
-	}
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
+    }
 
 	public void addTagChangeListener(TagChangeListener l) {
 		listeners.add(l);
@@ -343,8 +328,7 @@ public class TagView extends JPanel
 			SwingUtilities.invokeAndWait(new Runnable() {
 				@Override
 				public void run() {
-					tagHolder.removeAll();
-					tagHolder.add(busy);
+                    setBusy();
 				}});
 		} catch (InterruptedException e) {
 			log.error(e);

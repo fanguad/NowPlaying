@@ -17,12 +17,9 @@ import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 import org.nekocode.nowplaying.tags.cloud.TagCloudGroup;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,23 +57,88 @@ public class TagModel
 	private static final Logger log = Logger.getLogger(TagModel.class);
 	private final Set<TagChangeListener> tagChangeListeners;
 	private final Executor tagChangeExecutor;
-	private final ExecutorService dbAccess;
-	private final Map<StatementName, PreparedStatement> statementCache;
+    private final ExecutorService dbAccess;
+    private TagDatabase database;
 
-	private Connection conn;
+    public TagModel() throws ClassNotFoundException, SQLException, IOException {
+        tagChangeListeners = new CopyOnWriteArraySet<>();
+        tagChangeExecutor = Executors.newSingleThreadExecutor(new DaemonThreadFactory());
+        dbAccess = Executors.newSingleThreadExecutor();
 
-	public TagModel() throws ClassNotFoundException, SQLException {
-		tagChangeListeners = new CopyOnWriteArraySet<>();
-		tagChangeExecutor = Executors.newSingleThreadExecutor(new DaemonThreadFactory());
-		dbAccess = Executors.newSingleThreadExecutor();
+        String tagDatabase = NowPlayingProperties.loadProperties().getProperty(NowPlayingProperties.TAG_DATABASE.name());
 
-		statementCache = new HashMap<>();
+        database = new TagDatabase(new java.io.File(tagDatabase), getClass().getResource("schema.sqlite.sql"));
 
-		String tagDatabase = NowPlayingProperties.loadProperties().getProperty(NowPlayingProperties.TAG_DATABASE.name());
+        // register queries... kind of like stored procedures (but kind of missing the point, of which I'm aware)
 
-        Class.forName("org.sqlite.JDBC");
-        log.info("opening database connection");
-        conn = DriverManager.getConnection("jdbc:sqlite:" + tagDatabase);
+        // new track
+        database.registerPreparedStatement(getTrackUUIDInsert,
+                "INSERT INTO track_id_to_guid(uuid, track_id) VALUES(?, ?)");
+
+        // get track information
+        database.registerPreparedStatement(getTrackIdUUIDSelect,
+                "SELECT uuid FROM track_id_to_guid WHERE track_id = ?");
+        database.registerPreparedStatement(getAllTrackIds,
+                "SELECT track_id FROM track_id_to_guid");
+
+        // remove a track
+        database.registerPreparedStatement(deleteTrackTags,
+                "DELETE FROM track_tags WHERE uuid = ?");
+        database.registerPreparedStatement(deleteTrackIdToUUID,
+                "DELETE FROM track_id_to_guid WHERE uuid = ?");
+        database.registerPreparedStatement(deleteTrackFromDuplicates,
+                "DELETE FROM track_duplicates WHERE uuid = ?");
+        database.registerPreparedStatement(deleteTrackFromGroups,
+                "DELETE FROM track_groups WHERE uuid = ?");
+
+        // new or updated tag
+        database.registerPreparedStatement(addTrackTag,
+                "INSERT OR IGNORE INTO track_tags(uuid, tag_id) VALUES (?, ?)");
+        database.registerPreparedStatement(updateTagCount,
+                "UPDATE tags SET count = (SELECT COUNT(tag_id) FROM track_tags WHERE tag_id = ?) WHERE tag_id = ?");
+        database.registerPreparedStatement(addTag,
+                "INSERT INTO tags(name, metadata, count) VALUES (?, ?, 0)");
+
+        // get tag, or tag information
+        database.registerPreparedStatement(getTag,
+                "SELECT name, metadata, count FROM tags_view WHERE uuid = ?");
+        database.registerPreparedStatement(getTagId,
+                "SELECT tag_id FROM tags WHERE name = ?");
+        database.registerPreparedStatement(getTagCounts,
+                "SELECT name, metadata, count FROM tags WHERE count >= ?");
+        database.registerPreparedStatement(getMaxTagCount,
+                "SELECT MAX(count) AS max_count FROM tags");
+        database.registerPreparedStatement(getTagIdsForTrack,
+                "SELECT tag_id FROM track_tags WHERE uuid = ?");
+
+        // remove a tag
+        database.registerPreparedStatement(removeTag,
+                "DELETE FROM track_tags WHERE uuid = ? AND tag_id = ?");
+        database.registerPreparedStatement(deleteTag,
+                "DELETE FROM tags WHERE tag_id == ? AND count == 0");
+
+        // track duplicates
+        database.registerPreparedStatement(getDuplicates,
+                "SELECT uuid FROM track_duplicates WHERE duplicate_id IN " +
+                        "(SELECT duplicate_id FROM track_duplicates WHERE uuid = ?)");
+        database.registerPreparedStatement(getDuplicateId,
+                "SELECT duplicate_id FROM track_duplicates WHERE uuid = ?");
+        database.registerPreparedStatement(getMaxDuplicateId,
+                "SELECT MAX(duplicate_id) AS max FROM track_duplicates");
+        database.registerPreparedStatement(setDuplicate,
+                "INSERT OR IGNORE INTO track_duplicates (duplicate_id, uuid) VALUES (?, ?)");
+
+        // track groups
+        database.registerPreparedStatement(getGroups,
+                "SELECT name FROM groups WHERE group_id IN (SELECT group_id FROM track_groups WHERE uuid = ?)");
+        database.registerPreparedStatement(getGroupId,
+                "SELECT group_id FROM groups WHERE name = ?");
+        database.registerPreparedStatement(getMaxGroupId,
+                "SELECT MAX(group_id) AS max FROM groups");
+        database.registerPreparedStatement(setGroup,
+                "INSERT OR IGNORE INTO groups (group_id, name) VALUES (?, ?)");
+        database.registerPreparedStatement(setTrackGroup,
+                "INSERT OR IGNORE INTO track_groups (group_id, uuid) VALUES (?, ?)");
     }
 
 	/**
@@ -102,12 +164,10 @@ public class TagModel
 			int tagId = getOrAddTagId(tag, metadata);
 
 			// insert the entry into the track_tags table
-			PreparedStatement addTagStmt = getStatementFromCache(addTrackTag,
-				"INSERT OR IGNORE INTO track_tags(uuid, tag_id) VALUES (?, ?)");
+			PreparedStatement addTagStmt = database.getPreparedStatement(addTrackTag);
 			addTagStmt.setString(1, uuid);
 			addTagStmt.setInt(2, tagId);
 			addTagStmt.executeUpdate();
-			addTagStmt.close();
 
 			updateTagCount(tagId);
 
@@ -129,8 +189,7 @@ public class TagModel
 			// first, get the tag id from the tags table
 			int tagId = getOrAddTagId(tag, metadata);
 
-			PreparedStatement addTagStmt = getStatementFromCache(addTrackTag,
-					"INSERT OR IGNORE INTO track_tags(uuid, tag_id) VALUES (?, ?)");
+            PreparedStatement addTagStmt = database.getPreparedStatement(addTrackTag);
 			for (Track track : tracks) {
 				String uuid = getTrackUUID(track);
 				// insert the entry into the track_tags table
@@ -141,7 +200,6 @@ public class TagModel
 				log.debug(String.format("Added [%s] to %s", tag, uuid));
 			}
 			addTagStmt.executeBatch();
-			addTagStmt.close();
 			log.debug("Finished updating tracks");
 
 			updateTagCount(tagId);
@@ -160,12 +218,10 @@ public class TagModel
 	}
 
 	private void updateTagCount(int tagId) throws SQLException {
-		PreparedStatement updateTagCountStmt = getStatementFromCache(updateTagCount,
-			"UPDATE tags SET count = (SELECT COUNT(tag_id) FROM track_tags WHERE tag_id = ?) WHERE tag_id = ?");
+		PreparedStatement updateTagCountStmt = database.getPreparedStatement(updateTagCount);
 		updateTagCountStmt.setInt(1, tagId);
 		updateTagCountStmt.setInt(2, tagId);
 		updateTagCountStmt.executeUpdate();
-		updateTagCountStmt.close();
 	}
 
 	private int getOrAddTagId(String tag, String metadata) throws SQLException {
@@ -173,14 +229,12 @@ public class TagModel
 
 		if (tagId < 0) {
 			// we need to add the tag
-			PreparedStatement addTagStmt = getStatementFromCache(addTag,
-				"INSERT INTO tags(name, metadata) VALUES (?, ?)");
+			PreparedStatement addTagStmt = database.getPreparedStatement(addTag);
 			addTagStmt.setString(1, tag);
 			addTagStmt.setString(2, metadata);
 			addTagStmt.executeUpdate();
 
 			tagId = getTagId(tag);
-			addTagStmt.close();
 			if (tagId < 0) {
 				throw new SQLException("unable to retrieve tag ID or create a new entry");
 			}
@@ -190,8 +244,7 @@ public class TagModel
 
 	private int getTagId(String tag) throws SQLException {
 		int tagId;
-		PreparedStatement stmt = getStatementFromCache(getTagId,
-			"SELECT tag_id FROM tags WHERE name = ?");
+		PreparedStatement stmt = database.getPreparedStatement(getTagId);
 		stmt.setString(1, tag);
 		ResultSet rs = stmt.executeQuery();
 
@@ -200,7 +253,7 @@ public class TagModel
 		} else {
 			tagId = -1;
 		}
-		stmt.close();
+        rs.close();
 		return tagId;
 	}
 
@@ -210,8 +263,7 @@ public class TagModel
 		try {
 			int max = __getMaxTagCount();
 			// doesn't include tags with less than minimum number of entries
-			PreparedStatement stmt = getStatementFromCache(getTagCounts,
-				"SELECT name, metadata, count FROM tags WHERE count >= ?");
+			PreparedStatement stmt = database.getPreparedStatement(getTagCounts);
 			stmt.setInt(1, minimum);
 
 			ResultSet rs = stmt.executeQuery();
@@ -230,8 +282,7 @@ public class TagModel
 	private int __getMaxTagCount() {
 		int ret = 0;
 		try {
-			PreparedStatement stmt = getStatementFromCache(getMaxTagCount,
-					"SELECT MAX(count) AS max_count FROM tags");
+			PreparedStatement stmt = database.getPreparedStatement(getMaxTagCount);
 			ResultSet rs = stmt.executeQuery();
 			rs.next();
 			ret = rs.getInt("max_count");
@@ -324,16 +375,13 @@ public class TagModel
 	private Collection<String> __getDuplicateTracks(String uuid) throws SQLException {
 		List<String> duplicateIds = new ArrayList<>();
 
-		PreparedStatement stmt = getStatementFromCache(getDuplicates,
-				"SELECT uuid FROM track_duplicates WHERE duplicate_id IN " +
-				"(SELECT duplicate_id FROM track_duplicates WHERE uuid = ?)");
+		PreparedStatement stmt = database.getPreparedStatement(getDuplicates);
 		stmt.setString(1, uuid);
 		ResultSet results = stmt.executeQuery();
 		while (results.next()) {
 			duplicateIds.add(results.getString("uuid"));
 		}
 		results.close();
-		stmt.close();
 		// the query will include the original uuid, which we don't want
 		duplicateIds.remove(uuid);
 
@@ -359,8 +407,7 @@ public class TagModel
 			//        registered in the duplicates table
 			Set<Integer> duplicateIds = new HashSet<>();
 			{
-				PreparedStatement stmt = getStatementFromCache(getDuplicateId,
-				"SELECT duplicate_id FROM track_duplicates WHERE uuid = ?");
+				PreparedStatement stmt = database.getPreparedStatement(getDuplicateId);
 				for (String uuid : uuids) {
 					stmt.setString(1, uuid);
 					ResultSet results = stmt.executeQuery();
@@ -369,7 +416,6 @@ public class TagModel
 					}
 					results.close();
 				}
-				stmt.close();
 			}
 
 			// get the group id, or fail if there are already multiple duplicate
@@ -378,8 +424,7 @@ public class TagModel
 			switch (duplicateIds.size()) {
 			case 0:
 				// need to make a new group
-				PreparedStatement stmt = getStatementFromCache(getMaxDuplicateId,
-				"SELECT MAX(duplicate_id) AS max FROM track_duplicates");
+				PreparedStatement stmt = database.getPreparedStatement(getMaxDuplicateId);
 				ResultSet results = stmt.executeQuery();
 				if (results.next()) {
 					duplicateGroupId = results.getInt("max") + 1;
@@ -388,7 +433,6 @@ public class TagModel
 					duplicateGroupId = 1;
 				}
 				results.close();
-				stmt.close();
 				break;
 			case 1:
 				// use existing group
@@ -400,8 +444,7 @@ public class TagModel
 			}
 
 			// finally, store the group in the database
-			PreparedStatement stmt = getStatementFromCache(setDuplicate,
-					"INSERT OR IGNORE INTO track_duplicates (duplicate_id, uuid) VALUES (?, ?)");
+			PreparedStatement stmt = database.getPreparedStatement(setDuplicate);
 			stmt.setInt(1, duplicateGroupId);
 
 			for (String uuid : uuids) {
@@ -409,7 +452,6 @@ public class TagModel
 				stmt.execute();
 				log.debug(format("added %s to duplicate group #%s", uuid, duplicateGroupId));
 			}
-			stmt.close();
 			log.debug(format("added %s tracks to duplicate group", uuids.size()));
 
             for (Track track : tracks) {
@@ -425,9 +467,7 @@ public class TagModel
 
 	private Collection<String> __getGroups(String uuid) {
 		try {
-			PreparedStatement stmt = getStatementFromCache(getGroups,
-					"SELECT name FROM groups WHERE group_id IN " +
-			"(SELECT group_id FROM track_groups WHERE uuid = ?)");
+			PreparedStatement stmt = database.getPreparedStatement(getGroups);
 			stmt.setString(1, uuid);
 
 			List<String> groups = new ArrayList<>();
@@ -435,6 +475,8 @@ public class TagModel
 			while (results.next()) {
 				groups.add(results.getString("name"));
 			}
+            results.close();
+
 			return groups;
 		} catch (SQLException e) {
 			log.error("SQLException", e);
@@ -453,27 +495,23 @@ public class TagModel
 			int groupId = -1;
 			boolean createNewGroup = false;
 			{
-				PreparedStatement stmt = getStatementFromCache(getGroupId,
-					"SELECT group_id FROM groups WHERE name = ?");
+				PreparedStatement stmt = database.getPreparedStatement(getGroupId);
 				stmt.setString(1, name);
 				ResultSet results = stmt.executeQuery();
 				if (results.next()) {
 					groupId = results.getInt("group_id");
 				}
 				results.close();
-				stmt.close();
 
 				// doesn't exist, pick the next id
 				if (groupId < 0) {
 					createNewGroup = true;
-					stmt = getStatementFromCache(getGroupId,
-						"SELECT MAX(group_id) AS max FROM groups");
+					stmt = database.getPreparedStatement(getMaxGroupId);
 					results = stmt.executeQuery();
 					if (results.next()) {
 						groupId = results.getInt("max") + 1;
 					}
 					results.close();
-					stmt.close();
 				}
 
 				// if the table was empty, start from 1
@@ -484,20 +522,15 @@ public class TagModel
 			}
 
 			if (createNewGroup) {
-				PreparedStatement stmt = getStatementFromCache(setGroup,
-						"INSERT OR IGNORE INTO groups (group_id, name) " +
-						"VALUES (?, ?)");
+				PreparedStatement stmt = database.getPreparedStatement(setGroup);
 				stmt.setInt(1, groupId);
 				stmt.setString(2, name);
 				stmt.execute();
-				stmt.close();
 				log.debug(format("created new group \"%s\"", name));
 			}
 
 			// finally, store the track/group mapping in the database
-			PreparedStatement stmt = getStatementFromCache(setTrackGroup,
-					"INSERT OR IGNORE INTO track_groups (group_id, uuid) " +
-					"VALUES (?, ?)");
+			PreparedStatement stmt = database.getPreparedStatement(setTrackGroup);
 			stmt.setInt(1, groupId);
 
 			for (String uuid : uuids) {
@@ -505,7 +538,6 @@ public class TagModel
 				stmt.execute();
 				log.debug(format("added %s to group \"%s\"", uuid, name));
 			}
-			stmt.close();
 			log.debug(format("added %s tracks to group", uuids.size()));
 			return true;
 		} catch (SQLException e) {
@@ -518,8 +550,7 @@ public class TagModel
 		try {
 			String uuid = getTrackUUID(track);
 			int tagId = getTagId(tag);
-			PreparedStatement stmt = getStatementFromCache(removeTag,
-				"DELETE FROM track_tags WHERE uuid = ? AND tag_id = ?");
+			PreparedStatement stmt = database.getPreparedStatement(removeTag);
 			stmt.setString(1, uuid);
 			stmt.setInt(2, tagId);
 			stmt.execute();
@@ -535,8 +566,7 @@ public class TagModel
     private void __removeTag(Collection<Track> tracks, String tag) {
         try {
             int tagId = getTagId(tag);
-            PreparedStatement stmt = getStatementFromCache(removeTag,
-                "DELETE FROM track_tags WHERE uuid = ? AND tag_id = ?");
+            PreparedStatement stmt = database.getPreparedStatement(removeTag);
 
             for (Track track : tracks) {
                 String uuid = getTrackUUID(track);
@@ -549,7 +579,6 @@ public class TagModel
             }
 
             stmt.executeBatch();
-            stmt.close();
             log.debug("Finished updating tracks");
 
             updateTagCount(tagId);
@@ -565,10 +594,8 @@ public class TagModel
 
     private void __deleteTags(Collection<String> tagsToDelete) {
         try {
-            PreparedStatement updateTagCountStmt = getStatementFromCache(updateTagCount,
-                    "UPDATE tags SET count = (SELECT COUNT(tag_id) FROM track_tags WHERE tag_id = ?) WHERE tag_id = ?");
-            PreparedStatement deleteTagStmt = getStatementFromCache(deleteTag,
-                "DELETE FROM tags WHERE tag_id == ? AND count == 0");
+            PreparedStatement updateTagCountStmt = database.getPreparedStatement(updateTagCount);
+            PreparedStatement deleteTagStmt = database.getPreparedStatement(deleteTag);
 
             for (String tagName : tagsToDelete) {
                 int tagId = getTagId(tagName);
@@ -586,8 +613,6 @@ public class TagModel
             // then, execute delte
             deleteTagStmt.executeBatch();
 
-            updateTagCountStmt.close();
-            deleteTagStmt.close();
         } catch (SQLException e) {
             log.error("SQLException", e);
         }
@@ -596,7 +621,7 @@ public class TagModel
 	private void __shutdown() {
 		try {
 			log.info("closing database connection");
-			conn.close();
+            database.shutdown();
 			dbAccess.shutdown();
 			log.info("closed database connection");
 		} catch (SQLException e) {
@@ -605,25 +630,6 @@ public class TagModel
 		}
 	}
 
-	/**
-	 * Retrieves the statement by the given name, if it exists.  If it does not,
-	 * it creates the statement with the given SQL, caches it, and returns it.
-	 *
-	 * @param name name of prepared statement
-	 * @param sql SQL of statement
-	 * @return cached copy of statement.  NOT threadsafe
-	 * @throws SQLException
-	 */
-	private PreparedStatement getStatementFromCache(StatementName name, String sql) throws SQLException {
-		PreparedStatement stmt = statementCache.get(name);
-		// ok, it seems like sqlite-jdbc doesn't like reusing PreparedStatements
-		// TODO find out why
-//		if (stmt == null) {
-			stmt = conn.prepareStatement(sql);
-//			statementCache.put(name, stmt);
-//		}
-		return stmt;
-	}
 	/**
 	 * Returns all tags for a given uuid.
 	 *
@@ -634,8 +640,7 @@ public class TagModel
 	private List<TagCloudEntry> getTags(String uuid) throws SQLException {
 		List<TagCloudEntry> ret = new ArrayList<>();
 
-		PreparedStatement stmt = getStatementFromCache(getTags,
-				"SELECT name, metadata, count FROM tags_view WHERE uuid = ?");
+		PreparedStatement stmt = database.getPreparedStatement(getTag);
 
 		stmt.setString(1, uuid);
 		ResultSet rs = stmt.executeQuery();
@@ -645,6 +650,7 @@ public class TagModel
 			ret.add(new TagCloudEntry(rs.getString("name"), rs.getString("metadata"),
 					rs.getInt("count"), maxcount));
 		}
+        rs.close();
 
 		log.debug(uuid + ": " + ret);
 		return ret;
@@ -713,12 +719,10 @@ public class TagModel
             log.debug(String.format("Creating new UUID for %s", trackId));
             uuid = '{' + UUID.randomUUID().toString().toUpperCase() + '}';
             log.debug("UUID created: " + uuid);
-            PreparedStatement stmt = getStatementFromCache(getTrackUUIDInsert,
-                    "INSERT INTO track_id_to_guid(uuid, track_id) VALUES(?, ?)");
+            PreparedStatement stmt = database.getPreparedStatement(getTrackUUIDInsert);
             stmt.setString(1, uuid);
             stmt.setString(2, trackId);
             stmt.executeUpdate();
-            stmt.close();
         }
 
         addToCache(trackId, uuid);
@@ -728,15 +732,13 @@ public class TagModel
 
     private String getUUIDFromTrackId(String trackId) throws SQLException {
         String uuid = null;
-        PreparedStatement stmt = getStatementFromCache(getTrackIdUUIDSelect,
-                "SELECT uuid FROM track_id_to_guid WHERE track_id = ?");
+        PreparedStatement stmt = database.getPreparedStatement(getTrackIdUUIDSelect);
         stmt.setString(1, trackId);
         ResultSet rs = stmt.executeQuery();
         if (rs.next()) {
             uuid = rs.getString(1);
         }
         rs.close();
-        stmt.close();
 
         if (uuid != null) {
             log.debug(format("Found UUID for %s: %s", trackId, uuid));
@@ -778,31 +780,13 @@ public class TagModel
 
             // try to load UUID from database
             if (uuid == null) {
-                PreparedStatement stmt = getStatementFromCache(getTrackUUIDSelect,
-                        "SELECT uuid FROM tracks WHERE location = ?");
+                PreparedStatement stmt = database.getPreparedStatement(getTrackUUIDSelect);
                 stmt.setString(1, location);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     uuid = rs.getString(1);
                 }
                 rs.close();
-                stmt.close();
-            }
-
-            // create a new UUID and store in the database.  if the file was an
-            //    mp3 file, the act of retrieving the UUID for the first time would
-            //    have created one already
-            if (uuid == null) {
-                // otherwise, create a new, random one
-                log.info(String.format("Creating new UUID for %s", location));
-                uuid = '{' + UUID.randomUUID().toString().toUpperCase() + '}';
-                log.debug("UUID created: " + uuid);
-                PreparedStatement stmt = getStatementFromCache(getTrackUUIDInsert,
-                        "INSERT INTO tracks(uuid, location) VALUES(?, ?)");
-                stmt.setString(1, uuid);
-                stmt.setString(2, location);
-                stmt.executeUpdate();
-                stmt.close();
             }
 
             addToCache(location, uuid);
@@ -1143,20 +1127,15 @@ public class TagModel
                 @Override
                 public void run() {
                     try {
-                        conn.setAutoCommit(false);
+                        database.beginTransaction();
 
                         Set<Integer> affectedTags = new HashSet<>();
-                        PreparedStatement deleteTrackTagsStmt = getStatementFromCache(deleteTrackTags,
-                                "DELETE FROM track_tags WHERE uuid = ?");
-                        PreparedStatement deleteTrackIdToUuidStmt = getStatementFromCache(deleteTrackIdToUUID,
-                                "DELETE FROM track_id_to_guid WHERE uuid = ?");
-                        PreparedStatement deleteDuplicateStmt = conn.prepareStatement(
-                                "DELETE FROM track_duplicates WHERE uuid = ?");
-                        PreparedStatement deleteGroupStmt = conn.prepareStatement(
-                                "DELETE FROM track_groups WHERE uuid = ?");
+                        PreparedStatement deleteTrackTagsStmt = database.getPreparedStatement(deleteTrackTags);
+                        PreparedStatement deleteTrackIdToUuidStmt = database.getPreparedStatement(deleteTrackIdToUUID);
+                        PreparedStatement deleteDuplicateStmt = database.getPreparedStatement(deleteTrackFromDuplicates);
+                        PreparedStatement deleteGroupStmt = database.getPreparedStatement(deleteTrackFromGroups);
 
-                        PreparedStatement getTagIds = conn.prepareStatement(
-                                "SELECT tag_id FROM track_tags WHERE uuid = ?");
+                        PreparedStatement getTagIds = database.getPreparedStatement(getTagIdsForTrack);
 
                         for (String trackId : tracksToDelete) {
                             String uuid = getUUIDFromTrackId(trackId);
@@ -1179,40 +1158,29 @@ public class TagModel
                             while (rs.next()) {
                                 affectedTags.add(rs.getInt("tag_id"));
                             }
+                            rs.close();
                         }
 
                         deleteTrackTagsStmt.executeBatch();
-                        deleteTrackTagsStmt.close();
 
                         deleteTrackIdToUuidStmt.executeBatch();
-                        deleteTrackIdToUuidStmt.close();
 
                         deleteDuplicateStmt.executeBatch();
-                        deleteDuplicateStmt.close();
 
                         deleteGroupStmt.executeBatch();
-                        deleteGroupStmt.close();
 
-                        PreparedStatement updateTagCountStmt = getStatementFromCache(updateTagCount,
-                                "UPDATE tags SET count = (SELECT COUNT(tag_id) FROM track_tags WHERE tag_id = ?) WHERE tag_id = ?");
+                        PreparedStatement updateTagCountStmt = database.getPreparedStatement(updateTagCount);
                         for (int tag_id : affectedTags) {
                             updateTagCountStmt.setInt(1, tag_id);
                             updateTagCountStmt.addBatch();
                         }
                         updateTagCountStmt.executeBatch();
-                        updateTagCountStmt.close();
 
                         // commit all this work
-                        conn.commit();
+                        database.endTransaction();
 
                     } catch (SQLException e) {
                         log.error("Error deleting tracks", e);
-                    } finally {
-                        try {
-                            conn.setAutoCommit(true);
-                        } catch (SQLException e) {
-                            log.error("Error re-enabling autocommit mode", e);
-                        }
                     }
                 }}).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -1229,14 +1197,13 @@ public class TagModel
         Callable<List<String>> getTags = new Callable<List<String>>() {
             @Override
             public List<String> call() throws Exception {
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT track_id FROM track_id_to_guid");
+                PreparedStatement stmt = database.getPreparedStatement(getAllTrackIds);
+                ResultSet rs = stmt.executeQuery();
                 ArrayList<String> ret = new ArrayList<>();
                 while (rs.next()) {
                     ret.add(rs.getString("track_id"));
                 }
                 rs.close();
-                stmt.close();
                 return ret;
             }};
         List<String> tags = new ArrayList<>();
@@ -1261,14 +1228,16 @@ public class TagModel
 	}
 
     static enum StatementName {
-		getTags,
+        getTag,
 		getTrackUUIDSelect, getTrackUUIDInsert,
         getTrackIdUUIDSelect,
 		addTag, addTrackTag, removeTag,
 		getTagCounts, getMaxTagCount, updateTagCount,
 		getTagId, getDuplicates, getDuplicateId,
 		getMaxDuplicateId, setDuplicate,
-		getGroups, setGroup, setTrackGroup, getGroupId,
+		getGroups, setGroup, setTrackGroup, getGroupId, getMaxGroupId,
         deleteTag, deleteTrackTags, deleteTrackIdToUUID,
+        getTagIdsForTrack, deleteTrackFromGroups, deleteTrackFromDuplicates,
+        getAllTrackIds,
 	}
 }

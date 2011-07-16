@@ -34,6 +34,7 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,14 +54,16 @@ public class NowPlayingController
 	private TagModel tagModel;
 	private TrayIcon trayIcon;
 	private TrackMonitor monitor;
+    private boolean shutdown;
 
-	public static void main(String... args) {
+    public static void main(String... args) {
 		LogMuter.muteLogging();
 		NowPlayingController controller = new NowPlayingController();
 		controller.start();
 	}
 
 	public NowPlayingController() {
+        shutdown = false;
         String mediaPlayerClassName = NowPlayingProperties.loadProperties().getProperty(NowPlayingProperties.MEDIA_PLAYER.name());
         try {
 //            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -86,6 +89,7 @@ public class NowPlayingController
                 ClassNotFoundException |
                 InstantiationException |
                 SQLException |
+                IOException |
                 IllegalAccessException e) {
             e.printStackTrace();
             log.fatal(e);
@@ -187,6 +191,8 @@ public class NowPlayingController
     }
 
 	public void start() {
+        if (shutdown) return;
+
 		view.setUndecorated(true);
 
 //		JPanel spacer = new JPanel();
@@ -257,6 +263,8 @@ public class NowPlayingController
 	}
 
 	private void shutdown() {
+        shutdown = true;
+
 		NowPlayingProperties.storeProperties();
 		if (monitor != null)
 			try {

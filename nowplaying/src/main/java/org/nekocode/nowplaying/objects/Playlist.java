@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Interface for playlist.
  *
- * @author dclark
+ * @author dan.clark@nekocode.org
  * @since Jun 15, 2010
  */
 public interface Playlist {

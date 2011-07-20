@@ -29,7 +29,7 @@
         <repository>
             <id>local-repository</id>
             <name>Local Repository</name>
-            <url>file://${project.parent.relativePath}/lib</url>
+            <url>file://${project.basedir}/../lib</url>
         </repository>
     </repositories>
 

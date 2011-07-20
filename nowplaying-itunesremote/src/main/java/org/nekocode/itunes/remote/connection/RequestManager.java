@@ -151,6 +151,8 @@ public class RequestManager {
         connections.add(connection);
         shutdownLock.unlock();
         connection.setRequestProperty("Viewer-Only-Client", "1");
+        connection.setRequestProperty("Client-Daap-Version", "3.10");
+        connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
         if (!keepOpen) {
             connection.setConnectTimeout(DEFAULT_TIMEOUT);
             connection.setReadTimeout(DEFAULT_TIMEOUT);

@@ -153,7 +153,7 @@ public enum ContentCode {
     DMAP_PERSISTENT_ID("mper", "dmap.persistentid", LONG),
     DMAP_ITEM_COUNT("mimc", "dmap.itemcount", INTEGER),
     DMAP_MSMA("msma", INTEGER), // speaker machine address?
-    DMAP_MDBK("mdbk", INTEGER),
+    DMAP_MDBK("mdbk", INTEGER), // database type?  library/radio/shared library?
     DMAP_CONTAINER_COUNT("mctc", "dmap.containercount", INTEGER),
     DMAP_MEDS("meds", INTEGER),
 

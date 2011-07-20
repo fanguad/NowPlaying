@@ -10,14 +10,11 @@
  */
 package org.nekocode.nowplaying.components;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.RenderingHints.Key;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.util.Collections;
@@ -59,7 +56,11 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
 	/**
 	 * Number of pixels of the border that were filled in as of the last update.
 	 */
-	private int lastFilledLength;
+	private double lastFilledLength;
+    /**
+     * Number of pixels of the border that are currently filled in.
+     */
+	private double currentFilledLength;
 
 	private BufferedImage corner;
     private BufferedImage partial;
@@ -80,10 +81,6 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
 	private int topHalf;
 
 	// clip regions, so we don't have to unnecessarily draw stuff
-	private Rectangle clipTop;
-	private Rectangle clipRight;
-	private Rectangle clipLeft;
-	private Rectangle clipBottom;
 	private Rectangle clipAll;
     private Rectangle clipNE;
     private Rectangle clipSE;
@@ -162,10 +159,6 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
 		sectionLengths[8] = perimeter; // do I need this one?
 
 		clipAll = new Rectangle(0, 0, width, height);
-		clipTop = new Rectangle(cornerRadius, 0, bottom, borderSize);
-		clipRight = new Rectangle(width- borderSize, cornerRadius, borderSize, side);
-		clipLeft = new Rectangle(0, cornerRadius, borderSize, side);
-		clipBottom = new Rectangle(cornerRadius, height- borderSize, bottom, borderSize);
 
         clipNE = new Rectangle(width- cornerRadius, 0, cornerRadius, cornerRadius);
         clipSE = new Rectangle(width- cornerRadius, height- cornerRadius, cornerRadius, cornerRadius);
@@ -181,27 +174,27 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
             g.drawImage(corner, cornerRadius, 0, null);
 			break;
 		case 6:
-			g.fillRect(0, cornerRadius, borderSize, side);
+			g.fill(new Rectangle2D.Double(0, cornerRadius, borderSize, side));
 			break;
 		case 5:
             g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(180), cornerRadius, height - cornerRadius));
             g.drawImage(corner, cornerRadius, height - cornerDiameter, null);
 			break;
 		case 4:
-			g.fillRect(cornerRadius, height - borderSize, bottom, borderSize);
+            g.fill(new Rectangle2D.Double(cornerRadius, height - borderSize, bottom, borderSize));
 			break;
 		case 3:
             g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(90), width - cornerRadius, height - cornerRadius));
             g.drawImage(corner, width - cornerRadius, height - cornerDiameter, null);
 			break;
 		case 2:
-			g.fillRect(width - borderSize, cornerRadius, borderSize, side);
+            g.fill(new Rectangle2D.Double(width - borderSize, cornerRadius, borderSize, side));
 			break;
 		case 1:
             g.drawImage(corner, width - cornerRadius, 0, null);
 			break;
 		case 0:
-			g.fillRect(width / 2, 0, topHalf, borderSize);
+            g.fill(new Rectangle2D.Double(width / 2, 0, topHalf, borderSize));
 			break;
 		}
         g.setTransform(originalTransform);
@@ -212,21 +205,22 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
      * @param degrees # of degrees to show (max = 90)
      * @return image to display
      */
-    private Image getPartialCorner(int degrees) {
+    private Image getPartialCorner(double degrees) {
         Graphics2D g = (Graphics2D) partial.getGraphics();
         g.setBackground(new Color(0, 0, 0, 0));
         g.clearRect(0, 0, cornerRadius, cornerRadius);
         g.setRenderingHints(RENDERING_HINTS);
         final int buffer = 5; // need to draw this arc bigger than the arc in corner so nothing gets clipped
-        g.fillArc(-cornerRadius - buffer, -buffer, cornerDiameter+buffer*2, cornerDiameter+buffer*2, 90, degrees);
+        g.fill(new Arc2D.Double(-cornerRadius - buffer, -buffer,
+                cornerDiameter + buffer * 2, cornerDiameter + buffer * 2, 90, degrees, Arc2D.PIE));
         g.setComposite(AlphaComposite.SrcIn);
         g.drawImage(corner, 0, 0, null);
         g.dispose();
         return partial;
     }
 
-	private void drawTrackProgress(Graphics g2) {
-		int filledLength = lastFilledLength;
+    private void drawTrackProgress(Graphics g2) {
+		double filledLength = currentFilledLength;
 
 		Graphics2D g = (Graphics2D) g2;
         g.setRenderingHints(RENDERING_HINTS);
@@ -246,51 +240,58 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
             // of pixels filled of the current section
             filledLength -= sectionLengths[i-1];
         }
-        int degrees = (int) (filledLength / cornerLength * -90);
+        double degrees = (int) (filledLength / cornerLength * -90);
         AffineTransform originalTransform = g.getTransform();
-		switch (i) {
+
+        switch (i) {
 		case 8:
-			g.fillRect(cornerRadius, 0, filledLength, borderSize);
+			g.fill(new Rectangle2D.Double(cornerRadius, 0, filledLength, borderSize));
 			break;
 		case 7:
-            g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(270), cornerRadius, cornerRadius));
-            g.drawImage(getPartialCorner(degrees), cornerRadius, 0, null);
+            g.setTransform(createCornerTransform(270, cornerRadius, cornerRadius, cornerRadius, 0));
+            g.drawImage(getPartialCorner(degrees), 0, 0, null);
             break;
 		case 6:
 			// starts at bottom, so fillRect parameters need to be switched around
-			g.fillRect(0, cornerRadius + side - filledLength, borderSize, filledLength);
+			g.fill(new Rectangle2D.Double(0, cornerRadius + side - filledLength, borderSize, filledLength));
 			break;
 		case 5:
-            g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(180), cornerRadius, height - cornerRadius));
-            g.drawImage(getPartialCorner(degrees), cornerRadius, height - cornerDiameter, null);
+            g.setTransform(createCornerTransform(180, cornerRadius, height - cornerRadius, cornerRadius, height - cornerDiameter));
+            g.drawImage(getPartialCorner(degrees), 0, 0, null);
 			break;
 		case 4:
 			// starts at right, so fillRect parameters need to be switched around
-			g.fillRect(cornerRadius + bottom - filledLength,
-					height - borderSize, filledLength, borderSize);
+			g.fill(new Rectangle2D.Double(cornerRadius + bottom - filledLength,
+                    height - borderSize, filledLength, borderSize));
 			break;
 		case 3:
-            g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(90), width - cornerRadius, height - cornerRadius));
-            g.drawImage(getPartialCorner(degrees), width - cornerRadius, height - cornerDiameter, null);
+            g.setTransform(createCornerTransform(90, width - cornerRadius, height - cornerRadius, width - cornerRadius, height - cornerDiameter));
+            g.drawImage(getPartialCorner(degrees), 0, 0, null);
 			break;
 		case 2:
-			g.fillRect(width - borderSize, cornerRadius, borderSize, filledLength);
+			g.fill(new Rectangle2D.Double(width - borderSize, cornerRadius, borderSize, filledLength));
 			break;
 		case 1:
-            g.drawImage(getPartialCorner(degrees), width - cornerRadius, 0, null);
+            g.setTransform(createCornerTransform(0, 0, 0, width - cornerRadius, 0));
+            g.drawImage(getPartialCorner(degrees), 0, 0, null);
 			break;
 		case 0:
-			g.fillRect(width / 2, 0, filledLength, borderSize);
+			g.fill(new Rectangle2D.Double(width / 2, 0, filledLength, borderSize));
 			break;
 		}
         g.setTransform(originalTransform);
-
-		g.dispose();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nekocode.nowplaying.events.TrackChangeListener#trackChanged(org.nekocode.nowplaying.events.TrackChangeEvent)
-	 */
+    private AffineTransform createCornerTransform(int rotateAngle, int anchorX, int anchorY, int tx, int ty) {
+        AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(rotateAngle), anchorX, anchorY);
+        AffineTransform translate = AffineTransform.getTranslateInstance(tx, ty);
+        rotate.concatenate(translate);
+        return rotate;
+    }
+
+    /* (non-Javadoc)
+      * @see org.nekocode.nowplaying.events.TrackChangeListener#trackChanged(org.nekocode.nowplaying.events.TrackChangeEvent)
+      */
 	@Override
 	public void trackChanged(TrackChangeEvent e) {
         dirtySong = true;
@@ -305,18 +306,15 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
 	public void setTrackProgress(double percent) {
 		log.debug("track progress: " + percent);
 
-		int filledLength = (int) (percent * perimeter);
-		if (lastFilledLength > filledLength) {
+		double filledLength = percent * perimeter;
+		if (currentFilledLength > filledLength) {
 			dirtySong = true;
 
             firePropertyChange(DIRTY_SONG, false, true);
 		}
-		if (lastFilledLength < filledLength) {
-            int i = 0; // which side the last update was in
-            for (; i < sectionLengths.length && sectionLengths[i] < lastFilledLength; i++);
-            int lastSide = i;
-            for (; i < sectionLengths.length && sectionLengths[i] < filledLength; i++);
-            int currentSide = i;
+		if (currentFilledLength < filledLength) {
+            int lastSide = getSection(currentFilledLength);
+            int currentSide = getSection(filledLength);
 
             if (currentSide > (lastSide + 1)) {
                 // this update was more than a single side, probably the track position jumped:
@@ -328,7 +326,8 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
             }
 		}
 
-		lastFilledLength = filledLength;
+        lastFilledLength = currentFilledLength;
+		currentFilledLength = filledLength;
 	}
 
     @Override
@@ -346,19 +345,37 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
      * @return clip region for current update
      */
 	public Rectangle getClip() {
-		int i = 0;
-		for (; i < sectionLengths.length && sectionLengths[i] < lastFilledLength; i++);
+        int i = getSection(currentFilledLength);
 
-		switch (i) {
+        int sectionCurrentFill = (int) Math.ceil(currentFilledLength);
+        int sectionLastFill = (int) Math.floor(lastFilledLength);
+        if (i > 0) {
+            // change filledLength from the total # of pixels filled into the number
+            // of pixels filled of the current section
+            sectionCurrentFill -= sectionLengths[i-1];
+            sectionLastFill -= sectionLengths[i-1];
+        }
+
+        // TODO special case for when currentFilledLength and lastFilledLength aren't on the same section of the border
+        if (sectionLastFill < 0) {
+            System.out.println("need to do a special update");
+        }
+
+        // TODO small clip bounds for corners
+
+        // +2 on the end for 1 pixel overage on each side
+        int changeSize = sectionCurrentFill - sectionLastFill + 2;
+        switch (i) {
 		case 0:
+            return new Rectangle(width / 2 + sectionLastFill - 1, 0, changeSize, borderSize);
 		case 8:
-			return clipTop;
+            return new Rectangle(cornerRadius + sectionLastFill - 1, 0, changeSize, borderSize);
 		case 2:
-			return clipRight;
+            return new Rectangle(width- borderSize, cornerRadius + sectionLastFill - 1, borderSize, changeSize);
 		case 4:
-			return clipBottom;
+			return new Rectangle(width - cornerRadius - sectionCurrentFill - 1, height- borderSize, changeSize, borderSize );
 		case 6:
-			return clipLeft;
+            return new Rectangle(0, height - cornerRadius - sectionCurrentFill - 1, borderSize, changeSize);
 		case 7:
             return clipNW;
 		case 5:
@@ -372,4 +389,27 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
 			return clipAll;
 		}
 	}
+
+    /**
+     * Finds the section of the progress bar that the indicated length (in pixels) from the start is located in.
+     * <ul>
+     *     <li>0: upper bar, right half</li>
+     *     <li>1: upper right corner</li>
+     *     <li>2: right bar</li>
+     *     <li>3: lower right corner</li>
+     *     <li>4: lower bar</li>
+     *     <li>5: lower left corner</li>
+     *     <li>6: left bar</li>
+     *     <li>7: upper left corner</li>
+     *     <li>8: upper bar, left half</li>
+     * </ul>
+     *
+     * @param fillLength length (in pixels) of progress bar location
+     * @return section number of progress bar location
+     */
+    public int getSection(double fillLength) {
+        int i = 0;
+        for (; i < sectionLengths.length && sectionLengths[i] < fillLength; i++);
+        return i;
+    }
 }

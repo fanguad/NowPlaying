@@ -92,8 +92,10 @@ public class TagModel
                 "DELETE FROM track_groups WHERE uuid = ?");
 
         // new or updated tag
-        database.registerPreparedStatement(addTrackTag,
-                "INSERT OR IGNORE INTO track_tags(uuid, tag_id) VALUES (?, ?)");
+        // the basic track tag has a single-file and 
+        String addTrackTagString = "INSERT OR IGNORE INTO track_tags(uuid, tag_id) VALUES (?, ?)";
+        database.registerPreparedStatement(addTrackTag, addTrackTagString);
+        database.registerPreparedStatement(addTrackTagBatch, addTrackTagString);
         database.registerPreparedStatement(updateTagCount,
                 "UPDATE tags SET count = (SELECT COUNT(tag_id) FROM track_tags WHERE tag_id = ?) WHERE tag_id = ?");
         database.registerPreparedStatement(addTag,
@@ -189,7 +191,7 @@ public class TagModel
 			// first, get the tag id from the tags table
 			int tagId = getOrAddTagId(tag, metadata);
 
-            PreparedStatement addTagStmt = database.getPreparedStatement(addTrackTag);
+            PreparedStatement addTagStmt = database.getPreparedStatement(addTrackTagBatch);
 			for (Track track : tracks) {
 				String uuid = getTrackUUID(track);
 				// insert the entry into the track_tags table
@@ -1231,7 +1233,7 @@ public class TagModel
         getTag,
 		getTrackUUIDSelect, getTrackUUIDInsert,
         getTrackIdUUIDSelect,
-		addTag, addTrackTag, removeTag,
+		addTag, addTrackTag, addTrackTagBatch, removeTag,
 		getTagCounts, getMaxTagCount, updateTagCount,
 		getTagId, getDuplicates, getDuplicateId,
 		getMaxDuplicateId, setDuplicate,

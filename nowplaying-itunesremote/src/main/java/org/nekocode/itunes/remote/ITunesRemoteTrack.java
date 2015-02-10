@@ -77,10 +77,11 @@ public class ITunesRemoteTrack implements Track {
         if (response.hasLeaf(DMAP_PERSISTENT_ID)) {
             item = response;
         } else {
-            item = response.getMultiBranch(DAAP_DATABASE_SONGS, DMAP_LIST, DMAP_LIST_ITEM).get(0);
+            ContentCode listType = response.hasLeaf(DAAP_DATABASE_SONGS) ? DAAP_DATABASE_SONGS : DAAP_PLAYLIST_SONGS;
+            item = response.getMultiBranch(listType, DMAP_LIST, DMAP_LIST_ITEM).get(0);
         }
-        persistentId = item.getHexNumber(DMAP_PERSISTENT_ID);
         trackId = item.getInt(DMAP_ITEM_ID);
+        persistentId = item.hasLeaf(DMAP_PERSISTENT_ID) ? item.getHexNumber(DMAP_PERSISTENT_ID) : Integer.toHexString(trackId); // TODO MonkeyTunes doesn't seem to provide this
         title = item.getString(DMAP_ITEM_NAME);
         artist = item.getString(DAAP_SONG_ARTIST);
         album = item.getString(DAAP_SONG_ALBUM);

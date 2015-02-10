@@ -33,7 +33,7 @@ public class ITunesRemoteURLFactory {
 // /databases/%d/items/%d/extra_data/artwork?session-id=%s&mw=%d&mh=%d
 
     private static final String GET_META_DATA = "/databases/%d/items?session-id=%s&meta=%s&type=music&query='dmap.itemid:%d'";
-    private static final String SET_SONG_RATING = "/ctrl-int/1/setproperty?dacp.userrating=%d&song-spec='dmap.itemid:%d'&session-id=%s'";
+    private static final String SET_SONG_RATING = "/ctrl-int/1/setproperty?dacp.userrating=%d&song-spec='dmap.itemid:%d'&session-id=%s";
     private static final String FIND_TRACKS = "/databases/%d/items?session-id=%s&meta=%s&type=music&sort=album&query=(('dmap.itemname:%s')+('daap.songartist:%s')+('daap.songalbum:%s'))";
 
     private static final String FIND_TRACKS_PREFIX = "/databases/%d/items?session-id=%s&meta=%s&type=music&sort=album%s";

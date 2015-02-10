@@ -173,6 +173,16 @@ public class RequestManager {
 
         boolean printResult = false;
         int read = 0;
+
+        if (length < 9) {
+            // there's not enough room left for any subfields - just slurp up the data and toss it
+            // there aren't many, so don't worry about being inefficient
+            for (int i = 0; i < length; i++) {
+                data.readByte();
+            }
+            read += length;
+        }
+
         while (read < length) {
             String name = readString(data, stringBuffer);
             int fieldLength = data.readInt();

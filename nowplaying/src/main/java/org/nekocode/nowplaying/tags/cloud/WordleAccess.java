@@ -13,12 +13,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.text.Normalizer;
 import java.util.Collection;
 
 /**
  * Provides access to Wordle through exposed HTTP APIs.
  *
- * http://www.wordle.net/compose
+ * http://www.wordle.net/advanced
  * POST: wordcounts=word1:80,word2:20
  *
  * @author fanguad
@@ -34,7 +35,11 @@ public final class WordleAccess {
         // create the form data
         StringBuilder sb = new StringBuilder();
         for (TagCloudEntry entry : tags) {
-            sb.append(entry.getTag());
+            // converts characters with diacritics to their closest ascii character
+            String normalized = Normalizer.normalize(entry.getTag(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            // removes all other non-ASCII characters
+            normalized = normalized.replaceAll("[^\\p{ASCII}]+", "");
+            sb.append(normalized);
             sb.append(':');
             sb.append(entry.getCount());
             sb.append(NEWLINE);
@@ -69,10 +74,12 @@ public final class WordleAccess {
 //        out.print("<input name=\"");
         out.print("<textarea rows=\"40\" cols=\"80\"  name=\"");
         out.print(FORM_NAME);
+        out.print("\" id=\"");
+        out.print(FORM_NAME);
         out.print("\"/>");
         out.print(formData);
         out.println("</textarea>");
-        out.println("<input type=\"submit\" value=\"load tag cloud at wordle.net\"/>");
+        out.println("<input type=\"submit\" class=\"submit\" value=\"load tag cloud at wordle.net\"/>");
         out.println("</form> </body>");
         out.close();
 

@@ -66,7 +66,7 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
                 public void run() {
                     // we were unable to connect using a previous GUID, so initiate a new pairing
                     try {
-                        RemoteSession remoteSession = RemoteSession.pairWithITunes(host);
+                        RemoteSession remoteSession = RemoteSession.pairWithITunes();
                         setSession(remoteSession);
                     } catch (IOException e) {
                         log.error("Unable to pair", e);
@@ -90,6 +90,8 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
             playerGUID = session.getPairingGuid();
             log.info("Changing registered GUID to " + playerGUID);
             NowPlayingProperties.loadProperties().setProperty(NowPlayingProperties.MEDIA_PLAYER_GUID.name(), playerGUID);
+            log.info("Changing connected host to " + session.getHost());
+            NowPlayingProperties.loadProperties().setProperty(NowPlayingProperties.REMOTE_MACHINE.name(), session.getHost());
         }
 
         // loads the current track and triggers an update

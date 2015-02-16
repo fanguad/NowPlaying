@@ -38,7 +38,8 @@ public class RemoteSession {
             0x61, 0x74, 0x6f, 0x72, (byte) 0xe2, (byte) 0x80, (byte) 0x99, 0x73, 0x20, 0x69, 0x50, 0x6f, 0x64, 0x63, 0x6d, 0x74, 0x79, 0x00, 0x00, 0x00, 0x04, 0x69, 0x50, 0x6f, 0x64};
 
     private ITunesRemoteURLFactory urlFactory;
-    private String pairingGuid;
+    private final String host;
+    private final String pairingGuid;
     private AtomicLong revision;
     private long databaseId;
 
@@ -50,6 +51,7 @@ public class RemoteSession {
      * @throws IOException if a connection failure happens, including a failure to establish a session id
      */
     public RemoteSession(String host, String pairingGuid) throws IOException {
+        this.host = host;
         this.pairingGuid = pairingGuid;
         revision = new AtomicLong(1);
         urlFactory = new ITunesRemoteURLFactory(host);
@@ -75,6 +77,10 @@ public class RemoteSession {
 
     public String getPairingGuid() {
         return pairingGuid;
+    }
+
+    public String getHost() {
+        return host;
     }
 
     public ITunesRemoteResponse getPlayStatusUpdate() throws IOException {
@@ -132,11 +138,10 @@ public class RemoteSession {
      * <p>
      * This is method is synchronous on user input, so expect it to take a while!
      *
-     * @param host host itunes is running on
      * @return a RemoteSession ready for use
      * @throws java.io.IOException if this class was unable to pair (including errors caused by wrong codes and such)
      */
-    public static RemoteSession pairWithITunes(String host) throws IOException {
+    public static RemoteSession pairWithITunes() throws IOException {
         log.debug("Attempting to pair with iTunes");
 
         Random random = new Random();
@@ -162,6 +167,7 @@ public class RemoteSession {
         // listen for a response
         ServerSocket server = new ServerSocket(LISTEN_PORT);
         Socket socket = server.accept();
+        String host = socket.getInetAddress().getHostName();
 
         // don't actually care about the response for now: rules for interpreting the hash are online somewhere
 

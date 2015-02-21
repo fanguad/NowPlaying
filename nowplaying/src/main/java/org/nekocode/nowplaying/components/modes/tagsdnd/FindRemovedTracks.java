@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.divxdede.swing.busy.BusyModel;
 import org.divxdede.swing.busy.JBusyComponent;
 import org.divxdede.swing.busy.ui.BasicBusyLayerUI;
@@ -22,8 +23,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,7 +39,7 @@ import java.util.concurrent.Executors;
  * @author fanguad
  */
 public class FindRemovedTracks extends JBusyComponent<JPanel> {
-    private static final Logger log = Logger.getLogger(FindRemovedTracks.class);
+    private static final Logger log = LogManager.getLogger(FindRemovedTracks.class);
 
     private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
     
@@ -85,20 +84,10 @@ public class FindRemovedTracks extends JBusyComponent<JPanel> {
         view.add(scrollpane, BorderLayout.CENTER);
 
         final Runnable findUnusedTags = new FindRemovedTracksAction();
-        search.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(findUnusedTags);
-            }
-        });
+        search.addActionListener(e -> workerThread.execute(findUnusedTags));
 
         final Runnable deleteTracks = new PurgeTracksAction();
-        delete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(deleteTracks);
-            }
-        });
+        delete.addActionListener(e -> workerThread.execute(deleteTracks));
     }
 
     private class FindRemovedTracksAction implements Runnable {
@@ -128,7 +117,7 @@ public class FindRemovedTracks extends JBusyComponent<JPanel> {
             }
 */
 
-            Map<String, List<TagCloudEntry>> tags = tagModel.getTagsById(difference);
+            Map<String, List<TagCloudEntry>> tags = tagModel.getTagsById(difference, false);
 
             Object[][] dataVector = new Object[tags.size()][];
             int i = 0;

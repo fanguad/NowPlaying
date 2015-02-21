@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.tags;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.NowPlayingProperties;
 import org.nekocode.nowplaying.events.TagChangeListener;
 import org.nekocode.nowplaying.internals.DaemonThreadFactory;
@@ -37,6 +38,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.nekocode.nowplaying.tags.TagModel.StatementName.*;
@@ -54,13 +56,13 @@ import static org.nekocode.nowplaying.tags.TagModel.StatementName.*;
  */
 public class TagModel
 {
-	private static final Logger log = Logger.getLogger(TagModel.class);
+	private static final Logger log = LogManager.getLogger(TagModel.class);
 	private final Set<TagChangeListener> tagChangeListeners;
 	private final Executor tagChangeExecutor;
     private final ExecutorService dbAccess;
     private TagDatabase database;
 
-    public TagModel() throws ClassNotFoundException, SQLException, IOException {
+    public TagModel() throws Exception {
         tagChangeListeners = new CopyOnWriteArraySet<>();
         tagChangeExecutor = Executors.newSingleThreadExecutor(new DaemonThreadFactory());
         dbAccess = Executors.newSingleThreadExecutor();
@@ -295,7 +297,7 @@ public class TagModel
 		return ret;
 	}
 
-	private List<TagCloudEntry> __getTags(String uuid) {
+	private List<TagCloudEntry> __getTags(String uuid, boolean includeGroups) {
 		List<TagCloudEntry> ret = new ArrayList<>();
 		if (uuid == null) {
 			return ret;
@@ -310,10 +312,10 @@ public class TagModel
 				allEntries.addAll(getTags(duplicateUUID));
 			}
 
-			Collection<String> groups = __getGroups(uuid);
-			for (String group : groups) {
-				allEntries.add(new TagCloudGroup(group));
-			}
+            if (includeGroups) {
+                Collection<String> groups = __getGroups(uuid);
+                allEntries.addAll(groups.stream().map(TagCloudGroup::new).collect(Collectors.toList()));
+            }
 
 			ret.addAll(allEntries);
 		} catch (SQLException e) {
@@ -328,7 +330,7 @@ public class TagModel
      * @param tracks tracks to get tags for
      * @return map of tracks to tags
      */
-    private Map<Track, List<TagCloudEntry>> __getTags(Collection<Track> tracks) {
+    private Map<Track, List<TagCloudEntry>> __getTags(Collection<Track> tracks, boolean includeGroups) {
         Map<Track, List<TagCloudEntry>> ret = new HashMap<>();
         if (tracks == null || tracks.isEmpty())
             return ret;
@@ -336,7 +338,7 @@ public class TagModel
         for (Track track : tracks) {
             try {
                 String uuid = getTrackUUID(track);
-                ret.put(track, __getTags(uuid));
+                ret.put(track, __getTags(uuid, includeGroups));
             } catch (SQLException e) {
                 log.error("SQLException", e);
             }
@@ -350,7 +352,7 @@ public class TagModel
      * @param tracks track ids to get tags for
      * @return map of track ids to tags
      */
-    private Map<String, List<TagCloudEntry>> __getTagsById(Collection<String> tracks) {
+    private Map<String, List<TagCloudEntry>> __getTagsById(Collection<String> tracks, boolean includeGroups) {
         Map<String, List<TagCloudEntry>> ret = new HashMap<>();
         if (tracks == null || tracks.isEmpty())
             return ret;
@@ -358,7 +360,7 @@ public class TagModel
         for (String trackId : tracks) {
             try {
                 String uuid = getUUIDFromTrackId(trackId);
-                ret.put(trackId, __getTags(uuid));
+                ret.put(trackId, __getTags(uuid, includeGroups));
             } catch (SQLException e) {
                 log.error("SQLException", e);
             }
@@ -456,9 +458,7 @@ public class TagModel
 			}
 			log.debug(format("added %s tracks to duplicate group", uuids.size()));
 
-            for (Track track : tracks) {
-                fireTagsChangedEvent(track);
-            }
+			tracks.forEach(this::fireTagsChangedEvent);
 
 			return true;
 		} catch (SQLException e) {
@@ -634,10 +634,6 @@ public class TagModel
 
 	/**
 	 * Returns all tags for a given uuid.
-	 *
-	 * @param uuid
-	 * @return
-	 * @throws SQLException
 	 */
 	private List<TagCloudEntry> getTags(String uuid) throws SQLException {
 		List<TagCloudEntry> ret = new ArrayList<>();
@@ -663,9 +659,6 @@ public class TagModel
 
 	/**
 	 * Adds value to cache, preventing size from growing too large
-	 *
-	 * @param location
-	 * @param uuid
 	 */
 	private void addToCache(String location, String uuid) {
 		uuidCache.put(location, uuid);
@@ -681,10 +674,6 @@ public class TagModel
 	/**
 	 * Retrieves the UUID for the specified track, or creates a new one if it
 	 * does not yet exist in the database.
-	 *
-	 * @param track
-	 * @return
-	 * @throws SQLException
 	 */
 	private String getTrackUUID(Track track) throws SQLException {
         if (track == null) {
@@ -760,9 +749,6 @@ public class TagModel
                 log.warn("error getting track location", e);
                 return null;
             }
-            if (location == null) {
-                return null;
-            }
             // first, try to load the uuid from the MRU cache
             uuid = uuidCache.get(location);
 
@@ -804,12 +790,9 @@ public class TagModel
      * @param tag new tag
 	 */
 	protected void fireTagAddedEvent(final Track track, final String tag) {
-		tagChangeExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (TagChangeListener l : tagChangeListeners) {
-                    l.tagAdded(track, tag);
-                }
+		tagChangeExecutor.execute(() -> {
+            for (TagChangeListener l : tagChangeListeners) {
+                l.tagAdded(track, tag);
             }
         });
 	}
@@ -822,12 +805,9 @@ public class TagModel
      * @param tag removed tag
 	 */
 	protected void fireTagRemovedEvent(final Track track, final String tag) {
-		tagChangeExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (TagChangeListener l : tagChangeListeners) {
-                    l.tagRemoved(track, tag);
-                }
+		tagChangeExecutor.execute(() -> {
+            for (TagChangeListener l : tagChangeListeners) {
+                l.tagRemoved(track, tag);
             }
         });
 	}
@@ -839,75 +819,44 @@ public class TagModel
      * @param track track whose tags changed
      */
     protected void fireTagsChangedEvent(final Track track) {
-        tagChangeExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                for (TagChangeListener l : tagChangeListeners) {
-                    l.tagsChanged(track);
-                }
-            }});
+        tagChangeExecutor.execute(() -> {
+            for (TagChangeListener l : tagChangeListeners) {
+                l.tagsChanged(track);
+            }
+        });
     }
 
 	/**
 	 * Adds the <code>tag</code> (and metadata) to <code>track</code>.
-	 *
-	 * @param track
-	 * @param tag
-	 * @param metadata
 	 */
 	public void addTag(final Track track, final String tag, final String metadata) {
-		dbAccess.execute(new Runnable() {
-			@Override
-			public void run() {
-				__addTag(track, tag, metadata);
-			}});
+		dbAccess.execute(() -> __addTag(track, tag, metadata));
 	}
 
 	/**
 	 * Adds the <code>tag</code> (and metadata) to each track in <code>tracks</code>.
-	 *
-	 * @param tracks
-	 * @param tag
-	 * @param metadata
 	 */
 	public void addTag(final Collection<Track> tracks, final String tag, final String metadata) {
-		dbAccess.execute(new Runnable() {
-			@Override
-			public void run() {
-				__addTag(tracks, tag, metadata);
-			}});
+		dbAccess.execute(() -> __addTag(tracks, tag, metadata));
 	}
 
     /**
      * Adds the <code>tag</code> (and metadata) to each track in <code>tracks</code>.
      * <p>
      * This method does not return until all the tags have been added.
-     *
-     * @param tracks
-     * @param tag
-     * @param metadata
      */
     public void addTagAndWait(final Collection<Track> tracks, final String tag, final String metadata) throws ExecutionException, InterruptedException {
-        dbAccess.submit(new Runnable() {
-            @Override
-            public void run() {
-                __addTag(tracks, tag, metadata);
-            }}).get();
+        dbAccess.submit(() -> __addTag(tracks, tag, metadata)).get();
     }
 
 	/**
 	 * Returns all tags in the database that have at least the minimum number of entries.
 	 *
 	 * @param minimum limiting parameter to ignore tags that appear very infrequently.
-	 * @return
 	 */
 	public Collection<TagCloudEntry> getAllTags(final int minimum) {
-		Callable<Collection<TagCloudEntry>> getTags = new Callable<Collection<TagCloudEntry>>() {
-			@Override
-			public Collection<TagCloudEntry> call() throws Exception {
-				return __getAllTags(minimum);
-			}};
-		Collection<TagCloudEntry> tags = new ArrayList<TagCloudEntry>();
+		Callable<Collection<TagCloudEntry>> getTags = () -> __getAllTags(minimum);
+		Collection<TagCloudEntry> tags = new ArrayList<>();
 
 		try {
 			tags = dbAccess.submit(getTags).get();
@@ -924,11 +873,7 @@ public class TagModel
 	 */
 	public int getMaxTagCount() {
 
-		Callable<Integer> getTags = new Callable<Integer>() {
-			@Override
-			public Integer call() throws Exception {
-				return __getMaxTagCount();
-			}};
+		Callable<Integer> getTags = this::__getMaxTagCount;
 		int max = 0;
 
 		try {
@@ -941,17 +886,12 @@ public class TagModel
 
 	/**
 	 * Returns the tag entries for the input track.
-	 *
-	 * @param track
-	 * @return
 	 */
-	public List<TagCloudEntry> getTags(final Track track) {
-		Callable<List<TagCloudEntry>> getTags = new Callable<List<TagCloudEntry>>() {
-			@Override
-			public List<TagCloudEntry> call() throws Exception {
-                String uuid = getTrackUUID(track);
-				return __getTags(uuid);
-			}};
+	public List<TagCloudEntry> getTags(final Track track, boolean includeGroups) {
+		Callable<List<TagCloudEntry>> getTags = () -> {
+			String uuid = getTrackUUID(track);
+            return __getTags(uuid, includeGroups);
+        };
 		List<TagCloudEntry> tags = new ArrayList<>();
 
 		try {
@@ -968,12 +908,8 @@ public class TagModel
      * @param tracks a collection of tracks to retrieve tags for
      * @return all tags found for the selected tracks
      */
-    public Map<Track, List<TagCloudEntry>> getTags(final Collection<Track> tracks) {
-        Callable<Map<Track, List<TagCloudEntry>>> getTags = new Callable<Map<Track, List<TagCloudEntry>>>() {
-            @Override
-            public Map<Track, List<TagCloudEntry>> call() throws Exception {
-                return __getTags(tracks);
-            }};
+    public Map<Track, List<TagCloudEntry>> getTags(final Collection<Track> tracks, boolean includeGroups) {
+        Callable<Map<Track, List<TagCloudEntry>>> getTags = () -> __getTags(tracks, includeGroups);
         Map<Track, List<TagCloudEntry>> tags = new HashMap<>();
 
         try {
@@ -990,12 +926,8 @@ public class TagModel
      * @param tracks a collection of tracks to retrieve tags for
      * @return all tags found for the selected tracks
      */
-    public Map<String, List<TagCloudEntry>> getTagsById(final Collection<String> tracks) {
-        Callable<Map<String, List<TagCloudEntry>>> getTags = new Callable<Map<String, List<TagCloudEntry>>>() {
-            @Override
-            public Map<String, List<TagCloudEntry>> call() throws Exception {
-                return __getTagsById(tracks);
-            }};
+    public Map<String, List<TagCloudEntry>> getTagsById(final Collection<String> tracks, boolean includeGroups) {
+        Callable<Map<String, List<TagCloudEntry>>> getTags = () -> __getTagsById(tracks, includeGroups);
         Map<String, List<TagCloudEntry>> tags = new HashMap<>();
 
         try {
@@ -1008,34 +940,19 @@ public class TagModel
 
 	/**
 	 * Removes the specified tag from <code>track</code>.
-	 *
-	 * @param track
-	 * @param tag
 	 */
 	public void removeTag(final Track track, final String tag) {
-		dbAccess.execute(new Runnable() {
-            @Override
-            public void run() {
-                __removeTag(track, tag);
-            }
-        });
+		dbAccess.execute(() -> __removeTag(track, tag));
 	}
 
     /**
      * Removes the specified tag from all <code>tracks</code>
      * and does not return until the operation is complete.
-     *
-     * @param tracks
-     * @param tag
      * @throws InterruptedException if an exception occurs executing this command
      * @throws java.util.concurrent.ExecutionException if an exception occurs executing this command
      */
     public void removeTagsAndWait(final Collection<Track> tracks, final String tag) throws ExecutionException, InterruptedException {
-        dbAccess.submit(new Runnable() {
-            @Override
-            public void run() {
-                __removeTag(tracks, tag);
-            }}).get();
+        dbAccess.submit(() -> __removeTag(tracks, tag)).get();
     }
 
 	/**
@@ -1047,11 +964,7 @@ public class TagModel
 	 */
 	public boolean setDuplicates(final Collection<Track> tracks) {
 		try {
-			return dbAccess.submit(new Callable<Boolean>() {
-				@Override
-				public Boolean call() throws Exception {
-					return __setDuplicateTracks(tracks);
-				}}).get();
+			return dbAccess.submit(() -> __setDuplicateTracks(tracks)).get();
 		} catch (InterruptedException | ExecutionException e) {
 			log.error("Cannot set duplicates: " + tracks, e);
 			return false;
@@ -1062,17 +975,11 @@ public class TagModel
 	 * Places all the tracks in a group with the given name.  Returns true
 	 * if this was successful.  It will fail if the name is not unique.
 	 *
-	 * @param name
-	 * @param tracks
 	 * @return true if operation succeeded
 	 */
 	public boolean setGroup(final String name, final Collection<Track> tracks) {
 		try {
-			return dbAccess.submit(new Callable<Boolean>() {
-				@Override
-				public Boolean call() throws Exception {
-					return __setGroup(name, tracks);
-				}}).get();
+			return dbAccess.submit(() -> __setGroup(name, tracks)).get();
 		} catch (InterruptedException | ExecutionException e) {
 			log.error("Cannot set group: " + tracks, e);
 			return false;
@@ -1082,17 +989,14 @@ public class TagModel
 	/**
 	 * Returns all the groups that the specified track belongs to.
 	 *
-	 * @param track
 	 * @return group names this track belongs to
 	 */
 	public Collection<String> getGroups(final Track track) {
 		try {
-			return dbAccess.submit(new Callable<Collection<String>>() {
-				@Override
-				public Collection<String> call() throws Exception {
-                    String uuid = getTrackUUID(track);
-					return __getGroups(uuid);
-				}}).get();
+			return dbAccess.submit(() -> {
+				String uuid = getTrackUUID(track);
+                return __getGroups(uuid);
+            }).get();
 		} catch (InterruptedException | ExecutionException e) {
 			log.error("Cannot get groups: " + track, e);
 		}
@@ -1107,11 +1011,7 @@ public class TagModel
      */
     public void deleteTags(final List<String> tagsToDelete) {
         try {
-            dbAccess.submit(new Runnable() {
-                @Override
-                public void run() {
-                    __deleteTags(tagsToDelete);
-                }}).get();
+            dbAccess.submit(() -> __deleteTags(tagsToDelete)).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error deleting tags", e);
         }
@@ -1125,66 +1025,64 @@ public class TagModel
      */
     public void deleteTracks(final List<String> tracksToDelete) {
         try {
-            dbAccess.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        database.beginTransaction();
+            dbAccess.submit(() -> {
+                try {
+                    database.beginTransaction();
 
-                        Set<Integer> affectedTags = new HashSet<>();
-                        PreparedStatement deleteTrackTagsStmt = database.getPreparedStatement(deleteTrackTags);
-                        PreparedStatement deleteTrackIdToUuidStmt = database.getPreparedStatement(deleteTrackIdToUUID);
-                        PreparedStatement deleteDuplicateStmt = database.getPreparedStatement(deleteTrackFromDuplicates);
-                        PreparedStatement deleteGroupStmt = database.getPreparedStatement(deleteTrackFromGroups);
+                    Set<Integer> affectedTags = new HashSet<>();
+                    PreparedStatement deleteTrackTagsStmt = database.getPreparedStatement(deleteTrackTags);
+                    PreparedStatement deleteTrackIdToUuidStmt = database.getPreparedStatement(deleteTrackIdToUUID);
+                    PreparedStatement deleteDuplicateStmt = database.getPreparedStatement(deleteTrackFromDuplicates);
+                    PreparedStatement deleteGroupStmt = database.getPreparedStatement(deleteTrackFromGroups);
 
-                        PreparedStatement getTagIds = database.getPreparedStatement(getTagIdsForTrack);
+                    PreparedStatement getTagIds = database.getPreparedStatement(getTagIdsForTrack);
 
-                        for (String trackId : tracksToDelete) {
-                            String uuid = getUUIDFromTrackId(trackId);
-                            // delete from track_tags
-                            deleteTrackTagsStmt.setString(1, uuid);
-                            deleteTrackTagsStmt.addBatch();
-                            // delete from track_id_to_guid
-                            deleteTrackIdToUuidStmt.setString(1, uuid);
-                            deleteTrackIdToUuidStmt.addBatch();
-                            // delete from track_duplicates
-                            deleteDuplicateStmt.setString(1, uuid);
-                            deleteDuplicateStmt.addBatch();
-                            // delete from track_groups
-                            deleteGroupStmt.setString(1, uuid);
-                            deleteGroupStmt.addBatch();
+                    for (String trackId : tracksToDelete) {
+                        String uuid = getUUIDFromTrackId(trackId);
+                        // delete from track_tags
+                        deleteTrackTagsStmt.setString(1, uuid);
+                        deleteTrackTagsStmt.addBatch();
+                        // delete from track_id_to_guid
+                        deleteTrackIdToUuidStmt.setString(1, uuid);
+                        deleteTrackIdToUuidStmt.addBatch();
+                        // delete from track_duplicates
+                        deleteDuplicateStmt.setString(1, uuid);
+                        deleteDuplicateStmt.addBatch();
+                        // delete from track_groups
+                        deleteGroupStmt.setString(1, uuid);
+                        deleteGroupStmt.addBatch();
 
-                            // find tags this track used to have
-                            getTagIds.setString(1, uuid);
-                            ResultSet rs = getTagIds.executeQuery();
-                            while (rs.next()) {
-                                affectedTags.add(rs.getInt("tag_id"));
-                            }
-                            rs.close();
+                        // find tags this track used to have
+                        getTagIds.setString(1, uuid);
+                        ResultSet rs = getTagIds.executeQuery();
+                        while (rs.next()) {
+                            affectedTags.add(rs.getInt("tag_id"));
                         }
-
-                        deleteTrackTagsStmt.executeBatch();
-
-                        deleteTrackIdToUuidStmt.executeBatch();
-
-                        deleteDuplicateStmt.executeBatch();
-
-                        deleteGroupStmt.executeBatch();
-
-                        PreparedStatement updateTagCountStmt = database.getPreparedStatement(updateTagCount);
-                        for (int tag_id : affectedTags) {
-                            updateTagCountStmt.setInt(1, tag_id);
-                            updateTagCountStmt.addBatch();
-                        }
-                        updateTagCountStmt.executeBatch();
-
-                        // commit all this work
-                        database.endTransaction();
-
-                    } catch (SQLException e) {
-                        log.error("Error deleting tracks", e);
+                        rs.close();
                     }
-                }}).get();
+
+                    deleteTrackTagsStmt.executeBatch();
+
+                    deleteTrackIdToUuidStmt.executeBatch();
+
+                    deleteDuplicateStmt.executeBatch();
+
+                    deleteGroupStmt.executeBatch();
+
+                    PreparedStatement updateTagCountStmt = database.getPreparedStatement(updateTagCount);
+                    for (int tag_id : affectedTags) {
+                        updateTagCountStmt.setInt(1, tag_id);
+                        updateTagCountStmt.addBatch();
+                    }
+                    updateTagCountStmt.executeBatch();
+
+                    // commit all this work
+                    database.endTransaction();
+
+                } catch (SQLException e) {
+                    log.error("Error deleting tracks", e);
+                }
+            }).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error deleting tracks", e);
         }
@@ -1192,22 +1090,18 @@ public class TagModel
 
     /**
      * Returns all track ids for which there are tags in the system.
-     *
-     * @return
      */
     public List<String> getAllTrackIds() {
-        Callable<List<String>> getTags = new Callable<List<String>>() {
-            @Override
-            public List<String> call() throws Exception {
-                PreparedStatement stmt = database.getPreparedStatement(getAllTrackIds);
-                ResultSet rs = stmt.executeQuery();
-                ArrayList<String> ret = new ArrayList<>();
-                while (rs.next()) {
-                    ret.add(rs.getString("track_id"));
-                }
-                rs.close();
-                return ret;
-            }};
+        Callable<List<String>> getTags = () -> {
+            PreparedStatement stmt = database.getPreparedStatement(getAllTrackIds);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<String> ret = new ArrayList<>();
+            while (rs.next()) {
+                ret.add(rs.getString("track_id"));
+            }
+            rs.close();
+            return ret;
+        };
         List<String> tags = new ArrayList<>();
 
         try {
@@ -1222,11 +1116,7 @@ public class TagModel
 	 * Shuts down the database connection cleanly.
 	 */
 	public void shutdown() {
-		dbAccess.execute(new Runnable() {
-			@Override
-			public void run() {
-				__shutdown();
-			}});
+		dbAccess.execute(this::__shutdown);
 	}
 
     static enum StatementName {

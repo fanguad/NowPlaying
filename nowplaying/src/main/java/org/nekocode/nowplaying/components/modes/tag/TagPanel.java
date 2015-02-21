@@ -11,7 +11,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.NowPlayingView;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
@@ -27,7 +28,7 @@ import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
  */
 public class TagPanel extends NowPlayingControl {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NowPlayingView.class);
+	private static final Logger log = LogManager.getLogger(NowPlayingView.class);
 	private final static EnumSet<ChangeType> shouldUpdate = EnumSet.of(
 			ChangeType.CURRENT_SONG_CHANGE, ChangeType.TAG_CHANGE, ChangeType.FILE_CHANGE);
 
@@ -53,7 +54,7 @@ public class TagPanel extends NowPlayingControl {
 			tagView.setLoadingTags();
             List<TagCloudEntry> tags = Collections.emptyList();
             try {
-                tags = tagModel.getTags(trackChange.getTrack());
+                tags = tagModel.getTags(trackChange.getTrack(), true);
             } finally {
                 tagView.setTags(trackChange.getTrack(), tags);
             }

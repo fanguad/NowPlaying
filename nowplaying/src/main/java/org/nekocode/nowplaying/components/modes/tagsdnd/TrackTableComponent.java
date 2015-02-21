@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.divxdede.swing.busy.BusyModel;
 import org.divxdede.swing.busy.JBusyComponent;
 import org.divxdede.swing.busy.ui.BasicBusyLayerUI;
@@ -48,12 +49,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import static java.lang.String.format;
 
 /**
  * A table of tracks.  This component already has quite a bit of customized behavior, reducing
@@ -67,19 +68,19 @@ import java.util.concurrent.Executors;
  * </ul>
  */
 public class TrackTableComponent extends JPanel {
-    private static final Logger log = Logger.getLogger(TrackTableComponent.class);
+    private static final Logger log = LogManager.getLogger(TrackTableComponent.class);
 
-    private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
-    private MediaPlayer mediaPlayer;
-    private TrackTableModel dataModel;
-    private BusyModel busyModel;
+    private final Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
+    private final MediaPlayer mediaPlayer;
+    private final TrackTableModel dataModel;
+    private final BusyModel busyModel;
 
-    private JScrollPane scrollpane;
-    private Border defaultBorder;
-    private Border highlightBorder;
-    private TagModel tagModel;
-    private TrackTable trackTable;
-    private Collection<ChangeListener> changeListeners;
+    private final JScrollPane scrollpane;
+    private final Border defaultBorder;
+    private final Border highlightBorder;
+    private final TagModel tagModel;
+    private final TrackTable trackTable;
+    private final Collection<ChangeListener> changeListeners;
 
     /**
      * Constructor.
@@ -92,7 +93,7 @@ public class TrackTableComponent extends JPanel {
 
         this.mediaPlayer = mediaPlayer;
         this.tagModel = tagModel;
-        changeListeners = new HashSet<ChangeListener>();
+        changeListeners = new HashSet<>();
         dataModel = new TrackTableModel(tagModel);
         tagModel.addTagChangeListener(dataModel);
         trackTable = new TrackTable(dataModel);
@@ -105,7 +106,7 @@ public class TrackTableComponent extends JPanel {
         setBorder(false);
 
         BusyLayerUI busyLayerUI = new BasicBusyLayerUI(0, 0.85f, Color.WHITE);
-        JBusyComponent<JComponent> busyComponent = new JBusyComponent<JComponent>(scrollpane, busyLayerUI);
+        JBusyComponent<JComponent> busyComponent = new JBusyComponent<>(scrollpane, busyLayerUI);
 
         // use the BusyModel to control the busy state of this component
         busyModel = busyComponent.getBusyModel();
@@ -116,7 +117,8 @@ public class TrackTableComponent extends JPanel {
         busyComponent.setBusyLayerUI(ui);
 
         this.add(busyComponent, BorderLayout.CENTER);
-        @SuppressWarnings("unused") // the drop target needs to be created, but doesn't need to be attached to anything
+        // the drop target needs to be created, but doesn't need to be attached to anything
+        //noinspection UnusedAssignment
         DropTarget dt = new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, new FileDropListener());
 
         // create an action that will delete the selected rows if the delete key is pressed
@@ -261,9 +263,7 @@ public class TrackTableComponent extends JPanel {
                     @SuppressWarnings("unchecked")
                     List<File> files = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     workerThread.execute(new AddFiles(files));
-                } catch (UnsupportedFlavorException e) {
-                    log.error("error processing file drop", e);
-                } catch (IOException e) {
+                } catch (UnsupportedFlavorException | IOException e) {
                     log.error("error processing file drop", e);
                 }
             } else {
@@ -285,15 +285,14 @@ public class TrackTableComponent extends JPanel {
      * Adds files collected via drag-and-drop to the component.
      */
     private class AddFiles implements Runnable {
-        private List<File> files;
+        private final List<File> files;
 
         public AddFiles(List<File> files) {
-            this.files = new ArrayList<File>(files);
+            this.files = new ArrayList<>(files);
         }
 
         public void run() {
             setBusy(true);
-            final Map<Tuple3<String, String, String>, File> trackTags = new HashMap<Tuple3<String, String, String>, File>();
 
             // dig into directories recursively
             for (int i = 0; i < files.size(); i++) {
@@ -312,40 +311,40 @@ public class TrackTableComponent extends JPanel {
                     AudioFile f = AudioFileIO.read(file);
                     Tag tag = f.getTag();
 
-                    String title = tag.getFirst(FieldKey.TITLE);
-                    String artist = tag.getFirst(FieldKey.ARTIST);
-                    String album = tag.getFirst(FieldKey.ALBUM);
+                    final String title = tag.getFirst(FieldKey.TITLE);
+                    final String artist = tag.getFirst(FieldKey.ARTIST);
+                    final String album = tag.getFirst(FieldKey.ALBUM);
+                    String key = format("{title=\"%s\", artist=\"%s\", album=\"%s\"}", title, artist, album);
 
-                    final Tuple3<String, String, String> searchKey = Tuple3.of(title, artist, album);
-
-                    List<Track> tracks = mediaPlayer.findTracks(searchKey.a, searchKey.b, searchKey.c);
+                    List<Track> tracks = mediaPlayer.findTracks(title, artist, album);
                     if (tracks.isEmpty()) {
+                        log.info("Unable to find match for " + key);
                         addTrack(new UnknownTrack() {
                             @Override
                             public String getTitle() {
-                                return searchKey.a;
+                                return title;
                             }
 
                             @Override
                             public String getAlbum() {
-                                return searchKey.b;
+                                return artist;
                             }
 
                             @Override
                             public String getArtist() {
-                                return searchKey.c;
+                                return album;
                             }
                         });
                     } else {
+                        log.info("Successfully found match for " + key);
                         if (tracks.size() != 1) {
-                            log.warn("Search resulted in multiple tracks: " + searchKey);
+                            log.warn("Search resulted in multiple tracks for " + key);
                         }
-                        for (Track track : tracks) {
-                            addTrack(track);
-                        }
+                        tracks.forEach(TrackTableComponent.this::addTrack);
                     }
                 } catch (Exception e) {
-                    // not a big deal - jaudiotagger didn't recognize this file as having any tags
+                    log.debug("Couldn't load track " + file.getAbsolutePath(), e);
+                    // probably not a big deal - jaudiotagger didn't recognize this file as having any tags
                     addTrack(new UnknownTrack() {
                         @Override
                         public String getTitle() {
@@ -362,8 +361,8 @@ public class TrackTableComponent extends JPanel {
      * A Listener interface for TrackTableComponent that is notified of track additions and removals.
      */
     public static class TrackTableChangeEvent extends ChangeEvent {
-        private ChangeType type;
-        private Track track;
+        private final ChangeType type;
+        private final Track track;
 
         public static enum ChangeType { ADD, REMOVE, CLEAR }
 

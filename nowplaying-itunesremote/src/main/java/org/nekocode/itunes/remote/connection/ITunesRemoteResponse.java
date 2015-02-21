@@ -6,7 +6,8 @@
 
 package org.nekocode.itunes.remote.connection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +26,7 @@ import static java.lang.String.format;
  * the same path and contentCode, although only a few contentCodes do this.
  */
 public class ITunesRemoteResponse {
-    private static final Logger log = Logger.getLogger(ITunesRemoteResponse.class);
+    private static final Logger log = LogManager.getLogger(ITunesRemoteResponse.class);
 
     private Map<ContentCode, ITunesRemoteResponse> childNodes;
     private Map<ContentCode, List<ITunesRemoteResponse>> childMultiNodes;

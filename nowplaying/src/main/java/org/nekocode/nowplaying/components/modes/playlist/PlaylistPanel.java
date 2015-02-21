@@ -10,7 +10,8 @@
  */
 package org.nekocode.nowplaying.components.modes.playlist;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
@@ -29,7 +30,7 @@ import java.util.List;
  * @author dan.clark@nekocode.org
  */
 public class PlaylistPanel extends NowPlayingControl {
-	private static final Logger log = Logger.getLogger(PlaylistPanel.class);
+	private static final Logger log = LogManager.getLogger(PlaylistPanel.class);
     private MediaPlayer mediaPlayer;
     private NekoLabel next1Track;
     private NekoLabel next2Track;
@@ -83,10 +84,10 @@ public class PlaylistPanel extends NowPlayingControl {
         if (playlist != null) {
             // TODO check for null
             Track currentTrack = mediaPlayer.getCurrentTrack();
-            List<Track> nextTracks = new ArrayList<Track>();
+            List<Track> nextTracks = new ArrayList<>();
 
             if (playlist.count() <= 100) {
-                Logger.getLogger(PlaylistPanel.class).warn("Skipping updateNextTracks because >100 tracks in current playlist");
+                log.warn("Skipping updateNextTracks because >100 tracks in current playlist");
                 List<Track> tracks = playlist.getTracks();
                 boolean foundCurrentTrack = false;
                 for (int i = 0; i < tracks.size() && nextTracks.size() < 3; i++) {

@@ -10,7 +10,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Base class of an object that provides a proxy to a COM object.  Specifically,
@@ -20,7 +21,7 @@ import org.apache.log4j.Logger;
  * @author fanguad@nekocode.org
  */
 public class COMProxy {
-	private static final Logger log = Logger.getLogger(COMProxy.class);
+	private static final Logger log = LogManager.getLogger(COMProxy.class);
 
 	protected ExecutorService executor;
 

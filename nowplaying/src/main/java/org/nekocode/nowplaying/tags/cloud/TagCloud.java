@@ -11,7 +11,8 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
 
 import java.awt.FlowLayout;
@@ -32,7 +33,7 @@ import java.util.Set;
 public class TagCloud extends ScrollableFlowPanel {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(TagCloud.class);
+	private static final Logger log = LogManager.getLogger(TagCloud.class);
 
 	private Collection<TagCloudEntry> tags;
 
@@ -41,12 +42,7 @@ public class TagCloud extends ScrollableFlowPanel {
 	private TagCloudEntryMouseListener tagListener;
 	private Set<MouseListener> mouseListeners;
 
-	private TagCloudEntryRenderer defaultRenderer = new TagCloudEntryRenderer() {
-		@Override
-		public String getText(TagCloudEntry entry) {
-			return entry.getTag();
-		}
-	};
+	private TagCloudEntryRenderer defaultRenderer = TagCloudEntry::getTag;
 	private TagCloudEntryRenderer renderer = defaultRenderer;
     private Font baseFont;
 
@@ -54,9 +50,9 @@ public class TagCloud extends ScrollableFlowPanel {
 	 * Creates a new TagCloud with no tags.
 	 */
 	public TagCloud() {
-		fontCache = new HashMap<Float, Font>();
+		fontCache = new HashMap<>();
 		tagListener = new TagCloudEntryMouseListener();
-		mouseListeners = new HashSet<MouseListener>();
+		mouseListeners = new HashSet<>();
 
 		((FlowLayout)getLayout()).setHgap(10);
 		setOpaque(false);

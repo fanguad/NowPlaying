@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.tags;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteJDBCLoader;
 
@@ -30,7 +31,7 @@ import java.util.Map;
  * @author fanguad
  */
 public class TagDatabase {
-    private static final Logger log = Logger.getLogger(TagDatabase.class);
+    private static final Logger log = LogManager.getLogger(TagDatabase.class);
 
     private Connection conn;
     private Map<Object, PreparedStatement> preparedStatements;
@@ -44,7 +45,7 @@ public class TagDatabase {
      * @throws ClassNotFoundException if errors occur loading the database drivers
      * @throws java.io.IOException if errors occur loading the database schema
      */
-    public TagDatabase(File database, URL schemaLocation) throws SQLException, ClassNotFoundException, IOException {
+    public TagDatabase(File database, URL schemaLocation) throws Exception {
         // if the tag database does not exist, need to create it
         boolean initializeDatabase = !database.exists();
 

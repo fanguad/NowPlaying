@@ -6,17 +6,14 @@
 
 package org.nekocode.nowplaying;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.components.ArtPanel;
 import org.nekocode.nowplaying.components.ArtPanelProgressLayerUI;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.ResizeUpdateTrack;
-import org.nekocode.nowplaying.components.swing.NekoButton;
-import org.nekocode.nowplaying.components.swing.NekoFrame;
-import org.nekocode.nowplaying.components.swing.NekoLabel;
-import org.nekocode.nowplaying.components.swing.NekoPanel;
+import org.nekocode.nowplaying.components.swing.*;
 import org.nekocode.nowplaying.components.swing.NekoPanel.BorderPositions;
-import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
 import org.nekocode.nowplaying.internals.DaemonThreadFactory;
@@ -40,7 +37,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
@@ -66,7 +62,7 @@ import java.util.concurrent.Executors;
 public class NowPlayingView extends NekoFrame
 {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NowPlayingView.class);
+	private static final Logger log = LogManager.getLogger(NowPlayingView.class);
 
 	private final static EnumSet<ChangeType> shouldUpdateArtwork = EnumSet.of(
 			ChangeType.CURRENT_SONG_CHANGE, ChangeType.FILE_CHANGE);
@@ -84,15 +80,15 @@ public class NowPlayingView extends NekoFrame
 	// mode elements
 	private NekoButton currentMode;
 	private JPanel currentModeControls;
-	private Queue<String> modes = new LinkedList<String>();
-	private Set<NowPlayingControl> modeControls = new HashSet<NowPlayingControl>();
+	private Queue<String> modes = new LinkedList<>();
+	private Set<NowPlayingControl> modeControls = new HashSet<>();
 
 	// miscellaneous elements
     private final Executor executor;
 
 	private Track track;
 
-	private Collection<ArtPanelProgressLayerUI> progressLayers = new ArrayList<ArtPanelProgressLayerUI>();
+	private Collection<ArtPanelProgressLayerUI> progressLayers = new ArrayList<>();
 
 	private JComponent content;
 	/** the object that receives mouse commands */
@@ -148,12 +144,7 @@ public class NowPlayingView extends NekoFrame
     	  }};
         setContentPane(contentPane);
 
-		currentMode.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                rotateMode();
-            }
-        });
+		currentMode.addActionListener(e -> rotateMode());
 
         // remove Space from the button so it won't consume these keys
         currentMode.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "none");
@@ -198,12 +189,12 @@ public class NowPlayingView extends NekoFrame
         // add the underneath progressbar
         ArtPanelProgressLayerUI progressUI = new ArtPanelProgressLayerUI(panel, 3, Color.white);
         progressLayers.add(progressUI);
-        panelLayer = new JLayer<JComponent>(panel, progressUI);
+        panelLayer = new JLayer<>(panel, progressUI);
 
         // add another progressbar on top of that
         progressUI = new ArtPanelProgressLayerUI(panel, 2, Color.black);
         progressLayers.add(progressUI);
-        panelLayer = new JLayer<JComponent>(panelLayer, progressUI);
+        panelLayer = new JLayer<>(panelLayer, progressUI);
 
         content = panelLayer;
         mouseListenerTarget = panelLayer.getView();
@@ -243,24 +234,17 @@ public class NowPlayingView extends NekoFrame
 		log.info("updateTrack: " + trackChange.getType());
 
 		// update the text labels
-		Runnable updateInfo = new Runnable() {
-			public void run() {
-				title.setText(track.getTitle());
-				artist.setText(track.getArtist());
-				album.setText(track.getAlbum());
-				grouping.setText(track.getGrouping());
-			}
-		};
+		Runnable updateInfo = () -> {
+            title.setText(track.getTitle());
+            artist.setText(track.getArtist());
+            album.setText(track.getAlbum());
+            grouping.setText(track.getGrouping());
+        };
 		SwingUtilities.invokeLater(updateInfo);
 
 		// update all the mode controls
 		for (final NowPlayingControl npc : modeControls) {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					npc.updateTrack(trackChange);
-				}
-			});
+			executor.execute(() -> npc.updateTrack(trackChange));
 		}
 
         if (shouldUpdateArtwork.contains(trackChange.getType())) {
@@ -354,12 +338,7 @@ public class NowPlayingView extends NekoFrame
 	public void shutdown() {
 		// update all the mode controls
 		for (final NowPlayingControl npc : modeControls) {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					npc.shutdown();
-				}
-			});
+			executor.execute(npc::shutdown);
 		}
 	}
 

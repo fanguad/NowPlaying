@@ -20,8 +20,6 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * A single dialog that contains all the different kind of tag editing functionality.
@@ -63,15 +61,12 @@ public class UnifiedTagEditorDialog extends JDialog {
         tabbedPane.addTab("Add Tracks to Group", groupTracks);
 
         JButton clear = new JButton("Clear");
-        clear.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.clear();
-                tagMultipleTracks.clear();
-                changeTags.clear();
-                tagDuplicateTracks.clear();
-                groupTracks.clear();
-            }
+        clear.addActionListener(e -> {
+            table.clear();
+            tagMultipleTracks.clear();
+            changeTags.clear();
+            tagDuplicateTracks.clear();
+            groupTracks.clear();
         });
 
 

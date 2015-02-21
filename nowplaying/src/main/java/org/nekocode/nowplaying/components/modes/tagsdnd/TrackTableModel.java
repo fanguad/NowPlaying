@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 /**
  * A table model that knows how to display useful information about Tracks.
@@ -170,7 +171,7 @@ public class TrackTableModel extends AbstractTableModel implements TagChangeList
             return "";
         } else if (!tagCache.containsKey(track)) {
             // load tags from the model if they're not already in the cache
-            SortedSet<String> tags = toStrings(tagModel.getTags(track));
+            SortedSet<String> tags = toStrings(tagModel.getTags(track, false));
             tagCache.put(track, tags);
         }
         return toString(tagCache.get(track));
@@ -183,11 +184,9 @@ public class TrackTableModel extends AbstractTableModel implements TagChangeList
      * @return "tag" from each tag cloud entry
      */
     private SortedSet<String> toStrings(Collection<TagCloudEntry> tags) {
-        SortedSet<String> sortedSet = new TreeSet<String>();
-        for (TagCloudEntry tag : tags) {
-            sortedSet.add(tag.getTag());
-        }
-        return sortedSet;
+        return tags.stream().
+                map(TagCloudEntry::getTag).
+                collect(Collectors.toCollection(TreeSet::new));
     }
 
     /**

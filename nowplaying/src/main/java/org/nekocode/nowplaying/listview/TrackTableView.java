@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdesktop.swingx.JXTable;
 import org.nekocode.nowplaying.objects.Track;
 
@@ -24,7 +25,7 @@ import org.nekocode.nowplaying.objects.Track;
  * @author dan.clark@nekocode.org
  */
 public class TrackTableView extends JXTable {
-	private static final Logger log = Logger.getLogger(TrackTableView.class);
+	private static final Logger log = LogManager.getLogger(TrackTableView.class);
 
 	private TrackTableModel model;
 
@@ -48,7 +49,7 @@ public class TrackTableView extends JXTable {
 	 */
 	private static class TrackTableModel extends AbstractTableModel {
 
-		List<Track> tracks = new ArrayList<Track>();
+		List<Track> tracks = new ArrayList<>();
 
 		public void setValues(List<Track> newTracks) {
 			tracks.clear();

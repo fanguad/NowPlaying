@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -25,7 +26,7 @@ import java.util.Collection;
  * @author fanguad
  */
 public final class WordleAccess {
-    private static final Logger log = Logger.getLogger(WordleAccess.class);
+    private static final Logger log = LogManager.getLogger(WordleAccess.class);
 
     private static final String WORDLE_URL = "http://www.wordle.net/compose";
     private static final String FORM_NAME = "wordcounts";

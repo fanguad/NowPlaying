@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2011, dan.clark@nekocode.org
+  ~
+  ~ Licensed under FreeBSD license.  See README for details.
+  -->
+
+<Configuration>
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-6r [%-5p] %c{1} %x - %m%n"/>
+            <!--<PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n"/>-->
+        </Console>
+        <File name="LOG_FILE" fileName="nowplaying.log" append="false">
+            <PatternLayout pattern="%-6r [%-5p] [%t] %-5p %c %x - %m%n"/>
+        </File>
+        <File name="DACP_MESSAGES" fileName="dacp_messages.log" append="false">
+            <PatternLayout pattern="%-6r [%t] %-5p %c %x - %m%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.nekocode.nowplaying.components.ArtPanel" level="info" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.nowplaying.components.ArtPanelProgressLayerUI" level="info" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.nowplaying.internals.TrackMonitor" level="info" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.nowplaying.components.ResizeUpdateTrack" level="info" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.nowplaying.components.swing.NekoFrame" level="info" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.nowplaying.tags.TagModel" level="info" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.itunes.remote.connection.RemoteSession" level="info" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.itunes.remote.connection.RequestManager" level="debug" additivity="false">
+            <AppenderRef ref="DACP_MESSAGES"/>
+        </Logger>
+        <Root level="debug">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Root>
+    </Loggers>
+</Configuration>

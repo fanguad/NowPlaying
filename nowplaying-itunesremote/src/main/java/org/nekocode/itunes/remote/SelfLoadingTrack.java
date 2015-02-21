@@ -6,7 +6,8 @@
 
 package org.nekocode.itunes.remote;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.itunes.remote.connection.ITunesRemoteResponse;
 import org.nekocode.itunes.remote.connection.RemoteSession;
 import org.nekocode.itunes.remote.connection.RequestManager;
@@ -27,7 +28,7 @@ import java.util.Properties;
  * background and a TrackChangeEvent is fired when it is complete.
  */
 public class SelfLoadingTrack extends ITunesRemoteTrack implements Track {
-    private static final Logger log = Logger.getLogger(SelfLoadingTrack.class);
+    private static final Logger log = LogManager.getLogger(SelfLoadingTrack.class);
 
     public SelfLoadingTrack(int trackId,
                             RemoteSession session) throws IOException {

@@ -6,8 +6,9 @@
 
 package org.nekocode.itunes.remote.connection;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -31,7 +32,7 @@ import static java.lang.String.format;
  * Executes URLs against iTunes and parses the results.
  */
 public class RequestManager {
-    private static final Logger log = Logger.getLogger(RequestManager.class);
+    private static final Logger log = LogManager.getLogger(RequestManager.class);
     private static final int DEFAULT_TIMEOUT = 10000;
     private static final Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
 
@@ -209,7 +210,7 @@ public class RequestManager {
             }
         }
 
-        if (printResult && log.isEnabledFor(Level.WARN)) {
+        if (printResult && log.isEnabled(Level.WARN)) {
             log.warn(response.toString());
         }
         return response;

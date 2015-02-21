@@ -234,7 +234,7 @@ public enum ContentCode {
         if (idMap == null) {
             idMapLock.lock();
             if (idMap == null) {
-                idMap = new HashMap<String, ContentCode>();
+                idMap = new HashMap<>();
                 for (ContentCode ri : values()) {
                     if (idMap.containsKey(ri.id)) {
                         // this is to detect duplicates in the above list

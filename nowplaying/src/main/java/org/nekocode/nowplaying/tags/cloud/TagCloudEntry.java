@@ -8,12 +8,13 @@ package org.nekocode.nowplaying.tags.cloud;
 
 import java.awt.Color;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TagCloudEntry implements Comparable<TagCloudEntry> {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(TagCloudEntry.class);
+	private static final Logger log = LogManager.getLogger(TagCloudEntry.class);
 
 	public static final int NUM_LEVELS = 20;
 
@@ -94,9 +95,7 @@ public class TagCloudEntry implements Comparable<TagCloudEntry> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof TagCloudEntry)
-			return tag.equals(((TagCloudEntry)obj).tag);
-		return false;
+		return obj instanceof TagCloudEntry && tag.equals(((TagCloudEntry) obj).tag);
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()

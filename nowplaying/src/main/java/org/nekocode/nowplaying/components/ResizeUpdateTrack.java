@@ -12,7 +12,8 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * To be run when the track has been updating.  Resizes the window to
@@ -20,7 +21,7 @@ import org.apache.log4j.Logger;
  */
 public class ResizeUpdateTrack extends UpdateTrack {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(ResizeUpdateTrack.class);
+	private static final Logger log = LogManager.getLogger(ResizeUpdateTrack.class);
 
 	private JFrame view;
 	private int size;
@@ -51,7 +52,7 @@ public class ResizeUpdateTrack extends UpdateTrack {
 	 */
 	@Override
 	protected ImageIcon doInBackground() throws Exception {
-		Deque<ImageIcon> artList = new ArrayDeque<ImageIcon>(newTrack.getArtwork(size));
+		Deque<ImageIcon> artList = new ArrayDeque<>(newTrack.getArtwork(size));
 		return artList.poll();
 	}
 
@@ -63,9 +64,7 @@ public class ResizeUpdateTrack extends UpdateTrack {
 		ImageIcon artwork = null;
 		try {
 			artwork = get();
-		} catch (InterruptedException e) {
-			log.error(e);
-		} catch (ExecutionException e) {
+		} catch (InterruptedException | ExecutionException e) {
 			log.error(e);
 		}
 		if (artwork == null) {

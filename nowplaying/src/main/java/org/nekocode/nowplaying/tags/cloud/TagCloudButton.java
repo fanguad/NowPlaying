@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.tags.TagModel;
@@ -35,7 +36,7 @@ import java.util.concurrent.ExecutionException;
 @SuppressWarnings("serial")
 public class TagCloudButton extends NekoButton {
 	@SuppressWarnings("unused")
-    private static final Logger log = Logger.getLogger(TagCloudButton.class);
+    private static final Logger log = LogManager.getLogger(TagCloudButton.class);
 	private TagModel tagModel;
 	private static final int MINIMUM_ENTRIES = 5;
 
@@ -75,7 +76,7 @@ public class TagCloudButton extends NekoButton {
 		@Override
 		protected List<TagCloudEntry> doInBackground() throws Exception {
             Collection<TagCloudEntry> allTags = tagModel.getAllTags(MINIMUM_ENTRIES);
-			List<TagCloudEntry> sorted = new ArrayList<TagCloudEntry>(allTags);
+			List<TagCloudEntry> sorted = new ArrayList<>(allTags);
 			Collections.sort(sorted, new Comparator<TagCloudEntry>() {
 				public int compare(TagCloudEntry o1, TagCloudEntry o2) {
 					return o1.getTag().compareTo(o2.getTag());
@@ -89,11 +90,7 @@ public class TagCloudButton extends NekoButton {
 		 */
 		@Override
 		protected void done() {
-			TagCloudEntryRenderer renderer = new TagCloudEntryRenderer() {
-				@Override
-				public String getText(TagCloudEntry entry) {
-					return String.format("%s (%d)", entry.getTag(), entry.getCount());
-				}};
+			TagCloudEntryRenderer renderer = entry -> String.format("%s (%d)", entry.getTag(), entry.getCount());
 
 			try {
 				JFrame frame = new JFrame("tag cloud");
@@ -103,9 +100,7 @@ public class TagCloudButton extends NekoButton {
 				frame.pack();
 				frame.setLocationByPlatform(true);
 				frame.setVisible(true);
-			} catch (InterruptedException e) {
-				log.error(e);
-			} catch (ExecutionException e) {
+			} catch (InterruptedException | ExecutionException e) {
 				log.error(e);
 			}
 		}

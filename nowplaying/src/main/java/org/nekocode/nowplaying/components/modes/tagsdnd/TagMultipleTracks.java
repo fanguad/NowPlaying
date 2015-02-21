@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.internals.DaemonThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
@@ -18,7 +19,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,7 +32,7 @@ import java.util.concurrent.Executors;
  */
 public class TagMultipleTracks extends JPanel {
 
-    private static final Logger log = Logger.getLogger(TagMultipleTracks.class);
+    private static final Logger log = LogManager.getLogger(TagMultipleTracks.class);
 
     private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
 
@@ -49,12 +49,7 @@ public class TagMultipleTracks extends JPanel {
         JLabel tagLabel = new JLabel("label to add:");
         tagLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
 
-        ActionListener applyAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(applyTags);
-            }
-        };
+        ActionListener applyAction = e -> workerThread.execute(applyTags);
         tagInput = new JTextField();
         tagInput.addActionListener(applyAction);
         JButton apply = new JButton("Apply tag to tracks");
@@ -103,7 +98,7 @@ public class TagMultipleTracks extends JPanel {
             }
 
             // remove any bad tracks
-            LinkedList<Track> filteredTracks = new LinkedList<Track>(tracks);
+            LinkedList<Track> filteredTracks = new LinkedList<>(tracks);
             Iterator<Track> i = filteredTracks.iterator();
             while (i.hasNext()) {
                 if (i.next().getPersistentId() == null) {
@@ -114,9 +109,7 @@ public class TagMultipleTracks extends JPanel {
             if (!filteredTracks.isEmpty()) {
                 try {
                     tagModel.addTagAndWait(filteredTracks, tag, metadata);
-                } catch (ExecutionException e) {
-                    log.error("error adding tags", e);
-                } catch (InterruptedException e) {
+                } catch (ExecutionException | InterruptedException e) {
                     log.error("error adding tags", e);
                 }
             }

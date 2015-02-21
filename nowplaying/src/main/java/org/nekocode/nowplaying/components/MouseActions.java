@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.components.swing.NekoFrame;
 import org.nekocode.nowplaying.components.swing.NekoFrame.AnchorPosition;
 
@@ -27,14 +28,13 @@ import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import static java.lang.Math.*;
 
 public class MouseActions extends MouseInputAdapter {
 
-    private static final Logger log = Logger.getLogger(MouseActions.class);
+    private static final Logger log = LogManager.getLogger(MouseActions.class);
 
 	private Point offset;
     // location of last mouse event (for dragging), so we don't process the same event multiple times
@@ -111,10 +111,7 @@ public class MouseActions extends MouseInputAdapter {
 			t.stop();
 			t.setInitialDelay(5000);
 			t.setRepeats(false);
-			t.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					frame.setVisible(true);
-                }});
+			t.addActionListener(e1 -> frame.setVisible(true));
 			t.start();
 		}
     }
@@ -194,46 +191,24 @@ public class MouseActions extends MouseInputAdapter {
 		PopupMenu m = new PopupMenu();
 
 		MenuItem hide = new MenuItem("Hide");
-		hide.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.setState(JFrame.ICONIFIED);
-			}});
+		hide.addActionListener(e -> frame.setState(JFrame.ICONIFIED));
 
 		MenuItem close = new MenuItem("Close");
-		close.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
-			}});
+		close.addActionListener(e -> frame.dispose());
 
 		Menu dockmenu = new Menu("Dock to...");
 
 		MenuItem dockNW = new MenuItem("Dock to NW");
-		dockNW.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dockNW();
-			}
-		});
+		dockNW.addActionListener(e -> dockNW());
 		dockmenu.add(dockNW);
 		MenuItem dockNE = new MenuItem("Dock to NE");
-		dockNE.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dockNE();
-			}
-		});
+		dockNE.addActionListener(e -> dockNE());
 		dockmenu.add(dockNE);
 		MenuItem dockSE = new MenuItem("Dock to SE");
-		dockSE.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dockSE();
-			}
-		});
+		dockSE.addActionListener(e -> dockSE());
 		dockmenu.add(dockSE);
 		MenuItem dockSW = new MenuItem("Dock to SW");
-		dockSW.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dockSW();
-			}
-		});
+		dockSW.addActionListener(e -> dockSW());
 		dockmenu.add(dockSW);
 
 		m.add(dockmenu);

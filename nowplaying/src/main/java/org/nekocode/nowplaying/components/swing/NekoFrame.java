@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.JFrame;
 import java.awt.Dimension;
@@ -16,7 +17,7 @@ import java.awt.Window;
 @SuppressWarnings("serial")
 public class NekoFrame extends JFrame {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NekoFrame.class);
+	private static final Logger log = LogManager.getLogger(NekoFrame.class);
 	private AnchorPosition anchor;
 
 	public enum AnchorPosition {

@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.internals.DaemonThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
@@ -17,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
  */
 public class TagDuplicateTracks extends JPanel {
 
-    private static final Logger log = Logger.getLogger(TagDuplicateTracks.class);
+    private static final Logger log = LogManager.getLogger(TagDuplicateTracks.class);
 
     private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
 
@@ -46,12 +46,7 @@ public class TagDuplicateTracks extends JPanel {
 
         JLabel tagLabel = new JLabel("Set the following tracks as duplicates of each other");
 
-        ActionListener applyAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(setDuplicates);
-            }
-        };
+        ActionListener applyAction = e -> workerThread.execute(setDuplicates);
         JButton apply = new JButton("Apply");
         apply.addActionListener(applyAction);
         
@@ -86,7 +81,7 @@ public class TagDuplicateTracks extends JPanel {
             }
 
             // remove any bad tracks
-            LinkedList<Track> filteredTracks = new LinkedList<Track>(tracks);
+            LinkedList<Track> filteredTracks = new LinkedList<>(tracks);
             Iterator<Track> i = filteredTracks.iterator();
             while (i.hasNext()) {
                 if (i.next().getPersistentId() == null) {

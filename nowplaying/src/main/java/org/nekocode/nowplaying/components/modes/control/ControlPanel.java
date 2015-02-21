@@ -56,8 +56,8 @@ public class ControlPanel extends NowPlayingControl {
 	public ControlPanel() {
 		setLayout(new BorderLayout());
 
-		ratingChangeListeners = new HashSet<ChangeListener>();
-		controlListeners = new HashSet<ChangeListener>();
+		ratingChangeListeners = new HashSet<>();
+		controlListeners = new HashSet<>();
 
 		JPanel controls = new JPanel();
 		JComponent next = createImageLabel("next.png");
@@ -86,12 +86,7 @@ public class ControlPanel extends NowPlayingControl {
 		add(rating, BorderLayout.SOUTH);
 
 
-		rating.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e)
-			{
-				fireRatingChanged();
-			}}
-		);
+		rating.addChangeListener(e -> fireRatingChanged());
 
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('z'), Controls.PREVIOUS);
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('c'), Controls.PAUSE);
@@ -182,20 +177,12 @@ public class ControlPanel extends NowPlayingControl {
 	@Override
 	public void updateTrack(final TrackChangeEvent trackChange) {
 		if (shouldUpdate.contains(trackChange.getType())) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					rating.setValue(trackChange.getTrack().getRating());
-				}});
+			SwingUtilities.invokeLater(() -> rating.setValue(trackChange.getTrack().getRating()));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nekocode.nowplaying.components.NowPlayingControl#shutdown()
-	 */
 	@Override
 	public void shutdown() {
 		// nothing to do
 	}
-
 }

@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -28,7 +29,7 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodyUFID;
  * @author fanguad@nekocode.org
  */
 public class MP3TrackWrapper {
-	private static final Logger log = Logger.getLogger(MP3TrackWrapper.class);
+	private static final Logger log = LogManager.getLogger(MP3TrackWrapper.class);
 	//TODO move this to a property somewhere
 	public static final String UFID_OWNER = "nekocode.org";
 
@@ -41,15 +42,11 @@ public class MP3TrackWrapper {
 	        mp3file = new MP3File(file, MP3File.LOAD_ALL, !writable);
         } catch (ReadOnlyFileException e) {
         	// ignore, the rest of the class will work around this
-        } catch (IOException e) {
-        	throw new CannotUseMP3TrackException(e);
-        } catch (TagException e) {
-        	throw new CannotUseMP3TrackException(e);
-        } catch (InvalidAudioFrameException e) {
+        } catch (IOException | InvalidAudioFrameException | TagException e) {
         	throw new CannotUseMP3TrackException(e);
         }
 
-        getUUID();
+		getUUID();
 
         if (mp3file == null)
         	throw new CannotUseMP3TrackException("File was not an MP3 file");
@@ -126,12 +123,10 @@ public class MP3TrackWrapper {
 	    try {
 	    	log.debug("saving data to mp3file");
 	        mp3file.save();
-	    } catch (IOException e) {
-	        log.error(e);
-	    } catch (TagException e) {
+	    } catch (IOException | TagException e) {
 	        log.error(e);
 	    }
-	    return uuid;
+		return uuid;
     }
 
 	/**

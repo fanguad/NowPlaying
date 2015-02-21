@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -23,7 +24,7 @@ import java.awt.Container;
 @SuppressWarnings("serial")
 public class NekoPanel extends JPanel {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NekoPanel.class);
+	private static final Logger log = LogManager.getLogger(NekoPanel.class);
 
 	public enum BorderPositions {
 		PAGE_START(BorderLayout.PAGE_START, Rotation.NONE),

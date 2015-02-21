@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sun.swing.SwingUtilities2;
 
 import javax.swing.AbstractButton;
@@ -28,7 +29,7 @@ import java.awt.geom.AffineTransform;
  */
 public class NekoButtonUI extends BasicButtonUI {
 
-    private static final Logger log = Logger.getLogger(NekoButtonUI.class);
+    private static final Logger log = LogManager.getLogger(NekoButtonUI.class);
     private static final int ARC_SIZE = 20;
 
     private NekoTextPainter textPainter;

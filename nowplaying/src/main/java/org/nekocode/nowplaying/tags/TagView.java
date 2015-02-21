@@ -7,7 +7,8 @@
 package org.nekocode.nowplaying.tags;
 
 import furbelow.SpinningDial;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
 import org.nekocode.nowplaying.events.TagChangeListener;
 import org.nekocode.nowplaying.objects.Track;
@@ -30,7 +31,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -51,7 +51,7 @@ import java.util.Set;
 public class TagView extends JPanel
 {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(TagView.class);
+	private static final Logger log = LogManager.getLogger(TagView.class);
 
 	public JTextField newTag;
 	private Set<TagChangeListener> listeners;
@@ -66,7 +66,7 @@ public class TagView extends JPanel
 	private JComponent textfields;
 
     public TagView() {
-		listeners = new HashSet<TagChangeListener>();
+		listeners = new HashSet<>();
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
@@ -86,11 +86,7 @@ public class TagView extends JPanel
 					JPopupMenu contextMenu = new JPopupMenu();
 					JMenuItem removeItem = new JMenuItem();
 					removeItem.setText("Remove Tag");
-					removeItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							removeTag(value);
-						}
-					});
+					removeItem.addActionListener(e1 -> removeTag(value));
 					contextMenu.add(removeItem);
 					contextMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -136,12 +132,10 @@ public class TagView extends JPanel
 		newTag.setPreferredSize(size);
 		newTag.setMaximumSize(size);
 
-		newTag.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String tag = newTag.getText();
-				addTag(tag);
-			}
-		});
+		newTag.addActionListener(e -> {
+            String tag = newTag.getText();
+            addTag(tag);
+        });
 
 		Action showNewTag = new AbstractAction() {
 			/* (non-Javadoc)
@@ -206,20 +200,18 @@ public class TagView extends JPanel
      */
 	public void setTags(Track track, List<TagCloudEntry> tags) {
 		this.track = track;
-        final List<TagCloudEntry> tagsCopy = new ArrayList<TagCloudEntry>(tags);
+        final List<TagCloudEntry> tagsCopy = new ArrayList<>(tags);
 
 		// sort alphabetically
 		Collections.sort(tagsCopy);
 		log.info("Setting tags: " + tagsCopy);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				tagHolder.setTagEntries(tagsCopy);
-				tagHolder.add(addNew);
+		SwingUtilities.invokeLater(() -> {
+            tagHolder.setTagEntries(tagsCopy);
+            tagHolder.add(addNew);
 
-				pack();
-			}
-		});
+            pack();
+        });
 	}
 
 
@@ -325,15 +317,9 @@ public class TagView extends JPanel
 	 */
 	public void setLoadingTags() {
 		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-                    setBusy();
-				}});
-		} catch (InterruptedException e) {
+			SwingUtilities.invokeAndWait(this::setBusy);
+		} catch (InterruptedException | InvocationTargetException e) {
 			log.error(e);
-		} catch (InvocationTargetException e) {
-			log.error(e);
-        }
-    }
+		}
+	}
 }

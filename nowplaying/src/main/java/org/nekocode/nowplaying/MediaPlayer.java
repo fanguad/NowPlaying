@@ -11,7 +11,6 @@ import org.nekocode.nowplaying.objects.Playlist;
 import org.nekocode.nowplaying.objects.Track;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Represents the base application.  Provides an interface into the common

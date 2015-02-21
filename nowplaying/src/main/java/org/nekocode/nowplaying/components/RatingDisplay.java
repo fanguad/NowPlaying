@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.resources.images.Icons;
 
 import javax.swing.AbstractAction;
@@ -34,7 +35,7 @@ import java.util.Set;
 @SuppressWarnings("serial")
 public class RatingDisplay extends JComponent
 {
-   private static final Logger log = Logger.getLogger(RatingDisplay.class);
+   private static final Logger log = LogManager.getLogger(RatingDisplay.class);
 
    private static final Image heart_full;
    private static final Image heart_empty;
@@ -53,7 +54,7 @@ public class RatingDisplay extends JComponent
    private int value;
    private int xoffset; // offset from 0 horizontal # that the image is drawn
 
-   private Set<ChangeListener> listeners = new HashSet<ChangeListener>();
+   private Set<ChangeListener> listeners = new HashSet<>();
 
    public RatingDisplay() {
       // by default, all hearts are empty

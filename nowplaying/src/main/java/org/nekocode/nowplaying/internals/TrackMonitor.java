@@ -10,7 +10,8 @@
  */
 package org.nekocode.nowplaying.internals;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.MediaPlayer.PlayerState;
 import org.nekocode.nowplaying.NowPlayingView;
@@ -30,7 +31,7 @@ import java.util.TimerTask;
  */
 public class TrackMonitor implements Runnable, TrackChangeListener {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(TrackMonitor.class);
+	private static final Logger log = LogManager.getLogger(TrackMonitor.class);
 
 	private NowPlayingView view;
 	private MediaPlayer player;

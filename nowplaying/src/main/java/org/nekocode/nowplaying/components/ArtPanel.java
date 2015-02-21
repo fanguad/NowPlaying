@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.NowPlayingProperties;
 
 import javax.swing.ImageIcon;
@@ -35,7 +36,7 @@ import static java.lang.String.format;
 @SuppressWarnings("serial")
 public class ArtPanel extends JPanel
 {
-	private static Logger log = Logger.getLogger(ArtPanel.class);
+	private static Logger log = LogManager.getLogger(ArtPanel.class);
 
 	/**
 	 * An ID that gets incremented each time the art changes.  This can be used
@@ -185,7 +186,8 @@ public class ArtPanel extends JPanel
 	@Override
 	public Dimension getPreferredSize() {
 		Dimension size = super.getPreferredSize();
-		int height = 0, width = 0;
+		int height = 0;
+		int width;
 		if (art == null) {
 			width = maxSize;
             log.debug("getPreferredSize: no art");

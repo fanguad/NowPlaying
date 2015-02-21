@@ -9,7 +9,8 @@ package org.nekocode.nowplaying;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeListener;
 
@@ -19,12 +20,12 @@ import org.nekocode.nowplaying.events.TrackChangeListener;
  * @author fanguad@nekocode.org
  */
 public abstract class AbstractMediaPlayer implements MediaPlayer {
-	private static final Logger log = Logger.getLogger(AbstractMediaPlayer.class);
+	private static final Logger log = LogManager.getLogger(AbstractMediaPlayer.class);
 
 	protected Set<TrackChangeListener> trackChangeListeners;
 
 	public AbstractMediaPlayer() {
-		trackChangeListeners = new HashSet<TrackChangeListener>();
+		trackChangeListeners = new HashSet<>();
 	}
 	
 	/**

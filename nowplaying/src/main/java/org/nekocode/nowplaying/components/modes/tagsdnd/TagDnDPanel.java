@@ -22,8 +22,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Provides controls that open up dialogs allowing the user to manipulate tags through Drag and Drop.
@@ -73,13 +71,7 @@ public class TagDnDPanel extends NowPlayingControl {
 
     private void setUpDialog(NekoButton displayButton, final JDialog dialog) {
         // set up the button to open the dialog
-        displayButton.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.setVisible(true);
-                    }
-                });
+        displayButton.addActionListener(e -> dialog.setVisible(true));
         displayButton.setHorizontalAlignment(SwingConstants.CENTER);
 
         // set up the dialog

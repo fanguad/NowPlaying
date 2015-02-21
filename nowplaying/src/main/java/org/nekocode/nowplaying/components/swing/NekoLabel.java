@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.JLabel;
 import java.awt.Container;
@@ -21,7 +22,7 @@ import java.awt.Window;
 public class NekoLabel extends JLabel
 {
     @SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NekoLabel.class);
+	private static final Logger log = LogManager.getLogger(NekoLabel.class);
 
     public NekoLabel(String text) {
 		super(text);

@@ -6,7 +6,8 @@
 
 package org.nekocode.itunes.remote;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.itunes.remote.connection.ITunesRemoteResponse;
 import org.nekocode.nowplaying.objects.Track;
 
@@ -21,7 +22,7 @@ import static org.nekocode.itunes.remote.connection.ContentCode.*;
  * 
  */
 public class ITunesRemoteSimpleTrack implements Track {
-    private static final Logger log = Logger.getLogger(ITunesRemoteSimpleTrack.class);
+    private static final Logger log = LogManager.getLogger(ITunesRemoteSimpleTrack.class);
     
     private String title;
     private String artist;

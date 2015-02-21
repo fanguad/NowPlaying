@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.internals.DaemonThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
@@ -22,9 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +43,7 @@ import static java.lang.String.format;
  */
 public class ChangeTags extends JPanel {
 
-    private static final Logger log = Logger.getLogger(ChangeTags.class);
+    private static final Logger log = LogManager.getLogger(ChangeTags.class);
 
     private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
 
@@ -65,44 +63,27 @@ public class ChangeTags extends JPanel {
         JLabel tagLabel = new JLabel("original tag:");
         tagLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
 
-        ActionListener deleteAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(deleteTag);
-            }
-        };
-
-        ActionListener changeAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(changeTag);
-            }
-        };
-
         tagListModel = new TagNameComboBoxModel();
-        tagListPullDown = new JComboBox(tagListModel);
+        tagListPullDown = new JComboBox<>(tagListModel);
 
         newTagName = new JTextField();
 
         JButton delete = new JButton("Delete Tag");
-        delete.addActionListener(deleteAction);
+        delete.addActionListener(e -> workerThread.execute(deleteTag));
 
         JButton change = new JButton("Change Tag");
-        change.addActionListener(changeAction);
+        change.addActionListener(e -> workerThread.execute(changeTag));
 
-        table.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (e instanceof TrackTableComponent.TrackTableChangeEvent) {
-                    TrackTableComponent.TrackTableChangeEvent ttce = (TrackTableComponent.TrackTableChangeEvent) e;
-                    switch (ttce.getType()) {
-                        case ADD:
-                            tagListModel.addTagNames(ChangeTags.this.tagModel.getTags(ttce.getTrack()));
-                            break;
-                        case CLEAR:
-                            tagListModel.clear();
-                            break;
-                    }
+        table.addChangeListener(e -> {
+            if (e instanceof TrackTableComponent.TrackTableChangeEvent) {
+                TrackTableComponent.TrackTableChangeEvent ttce = (TrackTableComponent.TrackTableChangeEvent) e;
+                switch (ttce.getType()) {
+                    case ADD:
+                        tagListModel.addTagNames(ChangeTags.this.tagModel.getTags(ttce.getTrack(), false));
+                        break;
+                    case CLEAR:
+                        tagListModel.clear();
+                        break;
                 }
             }
         });
@@ -163,9 +144,7 @@ public class ChangeTags extends JPanel {
 
             try {
                 tagModel.removeTagsAndWait(tracks, selectedTag.getTag());
-            } catch (ExecutionException e) {
-                log.error(format("error removing tag %s", selectedTag.getTag()), e);
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 log.error(format("error removing tag %s", selectedTag.getTag()), e);
             }
 
@@ -190,7 +169,7 @@ public class ChangeTags extends JPanel {
             }
 
             // find which tracks have the tag at the moment
-            Map<Track, List<TagCloudEntry>> tags = tagModel.getTags(tracks);
+            Map<Track, List<TagCloudEntry>> tags = tagModel.getTags(tracks, false);
 
             List<Track> tracksWithTag = new ArrayList<>();
             OUTER_LOOP:
@@ -229,9 +208,7 @@ public class ChangeTags extends JPanel {
                 log.debug("new tag added: " + tag);
                 tagModel.removeTagsAndWait(tracksWithTag, selectedTag.getTag());
                 log.debug("old tag removed: " + selectedTag.getTag());
-            } catch (ExecutionException e) {
-                log.error(format("error changing tag from %s to %s", selectedTag.getTag(), tag), e);
-            } catch (InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 log.error(format("error changing tag from %s to %s", selectedTag.getTag(), tag), e);
             }
 
@@ -243,7 +220,7 @@ public class ChangeTags extends JPanel {
     /**
      * Maintains a list of Tag names.
      */
-    private static class TagNameComboBoxModel extends AbstractListModel implements ComboBoxModel {
+    private static class TagNameComboBoxModel extends AbstractListModel<TagCloudEntry> implements ComboBoxModel<TagCloudEntry> {
 
         private List<TagCloudEntry> tagNames = new ArrayList<>();
         private TagCloudEntry selectedItem = null;

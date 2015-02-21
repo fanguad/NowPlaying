@@ -20,14 +20,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * This panel provides utilities to recalculate the tag counts for all tags,
@@ -74,32 +72,20 @@ public class FindUnusedTags extends JBusyComponent<JPanel> {
         view.add(scrollpane, BorderLayout.CENTER);
 
         final Runnable findUnusedTags = new FindUnusedTagsAction();
-        search.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(findUnusedTags);
-            }
-        });
+        search.addActionListener(e -> workerThread.execute(findUnusedTags));
 
         final Runnable deleteTags = new DeleteTagsAction();
-        delete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(deleteTags);
-            }
-        });
+        delete.addActionListener(e -> workerThread.execute(deleteTags));
     }
 
     private void getUnusedTags() {
         Collection<TagCloudEntry> allTags = tagModel.getAllTags(0);
         // making this a List because the final result will be sorted
-        List<String> unusedTags = new ArrayList<>();
-        for (TagCloudEntry entry : allTags) {
-            if (entry.getCount() < 1) {
-                unusedTags.add(entry.getTag());
-            }
-        }
-        Collections.sort(unusedTags);
+        List<String> unusedTags = allTags.stream().
+                filter(entry -> entry.getCount() < 1).
+                map(TagCloudEntry::getTag).
+                sorted().
+                collect(Collectors.toList());
 
         Object[][] dataVector = new Object[unusedTags.size()][];
         for (int i = 0; i < unusedTags.size(); i++) {

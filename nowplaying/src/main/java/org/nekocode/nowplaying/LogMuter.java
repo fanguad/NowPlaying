@@ -22,7 +22,7 @@ public final class LogMuter {
         try {
             LogManager.getLogManager().readConfiguration(new ByteArrayInputStream("org.jaudiotagger.level = OFF".getBytes()));
         } catch (IOException e) {
-            org.apache.log4j.Logger.getLogger(LogMuter.class).warn(e);
+            org.apache.logging.log4j.LogManager.getLogger(LogMuter.class).warn(e);
         }
 //      Logger.getLogger("org.jaudiotagger").setLevel(Level.WARNING);
 //		Logger.getLogger("org.jaudiotagger.tag.id3").setLevel(Level.WARNING);

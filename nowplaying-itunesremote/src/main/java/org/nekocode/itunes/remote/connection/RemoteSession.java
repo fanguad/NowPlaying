@@ -6,7 +6,8 @@
 
 package org.nekocode.itunes.remote.connection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -29,7 +30,7 @@ import static org.nekocode.itunes.remote.connection.ContentCode.*;
  */
 public class RemoteSession {
 
-    private static final Logger log = Logger.getLogger(RemoteSession.class);
+    private static final Logger log = LogManager.getLogger(RemoteSession.class);
     public final static String REMOTE_TYPE = "_touch-remote._tcp.local.";
     public final static int LISTEN_PORT = 49197;
 

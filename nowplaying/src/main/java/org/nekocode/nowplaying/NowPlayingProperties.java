@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +32,7 @@ public enum NowPlayingProperties {
     ;
 
     public static final String PROPERTIES_FILE = "nowplaying.properties";
-    private static Logger log = Logger.getLogger(NowPlayingProperties.class);
+    private static Logger log = LogManager.getLogger(NowPlayingProperties.class);
     private static Properties properties;
 
     public static Properties loadProperties() {

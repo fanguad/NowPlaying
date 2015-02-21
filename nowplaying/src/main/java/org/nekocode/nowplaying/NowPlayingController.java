@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.components.MouseActions;
 import org.nekocode.nowplaying.components.RatingChangeEvent;
 import org.nekocode.nowplaying.components.modes.control.ControlPanel;
@@ -15,7 +16,6 @@ import org.nekocode.nowplaying.components.modes.tagsdnd.TagDnDPanel;
 import org.nekocode.nowplaying.events.TagChangeListener;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
-import org.nekocode.nowplaying.events.TrackChangeListener;
 import org.nekocode.nowplaying.internals.TrackMonitor;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.resources.images.Icons;
@@ -23,8 +23,6 @@ import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.TagView;
 
 import javax.swing.ImageIcon;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.GraphicsDevice;
@@ -47,7 +45,7 @@ import java.util.TimerTask;
 public class NowPlayingController
 {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(NowPlayingController.class);
+	private static final Logger log = LogManager.getLogger(NowPlayingController.class);
 	private MediaPlayer mediaPlayer;
 	private NowPlayingView view;
 	private TagView tagView;
@@ -88,14 +86,8 @@ public class NowPlayingController
             monitor = new TrackMonitor(view, mediaPlayer);
 
             connectComponents();
-        } catch (RuntimeException |
-                ClassNotFoundException |
-                InstantiationException |
-                SQLException |
-                IOException |
-                IllegalAccessException e) {
-            e.printStackTrace();
-            log.fatal(e);
+        } catch (Exception e) {
+            log.fatal("Fatal error", e);
             // try to shut down smoothly
             shutdown();
         }
@@ -103,11 +95,7 @@ public class NowPlayingController
 
 	private void connectComponents() {
 	    // hook everything up
-		mediaPlayer.addTrackChangeListener(new TrackChangeListener() {
-			public void trackChanged(TrackChangeEvent e) {
-				view.updateTrack(e);
-			}}
-		);
+		mediaPlayer.addTrackChangeListener(view::updateTrack);
         mediaPlayer.addTrackChangeListener(monitor);
 		tagView.addTagChangeListener(new TagChangeListener() {
 			public void tagAdded(Track track, String tag) {
@@ -152,32 +140,27 @@ public class NowPlayingController
 			}});
 
 		ControlPanel controls = new ControlPanel();
-		controls.addRatingChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                RatingChangeEvent rce = (RatingChangeEvent) e;
-                mediaPlayer.updateTrackRating(mediaPlayer.getCurrentTrack(), rce.getNewRating());
+		controls.addRatingChangeListener(e -> {
+            RatingChangeEvent rce = (RatingChangeEvent) e;
+            mediaPlayer.updateTrackRating(mediaPlayer.getCurrentTrack(), rce.getNewRating());
+        });
+		controls.addControlListener(e -> {
+            Controls controlType = (Controls)e.getSource();
+            switch (controlType) {
+            case PLAY:
+                mediaPlayer.play();
+                break;
+            case PAUSE:
+                mediaPlayer.pause();
+                break;
+            case NEXT:
+                mediaPlayer.next();
+                break;
+            case PREVIOUS:
+                mediaPlayer.previous();
+                break;
             }
-        }
-        );
-		controls.addControlListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Controls controlType = (Controls)e.getSource();
-				switch (controlType) {
-				case PLAY:
-					mediaPlayer.play();
-					break;
-				case PAUSE:
-					mediaPlayer.pause();
-					break;
-				case NEXT:
-					mediaPlayer.next();
-					break;
-				case PREVIOUS:
-					mediaPlayer.previous();
-					break;
-				}
-			}
-		});
+        });
 
 		TagPanel tags = new TagPanel(tagModel, tagView);
 //		TagOperationsPanel tagOps = new TagOperationsPanel(mediaPlayer, tagModel);
@@ -226,7 +209,7 @@ public class NowPlayingController
         if (gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSPARENT)) {
             view.setBackground(new Color(0, 0, 0, 0));
         } else {
-            Logger.getLogger(getClass()).warn("Per pixel transparency not supported.");
+            LogManager.getLogger(getClass()).warn("Per pixel transparency not supported.");
         }
         trayIcon = null;
 		if (SystemTray.isSupported()) {
@@ -241,7 +224,7 @@ public class NowPlayingController
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
-                System.err.println(e);
+                log.error("Error registering system tray", e);
             }
         }
 

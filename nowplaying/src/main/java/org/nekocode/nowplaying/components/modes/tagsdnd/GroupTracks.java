@@ -6,7 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.internals.DaemonThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
@@ -21,9 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +40,7 @@ import static java.lang.String.format;
  */
 public class GroupTracks extends JPanel {
 
-    private static final Logger log = Logger.getLogger(GroupTracks.class);
+    private static final Logger log = LogManager.getLogger(GroupTracks.class);
     private static final String GROUP_NAME_DEFAULT = "New group name...";
 
     private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
@@ -61,36 +59,27 @@ public class GroupTracks extends JPanel {
         JLabel tagLabel = new JLabel("group name:");
         tagLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
 
-        ActionListener applyAction = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                workerThread.execute(setGroup);
-//                log.debug("select group is: " + groupNamePullDown.getSelectedItem());
-            }
-        };
+        ActionListener applyAction = e -> workerThread.execute(setGroup);
 
         groupNameModel = new GroupNameComboBoxModel();
         groupNameModel.addGroupName(GROUP_NAME_DEFAULT);
         groupNameModel.setSelectedItem(GROUP_NAME_DEFAULT);
-        groupNamePullDown = new JComboBox(groupNameModel);
+        groupNamePullDown = new JComboBox<>(groupNameModel);
         groupNamePullDown.setEditable(true);
 
         JButton apply = new JButton("Add Tracks to Group");
         apply.addActionListener(applyAction);
         
-        table.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (e instanceof TrackTableComponent.TrackTableChangeEvent) {
-                    TrackTableComponent.TrackTableChangeEvent ttce = (TrackTableComponent.TrackTableChangeEvent) e;
-                    switch (ttce.getType()) {
-                        case ADD:
-                            groupNameModel.addGroupNames(GroupTracks.this.tagModel.getGroups(ttce.getTrack()));
-                            break;
-                        case CLEAR:
-                            groupNameModel.clear();
-                            break;
-                    }
+        table.addChangeListener(e -> {
+            if (e instanceof TrackTableComponent.TrackTableChangeEvent) {
+                TrackTableComponent.TrackTableChangeEvent ttce = (TrackTableComponent.TrackTableChangeEvent) e;
+                switch (ttce.getType()) {
+                    case ADD:
+                        groupNameModel.addGroupNames(GroupTracks.this.tagModel.getGroups(ttce.getTrack()));
+                        break;
+                    case CLEAR:
+                        groupNameModel.clear();
+                        break;
                 }
             }
         });
@@ -158,9 +147,9 @@ public class GroupTracks extends JPanel {
         }
     }
     
-    private static class GroupNameComboBoxModel extends AbstractListModel implements ComboBoxModel {
+    private static class GroupNameComboBoxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
 
-        private List<String> groupNames = new ArrayList<String>();
+        private List<String> groupNames = new ArrayList<>();
         private String selectedItem = null;
 
         @Override
@@ -188,10 +177,10 @@ public class GroupTracks extends JPanel {
 
         public void addGroupNames(Collection<String> newGroupNames) {
             // ensure there are no duplicates, and that it comes out sorted
-            Set<String> allGroupNames = new TreeSet<String>();
+            Set<String> allGroupNames = new TreeSet<>();
             allGroupNames.addAll(groupNames);
             allGroupNames.addAll(newGroupNames);
-            groupNames = new ArrayList<String>(allGroupNames);
+            groupNames = new ArrayList<>(allGroupNames);
             fireContentsChanged(this, -1, -1);
         }
 

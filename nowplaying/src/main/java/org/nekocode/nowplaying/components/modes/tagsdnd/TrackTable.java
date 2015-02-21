@@ -6,6 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.nekocode.nowplaying.resources.images.Icons;
 
 import javax.swing.ImageIcon;
@@ -21,10 +23,10 @@ import static java.lang.Math.max;
 /**
  * A subclass of JTable for displaying track information.
  */
-public class TrackTable extends JTable {
+public class TrackTable extends JXTable {
 
     /**
-     * Setting it to exactly the preferred width still leaves ellipis at the end, so add this buffer
+     * Setting it to exactly the preferred width still leaves ellipsis at the end, so add this buffer
      */
     private static final int BUFFER = 4;
     private static final int MIN_COLUMN_WIDTH = 150;
@@ -37,7 +39,8 @@ public class TrackTable extends JTable {
     public TrackTable(TrackTableModel model) {
         super(model);
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
+        setSortable(true);
+        setHighlighters(HighlighterFactory.createAlternateStriping());
 
         /*
          * the first column indicates whether the tracks exists in the media player
@@ -136,13 +139,10 @@ public class TrackTable extends JTable {
         public Component getTableCellRendererComponent(final JTable table, Object value, boolean isSelected, boolean hasFocus, int row, final int column) {
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             final int width = component.getPreferredSize().width;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    int preferred = table.getColumnModel().getColumn(column).getPreferredWidth();
-                    if (width > preferred) {
-                        table.getColumnModel().getColumn(column).setPreferredWidth(width + BUFFER);
-                    }
+            SwingUtilities.invokeLater(() -> {
+                int preferred = table.getColumnModel().getColumn(column).getPreferredWidth();
+                if (width > preferred) {
+                    table.getColumnModel().getColumn(column).setPreferredWidth(width + BUFFER);
                 }
             });
             return component;

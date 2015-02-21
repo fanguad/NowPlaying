@@ -40,11 +40,18 @@ public class ITunesRemoteURLFactory {
     private static final String FIND_TRACKS_QUERY = "&query=(%s)";
     private static final String FIND_TRACKS_QUERY_ELEMENT = "('%s:%s')";
     private static final String FIND_TRACKS_QUERY_CONNECTOR = "+";
+/*
+alternate - this appears to be for an OR query though
+    private static final String FIND_TRACKS_PREFIX = "/databases/%d/items?session-id=%s&meta=%s&type=music&sort=name&include-sort-headers=1%s";
+    private static final String FIND_TRACKS_QUERY = "&query=((%s))";
+    private static final String FIND_TRACKS_QUERY_ELEMENT = "'%s:%s'";
+    private static final String FIND_TRACKS_QUERY_CONNECTOR = ",";
+*/
     private static final String FIND_TRACKS_QUERY_ITEMNAME = "dmap.itemname";
     private static final String FIND_TRACKS_QUERY_ARTIST = "daap.songartist";
     private static final String FIND_TRACKS_QUERY_ALBUM = "daap.songalbum";
 
-    private String host;
+    private final String host;
     private String sessionId;
     private long databaseId;
 

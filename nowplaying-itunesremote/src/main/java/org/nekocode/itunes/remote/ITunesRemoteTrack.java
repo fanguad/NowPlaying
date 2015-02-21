@@ -6,13 +6,13 @@
 
 package org.nekocode.itunes.remote;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.itunes.remote.connection.ContentCode;
 import org.nekocode.itunes.remote.connection.ITunesRemoteResponse;
 import org.nekocode.nowplaying.objects.Track;
 
 import javax.swing.ImageIcon;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
@@ -22,7 +22,7 @@ import static org.nekocode.itunes.remote.connection.ContentCode.*;
  * A Track that loads data from ITunesRemoteResponse objects
  */
 public class ITunesRemoteTrack implements Track {
-    private static final Logger log = Logger.getLogger(ITunesRemoteTrack.class);
+    private static final Logger log = LogManager.getLogger(ITunesRemoteTrack.class);
 
     /**
      * These are the content codes expected in any response.
@@ -54,7 +54,7 @@ public class ITunesRemoteTrack implements Track {
     private short trackCount;
 
     public ITunesRemoteTrack(long databaseId,
-                             ITunesRemoteResponse response) throws IOException {
+                             ITunesRemoteResponse response) {
         setValues(databaseId, response);
     }
 
@@ -66,7 +66,6 @@ public class ITunesRemoteTrack implements Track {
     /**
      * Sets the internal values of this object.
      *
-     * @param trackId track id of track
      * @param databaseId database id of track
      * @param response can be either a LIST_ITEM or a DAAP_DATABASE_SONGS
      */
@@ -74,7 +73,7 @@ public class ITunesRemoteTrack implements Track {
         this.databaseId = databaseId;
 
         ITunesRemoteResponse item;
-        if (response.hasLeaf(DMAP_PERSISTENT_ID)) {
+        if (response.hasLeaf(DMAP_ITEM_ID)) {
             item = response;
         } else {
             ContentCode listType = response.hasLeaf(DAAP_DATABASE_SONGS) ? DAAP_DATABASE_SONGS : DAAP_PLAYLIST_SONGS;

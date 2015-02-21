@@ -6,11 +6,9 @@
 
 package org.nekocode.itunes.remote;
 
-import org.apache.log4j.Logger;
-import org.nekocode.itunes.remote.connection.ITunesRemoteResponse;
-import org.nekocode.itunes.remote.connection.ITunesRemoteResponseDiff;
-import org.nekocode.itunes.remote.connection.RemoteSession;
-import org.nekocode.itunes.remote.connection.RequestManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.nekocode.itunes.remote.connection.*;
 import org.nekocode.nowplaying.AbstractMediaPlayer;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.NowPlayingProperties;
@@ -32,7 +30,7 @@ import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.*;
  * Media Player that uses the iTunes Remote protocol (Digital Audio Control Protocol (DACP))
  */
 public class ITunesRemoteModel extends AbstractMediaPlayer {
-    private static final Logger log = Logger.getLogger(ITunesRemoteModel.class);
+    private static final Logger log = LogManager.getLogger(ITunesRemoteModel.class);
 
     private RemoteSession session;
     private String playerGUID;
@@ -333,10 +331,18 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
     public List<Track> findTracks(String title, String artist, String album) {
         try {
             ITunesRemoteResponse response = session.findTracks(title, artist, album, ITunesRemoteTrack.DEFAULT_CONTENT_CODES);
-            List<ITunesRemoteResponse> tracksRaw = response.getMultiBranch(DAAP_DATABASE_SONGS, DMAP_LIST, DMAP_LIST_ITEM);
+            ContentCode listType = response.hasLeaf(DAAP_DATABASE_SONGS) ? DAAP_DATABASE_SONGS : DAAP_PLAYLIST_SONGS;
+            List<ITunesRemoteResponse> tracksRaw = response.getMultiBranch(listType, DMAP_LIST, DMAP_LIST_ITEM);
             List<Track> tracks = new ArrayList<>(tracksRaw.size());
             for (ITunesRemoteResponse trackRaw : tracksRaw) {
-                tracks.add(new ITunesRemoteTrack(session.getDatabaseId(), trackRaw));
+                ITunesRemoteTrack remoteTrack = new ITunesRemoteTrack(session.getDatabaseId(), trackRaw);
+                // MonkeyTunes has a bug where you can't do an AND search, only OR, so need to manually filter results
+                // (make sure to do this filtering before creating the self-loading track)
+
+                if (title == null || title.equals(remoteTrack.getTitle()))
+//                    if (artist == null || artist.equals(remoteTrack.getArtist())) // multiple artists don't work right
+                        if (album == null || album.equals(remoteTrack.getAlbum()))
+                            tracks.add(remoteTrack);
             }
             return tracks;
         } catch (IOException e) {

@@ -29,6 +29,8 @@ public enum NowPlayingProperties {
     CORNER_RADIUS,
     MEDIA_PLAYER_GUID,
     REMOTE_MACHINE,
+    WINDOW_ANCHOR,
+    WINDOW_POSITION,
     ;
 
     public static final String PROPERTIES_FILE = "nowplaying.properties";

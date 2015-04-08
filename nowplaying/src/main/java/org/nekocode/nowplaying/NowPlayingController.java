@@ -229,7 +229,7 @@ public class NowPlayingController
         }
 
 		view.pack();
-		view.setLocationByPlatform(true);
+		view.setInitialLocation();
 		view.setVisible(true);
 		monitor.start();
 	}
@@ -251,7 +251,6 @@ public class NowPlayingController
 	private void shutdown() {
         shutdown = true;
 
-		NowPlayingProperties.storeProperties();
 		if (monitor != null)
 			try {
 				monitor.shutdown();
@@ -279,7 +278,9 @@ public class NowPlayingController
 		if (trayIcon != null)
 			SystemTray.getSystemTray().remove(trayIcon);
 
-		// as a safe-guard against hangs, force a quit after 60 more seconds
+        NowPlayingProperties.storeProperties();
+
+        // as a safe-guard against hangs, force a quit after 60 more seconds
 		TimerTask forceExit = new TimerTask() {
 			@Override
 			public void run() {

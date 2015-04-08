@@ -69,7 +69,43 @@ public class NekoFrame extends JFrame {
      *
      * @param anchor new anchor corner.  NORTHWEST will be used if anchor is null.
      */
-	public void setAnchorPosition(AnchorPosition anchor) {
+	public void setAnchor(AnchorPosition anchor) {
 		this.anchor = anchor == null ? AnchorPosition.NORTHWEST : anchor;
 	}
+
+    public AnchorPosition getAnchor() {
+        return anchor;
+    }
+
+    /**
+     * Gets the x location of the corner that is anchored.
+     *
+     * @return anchor corner
+     */
+    public int getAnchorX() {
+        switch (anchor)
+        {
+            case NORTHEAST:
+            case SOUTHEAST:
+                return getX() + getWidth();
+            default:
+                return getX();
+        }
+    }
+
+    /**
+     * Gets the x location of the corner that is anchored.
+     *
+     * @return anchor corner
+     */
+    public int getAnchorY() {
+        switch (anchor)
+        {
+            case SOUTHWEST:
+            case SOUTHEAST:
+                return getY() + getHeight();
+            default:
+                return getY();
+        }
+    }
 }

@@ -340,6 +340,16 @@ public class NowPlayingView extends NekoFrame {
 
     public void shutdown() {
         log.info("shutting down view");
+
+        // save anchor and position
+        Properties properties = NowPlayingProperties.loadProperties();
+        String anchorProperty = getAnchor().name();
+        String positionProperty = String.format("%d, %d", getAnchorX(), getAnchorY());
+        log.debug("Saving window anchor: " + anchorProperty);
+        log.debug("Saving window location: " + positionProperty);
+        properties.put(NowPlayingProperties.WINDOW_ANCHOR.name(), anchorProperty);
+        properties.put(NowPlayingProperties.WINDOW_POSITION.name(), positionProperty);
+
         // update all the mode controls
         for (final NowPlayingControl npc : modeControls) {
             executor.execute(npc::shutdown);
@@ -374,5 +384,37 @@ public class NowPlayingView extends NekoFrame {
     @Override
     public Dimension getPreferredSize() {
         return panel.getPreferredSize();
+    }
+
+    public void setInitialLocation()
+    {
+        Properties properties = NowPlayingProperties.loadProperties();
+        String anchorPositionProperty = properties.getProperty(NowPlayingProperties.WINDOW_ANCHOR.name());
+        if (anchorPositionProperty != null) {
+            log.debug("Setting initial anchor to saved value: " + anchorPositionProperty);
+            AnchorPosition savedAnchor = AnchorPosition.valueOf(anchorPositionProperty);
+            setAnchor(savedAnchor);
+        }
+        String windowPositionProperty = properties.getProperty(NowPlayingProperties.WINDOW_POSITION.name());
+        if (windowPositionProperty == null) {
+            setLocationByPlatform(true);
+        } else {
+            log.debug("Setting initial location to saved value: " + windowPositionProperty);
+            String[] xyPositions = windowPositionProperty.split("\\s*,\\s*");
+            int xPosition = Integer.parseInt(xyPositions[0]);
+            int yPosition = Integer.parseInt(xyPositions[1]);
+            log.debug(String.format("preferred size: h:%d, w:%d",
+                    (int) getPreferredSize().getHeight(), (int) getPreferredSize().getWidth()));
+
+            if (getAnchor() == AnchorPosition.SOUTHEAST || getAnchor() == AnchorPosition.SOUTHWEST) {
+                yPosition -= (int) getPreferredSize().getHeight();
+            }
+            if (getAnchor() == AnchorPosition.NORTHEAST || getAnchor() == AnchorPosition.SOUTHEAST) {
+                xPosition -= (int) getPreferredSize().getWidth();
+            }
+            log.debug(String.format("initial location after considering anchor: %d, %d", xPosition, yPosition));
+
+            setLocation(xPosition, yPosition);
+        }
     }
 }

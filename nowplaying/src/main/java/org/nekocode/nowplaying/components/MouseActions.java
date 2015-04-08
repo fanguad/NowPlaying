@@ -58,7 +58,6 @@ public class MouseActions extends MouseInputAdapter {
      *
      * @return popup menu
      */
-	@SuppressWarnings("serial")
     private JPopupMenu createPopupMenu() {
 	    JPopupMenu m = new JPopupMenu();
 		m.setLightWeightPopupEnabled(false);
@@ -77,22 +76,22 @@ public class MouseActions extends MouseInputAdapter {
 
 		dockmenu.add(new AbstractAction("Dock to NW") {
 			public void actionPerformed(ActionEvent e) {
-				dockNW();
+				dock(AnchorPosition.NORTHWEST);
 			}
 		});
 		dockmenu.add(new AbstractAction("Dock to NE") {
 			public void actionPerformed(ActionEvent e) {
-				dockNE();
+				dock(AnchorPosition.NORTHEAST);
 			}
 		});
 		dockmenu.add(new AbstractAction("Dock to SE") {
 			public void actionPerformed(ActionEvent e) {
-				dockSE();
+				dock(AnchorPosition.SOUTHEAST);
 			}
 		});
 		dockmenu.add(new AbstractAction("Dock to SW") {
 			public void actionPerformed(ActionEvent e) {
-				dockSW();
+				dock(AnchorPosition.SOUTHWEST);
 			}
 		});
 
@@ -199,16 +198,16 @@ public class MouseActions extends MouseInputAdapter {
 		Menu dockmenu = new Menu("Dock to...");
 
 		MenuItem dockNW = new MenuItem("Dock to NW");
-		dockNW.addActionListener(e -> dockNW());
+		dockNW.addActionListener(e -> dock(AnchorPosition.NORTHWEST));
 		dockmenu.add(dockNW);
 		MenuItem dockNE = new MenuItem("Dock to NE");
-		dockNE.addActionListener(e -> dockNE());
+		dockNE.addActionListener(e -> dock(AnchorPosition.NORTHEAST));
 		dockmenu.add(dockNE);
 		MenuItem dockSE = new MenuItem("Dock to SE");
-		dockSE.addActionListener(e -> dockSE());
+		dockSE.addActionListener(e -> dock(AnchorPosition.SOUTHEAST));
 		dockmenu.add(dockSE);
 		MenuItem dockSW = new MenuItem("Dock to SW");
-		dockSW.addActionListener(e -> dockSW());
+		dockSW.addActionListener(e -> dock(AnchorPosition.SOUTHWEST));
 		dockmenu.add(dockSW);
 
 		m.add(dockmenu);
@@ -218,30 +217,29 @@ public class MouseActions extends MouseInputAdapter {
 	    return m;
 	}
 
-	private void dockNW() {
-        frame.setAnchorPosition(AnchorPosition.NORTHWEST);
-        Rectangle bounds = getScreenBounds(frame.getX(), frame.getY());
-        frame.setLocation(bounds.x, bounds.y);
-    }
-
-	private void dockNE() {
-	    frame.setAnchorPosition(AnchorPosition.NORTHEAST);
+    private void dock(AnchorPosition anchorPosition)
+    {
+        frame.setAnchor(anchorPosition);
         Dimension size = frame.getSize();
-        Rectangle bounds = getScreenBounds(frame.getX() + size.width, frame.getY());
-        frame.setLocation(bounds.x + bounds.width - size.width, bounds.y);
-    }
-
-	private void dockSE() {
-	    frame.setAnchorPosition(AnchorPosition.SOUTHEAST);
-	    Dimension size = frame.getSize();
-        Rectangle bounds = getScreenBounds(frame.getX() + size.width, frame.getY() + size.height);
-        frame.setLocation(bounds.x + bounds.width - size.width, bounds.y + bounds.height - size.height);
-    }
-
-	private void dockSW() {
-	    frame.setAnchorPosition(AnchorPosition.SOUTHWEST);
-	    Dimension size = frame.getSize();
-        Rectangle bounds = getScreenBounds(frame.getX(), frame.getY() + size.height);
-        frame.setLocation(bounds.x, bounds.y + bounds.height - size.height);
+        Rectangle bounds;
+        switch (anchorPosition)
+        {
+            case NORTHWEST:
+                bounds = getScreenBounds(frame.getX(), frame.getY());
+                frame.setLocation(bounds.x, bounds.y);
+                break;
+            case NORTHEAST:
+                bounds = getScreenBounds(frame.getX() + size.width, frame.getY());
+                frame.setLocation(bounds.x + bounds.width - size.width, bounds.y);
+                break;
+            case SOUTHEAST:
+                bounds = getScreenBounds(frame.getX() + size.width, frame.getY() + size.height);
+                frame.setLocation(bounds.x + bounds.width - size.width, bounds.y + bounds.height - size.height);
+                break;
+            case SOUTHWEST:
+                bounds = getScreenBounds(frame.getX(), frame.getY() + size.height);
+                frame.setLocation(bounds.x, bounds.y + bounds.height - size.height);
+                break;
+        }
     }
 }

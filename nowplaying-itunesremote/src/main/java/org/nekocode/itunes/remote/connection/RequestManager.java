@@ -33,14 +33,14 @@ import static java.lang.String.format;
  */
 public class RequestManager {
     private static final Logger log = LogManager.getLogger(RequestManager.class);
-    private static final int DEFAULT_TIMEOUT = 10000;
+    private static final int DEFAULT_TIMEOUT = 30000;
     private static final Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
 
     /**
      * Weak references.  Concurrent.
      */
     private static Set<HttpURLConnection> connections =
-            Collections.newSetFromMap(new WeakHashMap<HttpURLConnection, Boolean>());
+            Collections.newSetFromMap(new WeakHashMap<>());
     //            Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<HttpURLConnection, Boolean>()));
     //            Collections.newSetFromMap(new ConcurrentHashMap<HttpURLConnection, Boolean>());
     private static Lock shutdownLock = new ReentrantLock();
@@ -298,9 +298,7 @@ public class RequestManager {
         shutdown = true;
 
         // disconnect any active connections
-        for (HttpURLConnection connection : connections) {
-            connection.disconnect();
-        }
+        connections.forEach(java.net.HttpURLConnection::disconnect);
 
         shutdownLock.unlock();
     }

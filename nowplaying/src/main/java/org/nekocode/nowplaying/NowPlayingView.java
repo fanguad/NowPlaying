@@ -16,7 +16,7 @@ import org.nekocode.nowplaying.components.swing.*;
 import org.nekocode.nowplaying.components.swing.NekoPanel.BorderPositions;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 
 import javax.swing.AbstractAction;
@@ -47,8 +47,9 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main window of the application.
@@ -84,7 +85,7 @@ public class NowPlayingView extends NekoFrame
 	private Set<NowPlayingControl> modeControls = new HashSet<>();
 
 	// miscellaneous elements
-    private final Executor executor;
+    private final ExecutorService executor;
 
 	private Track track;
 
@@ -100,7 +101,7 @@ public class NowPlayingView extends NekoFrame
 	public NowPlayingView() {
       super("Now Playing...");
 
-      executor = Executors.newCachedThreadPool(new DaemonThreadFactory());
+      executor = Executors.newCachedThreadPool(new NamedThreadFactory("NowPlayingView", false));
 
       Properties properties = NowPlayingProperties.loadProperties();
 
@@ -336,10 +337,18 @@ public class NowPlayingView extends NekoFrame
 	}
 
 	public void shutdown() {
+        log.info("shutting down view");
 		// update all the mode controls
 		for (final NowPlayingControl npc : modeControls) {
 			executor.execute(npc::shutdown);
 		}
+        try {
+            executor.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            log.warn("interrupted while shutting down view", e);
+        }
+        executor.shutdown();
+        log.info("finished shutting down view");
 	}
 
 	/* (non-Javadoc)

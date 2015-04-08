@@ -6,6 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.tags.TagModel;
 
@@ -28,19 +30,26 @@ import java.awt.Window;
  */
 public class UnifiedTagEditorDialog extends JDialog {
 
+    private static final Logger log = LogManager.getLogger(UnifiedTagEditorDialog.class);
+    private final TagMultipleTracks tagMultipleTracks;
+    private final ChangeTags changeTags;
+    private final TagDuplicateTracks tagDuplicateTracks;
+    private final GroupTracks groupTracks;
+    private final TrackTableComponent table;
+
     public UnifiedTagEditorDialog(Window owner, MediaPlayer mediaPlayer, TagModel tagModel) {
         super(owner, "Edit Tags for Multiple Tracks at Once");
 
         JPanel contentPane = new JPanel(new BorderLayout());
         this.setContentPane(contentPane);
 
-        final TrackTableComponent table = new TrackTableComponent(mediaPlayer, tagModel);
+        table = new TrackTableComponent(mediaPlayer, tagModel);
 
-        final TagMultipleTracks tagMultipleTracks = new TagMultipleTracks(table, tagModel);
+        tagMultipleTracks = new TagMultipleTracks(table, tagModel);
         tagMultipleTracks.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
-        final ChangeTags changeTags = new ChangeTags(table, tagModel);
-        final TagDuplicateTracks tagDuplicateTracks = new TagDuplicateTracks(table, tagModel);
-        final GroupTracks groupTracks = new GroupTracks(table, tagModel);
+        changeTags = new ChangeTags(table, tagModel);
+        tagDuplicateTracks = new TagDuplicateTracks(table, tagModel);
+        groupTracks = new GroupTracks(table, tagModel);
 
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
         UIManager.put("TabbedPane.tabsOverlapBorder", true);
@@ -85,5 +94,16 @@ public class UnifiedTagEditorDialog extends JDialog {
 
         contentPane.add(topComponent, BorderLayout.PAGE_START);
         contentPane.add(table, BorderLayout.CENTER);
+    }
+
+    public void shutdown()
+    {
+        log.info("shutting down Unified Tag Editor Dialog");
+        table.shutdown();
+        tagMultipleTracks.shutdown();
+        changeTags.shutdown();
+        tagDuplicateTracks.shutdown();
+        groupTracks.shutdown();
+        log.info("finished shutting down Unified Tag Editor Dialog");
     }
 }

@@ -8,7 +8,7 @@ package org.nekocode.nowplaying.components.modes.tagsdnd;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 
@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -34,7 +34,7 @@ public class TagMultipleTracks extends JPanel {
 
     private static final Logger log = LogManager.getLogger(TagMultipleTracks.class);
 
-    private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
+    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("TagMultipleTracks", false));
 
     private TagModel tagModel;
     private JTextField tagInput;
@@ -72,6 +72,10 @@ public class TagMultipleTracks extends JPanel {
 
     public void clear() {
         tagInput.setText("");
+    }
+
+    public void shutdown() {
+        workerThread.shutdown();
     }
 
     private class ApplyTags implements Runnable {

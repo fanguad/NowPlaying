@@ -93,6 +93,8 @@ public class TagDnDPanel extends NowPlayingControl {
     @Override
     public void shutdown() {
         tagCloudButton.shutdown();
+        editTags.shutdown();
+        dbUtils.shutdown();
         editTags.dispose();
         dbUtils.dispose();
     }

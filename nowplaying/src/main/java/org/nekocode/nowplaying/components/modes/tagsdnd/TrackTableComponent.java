@@ -18,7 +18,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.icons.SpinningDialBusyIcon;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.objects.UnknownTrack;
 import org.nekocode.nowplaying.tags.TagModel;
@@ -51,7 +51,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.lang.String.format;
@@ -70,7 +70,8 @@ import static java.lang.String.format;
 public class TrackTableComponent extends JPanel {
     private static final Logger log = LogManager.getLogger(TrackTableComponent.class);
 
-    private final Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
+    private final ExecutorService workerThread = Executors.newSingleThreadExecutor(
+            new NamedThreadFactory("TrackTable-AddFiles", false));
     private final MediaPlayer mediaPlayer;
     private final TrackTableModel dataModel;
     private final BusyModel busyModel;
@@ -221,6 +222,10 @@ public class TrackTableComponent extends JPanel {
         for (ChangeListener l : changeListeners) {
             l.stateChanged(e);
         }
+    }
+
+    public void shutdown() {
+        workerThread.shutdown();
     }
 
     /**

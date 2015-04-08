@@ -13,7 +13,7 @@ import org.divxdede.swing.busy.JBusyComponent;
 import org.divxdede.swing.busy.ui.BasicBusyLayerUI;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.icons.SpinningDialBusyIcon;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 public class FindRemovedTracks extends JBusyComponent<JPanel> {
     private static final Logger log = LogManager.getLogger(FindRemovedTracks.class);
 
-    private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
+    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("FindRemovedTracks", false));
     
     private MediaPlayer mediaPlayer;
     private TagModel tagModel;
@@ -88,6 +88,10 @@ public class FindRemovedTracks extends JBusyComponent<JPanel> {
 
         final Runnable deleteTracks = new PurgeTracksAction();
         delete.addActionListener(e -> workerThread.execute(deleteTracks));
+    }
+
+    public void shutdown() {
+        workerThread.shutdown();
     }
 
     private class FindRemovedTracksAction implements Runnable {

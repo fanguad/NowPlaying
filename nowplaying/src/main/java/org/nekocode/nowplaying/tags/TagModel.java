@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.NowPlayingProperties;
 import org.nekocode.nowplaying.events.TagChangeListener;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.FileTrack;
 import org.nekocode.nowplaying.objects.MP3Track;
 import org.nekocode.nowplaying.objects.Track;
@@ -32,12 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -58,14 +53,14 @@ public class TagModel
 {
 	private static final Logger log = LogManager.getLogger(TagModel.class);
 	private final Set<TagChangeListener> tagChangeListeners;
-	private final Executor tagChangeExecutor;
+	private final ExecutorService tagChangeExecutor;
     private final ExecutorService dbAccess;
     private TagDatabase database;
 
     public TagModel() throws Exception {
         tagChangeListeners = new CopyOnWriteArraySet<>();
-        tagChangeExecutor = Executors.newSingleThreadExecutor(new DaemonThreadFactory());
-        dbAccess = Executors.newSingleThreadExecutor();
+        tagChangeExecutor = Executors.newSingleThreadExecutor(new NamedThreadFactory("TagChangeNotifier", false));
+        dbAccess = Executors.newSingleThreadExecutor(new NamedThreadFactory("DatabaseAccess", false));
 
         String tagDatabase = NowPlayingProperties.loadProperties().getProperty(NowPlayingProperties.TAG_DATABASE.name());
 
@@ -624,7 +619,6 @@ public class TagModel
 		try {
 			log.info("closing database connection");
             database.shutdown();
-			dbAccess.shutdown();
 			log.info("closed database connection");
 		} catch (SQLException e) {
 			// there's not a whole lot of recovery that can be done if we can't close the connection
@@ -1116,7 +1110,16 @@ public class TagModel
 	 * Shuts down the database connection cleanly.
 	 */
 	public void shutdown() {
+        log.info("closing tag model");
 		dbAccess.execute(this::__shutdown);
+        try {
+            dbAccess.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            log.warn("Interrupted while shutting down database connection", e);
+        }
+        dbAccess.shutdown();
+        tagChangeExecutor.shutdown();
+        log.info("closed tag model");
 	}
 
     static enum StatementName {

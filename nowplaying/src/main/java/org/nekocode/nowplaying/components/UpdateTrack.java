@@ -10,12 +10,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.objects.Track;
 
 /**
  * Interface that will be called by the view to update the view
  */
 public abstract class UpdateTrack extends SwingWorker<ImageIcon, Object> {
+
+    private static final Logger log = LogManager.getLogger(UpdateTrack.class);
 
 	protected Track newTrack;
 
@@ -26,8 +30,12 @@ public abstract class UpdateTrack extends SwingWorker<ImageIcon, Object> {
 	 * @param newTrack new Track
 	 */
 	public void execute(Track newTrack) {
-		setTrack(newTrack);
-		execute();
+        try {
+            setTrack(newTrack);
+            execute();
+        } catch (Exception e) {
+            log.error("Problem on track update", e);
+        }
 	}
 
 	/**

@@ -8,7 +8,7 @@ package org.nekocode.nowplaying.components.modes.tagsdnd;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.lang.String.format;
@@ -45,7 +44,7 @@ public class ChangeTags extends JPanel {
 
     private static final Logger log = LogManager.getLogger(ChangeTags.class);
 
-    private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
+    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("ChangeTags", false));
 
     private TagModel tagModel;
     private JComboBox tagListPullDown;
@@ -115,6 +114,11 @@ public class ChangeTags extends JPanel {
     public void clear() {
         newTagName.setText("");
         tagListModel.clear();
+    }
+
+    public void shutdown()
+    {
+        workerThread.shutdown();
     }
 
     private class DeleteTag implements Runnable {

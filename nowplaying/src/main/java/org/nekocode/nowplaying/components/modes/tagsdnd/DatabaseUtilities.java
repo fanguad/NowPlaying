@@ -6,6 +6,8 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.tags.TagModel;
 
@@ -20,6 +22,10 @@ import java.awt.Window;
  */
 public class DatabaseUtilities extends JDialog {
 
+    private static final Logger log = LogManager.getLogger(DatabaseUtilities.class);
+    private final FindUnusedTags findUnusedTags;
+    private final FindRemovedTracks findRemovedTracks;
+
     public DatabaseUtilities(Window owner, MediaPlayer mediaPlayer, TagModel tagModel) {
         super(owner, "Database Utilities");
 
@@ -27,12 +33,20 @@ public class DatabaseUtilities extends JDialog {
 
         this.setContentPane(tabbedPane);
 
-        final FindUnusedTags findUnusedTags = new FindUnusedTags(tagModel);
+        findUnusedTags = new FindUnusedTags(tagModel);
 //        findUnusedTags.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
-        final FindRemovedTracks findRemovedTracks = new FindRemovedTracks(mediaPlayer, tagModel);
+        findRemovedTracks = new FindRemovedTracks(mediaPlayer, tagModel);
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.addTab("Find Unused Tags", findUnusedTags);
         tabbedPane.addTab("Find Removed Tracks", findRemovedTracks);
+    }
+
+    public void shutdown()
+    {
+        log.info("shutting down database utilities dialog");
+        findUnusedTags.shutdown();
+        findRemovedTracks.shutdown();
+        log.info("finished shutting down database utilities dialog");
     }
 }

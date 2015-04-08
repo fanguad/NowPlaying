@@ -10,7 +10,7 @@ import org.divxdede.swing.busy.BusyModel;
 import org.divxdede.swing.busy.JBusyComponent;
 import org.divxdede.swing.busy.ui.BasicBusyLayerUI;
 import org.nekocode.nowplaying.components.icons.SpinningDialBusyIcon;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
@@ -23,7 +23,7 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  */
 public class FindUnusedTags extends JBusyComponent<JPanel> {
     
-    private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
+    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("FindUnusedTags", false));
     private BusyModel busyModel;
     private TagModel tagModel;
     private DefaultTableModel tableModel;
@@ -93,6 +93,11 @@ public class FindUnusedTags extends JBusyComponent<JPanel> {
         }
 
         tableModel.setDataVector(dataVector, new Object[] {"Tag Name"});
+    }
+
+    public void shutdown()
+    {
+        workerThread.shutdown();
     }
 
     private class FindUnusedTagsAction implements Runnable {

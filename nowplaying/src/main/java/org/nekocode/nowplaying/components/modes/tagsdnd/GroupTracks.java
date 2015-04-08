@@ -8,7 +8,7 @@ package org.nekocode.nowplaying.components.modes.tagsdnd;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.nekocode.nowplaying.internals.DaemonThreadFactory;
+import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.lang.String.format;
@@ -43,7 +43,7 @@ public class GroupTracks extends JPanel {
     private static final Logger log = LogManager.getLogger(GroupTracks.class);
     private static final String GROUP_NAME_DEFAULT = "New group name...";
 
-    private Executor workerThread = Executors.newFixedThreadPool(1, new DaemonThreadFactory());
+    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("GroupTracks", false));
 
     private TagModel tagModel;
     private JComboBox groupNamePullDown;
@@ -106,6 +106,10 @@ public class GroupTracks extends JPanel {
     public void clear() {
         groupNameModel.clear();
         groupNameModel.setSelectedItem(GROUP_NAME_DEFAULT);
+    }
+
+    public void shutdown() {
+        workerThread.shutdown();
     }
 
     private class SetGroup implements Runnable {

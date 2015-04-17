@@ -339,9 +339,9 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
                 // MonkeyTunes has a bug where you can't do an AND search, only OR, so need to manually filter results
                 // (make sure to do this filtering before creating the self-loading track)
 
-                if (title == null || title.equals(remoteTrack.getTitle()))
+//                if (title == null || title.equals(remoteTrack.getTitle()))
 //                    if (artist == null || artist.equals(remoteTrack.getArtist())) // multiple artists don't work right
-                        if (album == null || album.equals(remoteTrack.getAlbum()))
+//                        if (album == null || album.equals(remoteTrack.getAlbum()))
                             tracks.add(remoteTrack);
             }
             return tracks;

@@ -46,11 +46,7 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -309,6 +305,8 @@ public class TrackTableComponent extends JPanel {
                 }
             }
 
+            Map<String, Collection<Track>> foundTracks = new HashMap<>();
+
             for (final File file : files) {
                 try {
                     log.debug("Loading file: " + file.getAbsolutePath());
@@ -321,7 +319,18 @@ public class TrackTableComponent extends JPanel {
                     final String album = tag.getFirst(FieldKey.ALBUM);
                     String key = format("{title=\"%s\", artist=\"%s\", album=\"%s\"}", title, artist, album);
 
-                    List<Track> tracks = mediaPlayer.findTracks(title, artist, album);
+                    if (!foundTracks.containsKey(key)) {
+                        Collection<Track> tracks = mediaPlayer.findTracks(title, artist, album);
+                        // take advantage of MonkeyTunes bug (it turns "AND" queries into "OR" queries)
+                        for (Track track : tracks) {
+                            key = format("{title=\"%s\", artist=\"%s\", album=\"%s\"}",
+                                    track.getTitle(), track.getArtist(), track.getAlbum());
+                            foundTracks.computeIfAbsent(key, k -> new ArrayList<>());
+                            foundTracks.get(key).add(track);
+                        }
+                    }
+                    Collection<Track> tracks = foundTracks.get(key);
+
                     if (tracks.isEmpty()) {
                         log.info("Unable to find match for " + key);
                         addTrack(new UnknownTrack() {

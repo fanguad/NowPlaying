@@ -9,13 +9,7 @@ package org.nekocode.itunes.remote.connection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -150,6 +144,21 @@ public class ITunesRemoteResponse {
             response = response.childNodes.get(contentCodes[i]);
         }
         return response.leafNodes.containsKey(contentCodes[i]);
+    }
+
+    /**
+     * Returns true if this response contains the specified child node.
+     *
+     * @param contentCodes node contentCodes
+     * @return true if this response contains the specified child node and it is not empty
+     */
+    public boolean hasChild(ContentCode... contentCodes) {
+        ITunesRemoteResponse response = this;
+        int i = 0;
+        for (; i < contentCodes.length - 1; i++) {
+            response = response.childNodes.get(contentCodes[i]);
+        }
+        return response.childNodes.containsKey(contentCodes[i]);
     }
 
     /**

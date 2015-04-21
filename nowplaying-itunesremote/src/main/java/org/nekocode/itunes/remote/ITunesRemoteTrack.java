@@ -76,7 +76,7 @@ public class ITunesRemoteTrack implements Track {
         if (response.hasLeaf(DMAP_ITEM_ID)) {
             item = response;
         } else {
-            ContentCode listType = response.hasLeaf(DAAP_DATABASE_SONGS) ? DAAP_DATABASE_SONGS : DAAP_PLAYLIST_SONGS;
+            ContentCode listType = response.hasChild(DAAP_DATABASE_SONGS) ? DAAP_DATABASE_SONGS : DAAP_PLAYLIST_SONGS;
             item = response.getMultiBranch(listType, DMAP_LIST, DMAP_LIST_ITEM).get(0);
         }
         trackId = item.getInt(DMAP_ITEM_ID);

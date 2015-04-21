@@ -317,6 +317,21 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
     }
 
     @Override
+    public Track getTrack(int trackId) {
+        try {
+            ITunesRemoteResponse response = session.getMetaData(trackId, ITunesRemoteTrack.DEFAULT_CONTENT_CODES);
+            ContentCode listType = response.hasLeaf(DAAP_DATABASE_SONGS) ? DAAP_DATABASE_SONGS : DAAP_PLAYLIST_SONGS;
+            List<ITunesRemoteResponse> tracksRaw = response.getMultiBranch(listType, DMAP_LIST, DMAP_LIST_ITEM);
+            if (!tracksRaw.isEmpty()) {
+                return new ITunesRemoteTrack(session.getDatabaseId(), tracksRaw.get(0));
+            }
+        } catch (IOException e) {
+            log.error("error searching for tracks", e);
+        }
+        return null;
+    }
+
+    @Override
     public PlayerState getPlayerState() {
         if (session == null) {
             return PlayerState.STOPPED;
@@ -354,14 +369,16 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
     @Override
     public List<String> findTrackIds(String title, String artist, String album) {
         try {
-            ITunesRemoteResponse response = session.findTracks(title, artist, album, DMAP_PERSISTENT_ID);
+            ITunesRemoteResponse response = session.findTracks(title, artist, album, DMAP_PERSISTENT_ID, DMAP_ITEM_ID);
             List<ITunesRemoteResponse> tracksRaw = response.getMultiBranch(DAAP_DATABASE_SONGS, DMAP_LIST, DMAP_LIST_ITEM);
             List<String> trackIds = new ArrayList<>(tracksRaw.size());
             for (ITunesRemoteResponse trackRaw : tracksRaw) {
-                if (!trackRaw.hasLeaf(DMAP_PERSISTENT_ID)) {
+                if (!trackRaw.hasLeaf(DMAP_ITEM_ID)) {
                     trackRaw = trackRaw.getMultiBranch(DAAP_DATABASE_SONGS, DMAP_LIST, DMAP_LIST_ITEM).get(0);
                 }
-                trackIds.add(trackRaw.getHexNumber(DMAP_PERSISTENT_ID));
+                int trackId = trackRaw.getInt(DMAP_ITEM_ID);
+                String persistentId = trackRaw.hasLeaf(DMAP_PERSISTENT_ID) ? trackRaw.getHexNumber(DMAP_PERSISTENT_ID) : Integer.toString(trackId); // TODO MonkeyTunes doesn't provide DMAP_PERSISTENT_ID
+                trackIds.add(persistentId);
             }
             return trackIds;
         } catch (IOException e) {

@@ -317,16 +317,15 @@ public class TrackTableComponent extends JPanel {
                     final String title = tag.getFirst(FieldKey.TITLE);
                     final String artist = tag.getFirst(FieldKey.ARTIST);
                     final String album = tag.getFirst(FieldKey.ALBUM);
-                    String key = format("{title=\"%s\", artist=\"%s\", album=\"%s\"}", title, artist, album);
+                    String key = getTrackKey(title, artist, album);
 
                     if (!foundTracks.containsKey(key)) {
                         Collection<Track> tracks = mediaPlayer.findTracks(title, artist, album);
                         // take advantage of MonkeyTunes bug (it turns "AND" queries into "OR" queries)
                         for (Track track : tracks) {
-                            key = format("{title=\"%s\", artist=\"%s\", album=\"%s\"}",
-                                    track.getTitle(), track.getArtist(), track.getAlbum());
-                            foundTracks.computeIfAbsent(key, k -> new ArrayList<>());
-                            foundTracks.get(key).add(track);
+                            String trackKey = getTrackKey(track.getTitle(), track.getArtist(), track.getAlbum());
+                            foundTracks.computeIfAbsent(trackKey, k -> new ArrayList<>());
+                            foundTracks.get(trackKey).add(track);
                         }
                     }
                     Collection<Track> tracks = foundTracks.get(key);
@@ -368,6 +367,12 @@ public class TrackTableComponent extends JPanel {
                 }
             }
             setBusy(false);
+        }
+
+        private String getTrackKey(String title, String artist, String album) {
+//            return format("{title=\"%s\", artist=\"%s\", album=\"%s\"}", title, artist, album);
+            // multiple artists causes keys to miss, so leave artists out of the equation
+            return format("{title=\"%s\", album=\"%s\"}", title, album);
         }
     }
 

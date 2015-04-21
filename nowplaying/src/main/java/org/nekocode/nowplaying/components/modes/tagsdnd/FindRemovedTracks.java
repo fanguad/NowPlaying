@@ -14,6 +14,7 @@ import org.divxdede.swing.busy.ui.BasicBusyLayerUI;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.icons.SpinningDialBusyIcon;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
+import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
@@ -23,12 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -102,13 +98,30 @@ public class FindRemovedTracks extends JBusyComponent<JPanel> {
 
             // load all track ids from tagModel
             List<String> trackIdsFromDatabase = tagModel.getAllTrackIds();
-            // load all track ids from media player (only grab the ids, don't make objects)
-            List<String> trackIdsFromPlayer = mediaPlayer.findTrackIds(null, null, null);
+
+            // MonkeyTunes doesn't do a "find all" search the same way as iTunes
+            List<String> trackIdsFromPlayer;
+            if (false) {
+                // load all track ids from media player (only grab the ids, don't make objects)
+                trackIdsFromPlayer = mediaPlayer.findTrackIds(null, null, null);
+            } else {
+                // this bit probably wouldn't work properly in iTunes, since persistentId and itemId aren't the same
+                trackIdsFromPlayer = new ArrayList<>();
+                for (String trackId : trackIdsFromDatabase) {
+                    try {
+                        Track track = mediaPlayer.getTrack(Integer.parseInt(trackId));
+                        if (track != null) {
+                            trackIdsFromPlayer.add(trackId);
+                        }
+                    } catch (NumberFormatException e) {
+                        // the id wasn't an integer - this will remove any badly-formed (by MonkeyTunes standards, at least) ids
+                    }
+                }
+            }
 
             Set<String> difference = new HashSet<>(trackIdsFromDatabase);
             difference.removeAll(trackIdsFromPlayer);
 
-/*
             if (log.isDebugEnabled()) {
                 Collections.sort(trackIdsFromDatabase);
                 Collections.sort(trackIdsFromPlayer);
@@ -119,7 +132,6 @@ public class FindRemovedTracks extends JBusyComponent<JPanel> {
                 log.debug("difference:           " + difference.size());
                 log.debug("difference:           " + difference);
             }
-*/
 
             Map<String, List<TagCloudEntry>> tags = tagModel.getTagsById(difference, false);
 

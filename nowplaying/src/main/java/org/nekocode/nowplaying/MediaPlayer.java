@@ -76,6 +76,8 @@ public interface MediaPlayer {
 
     Playlist getCurrentPlaylist();
 
+	Track getTrack(int trackId);
+
     static enum PlayerState {
 		PLAYING, STOPPED
 	}
@@ -90,9 +92,6 @@ public interface MediaPlayer {
     /**
      * Finds tracks matching the specified input.
      *
-     * @param title
-     * @param artist
-     * @param album
      * @return list of tracks that match the search parameters
      */
     List<Track> findTracks(String title, String artist, String album);

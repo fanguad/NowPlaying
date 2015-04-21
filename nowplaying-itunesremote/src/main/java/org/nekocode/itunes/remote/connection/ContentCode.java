@@ -123,6 +123,7 @@ public enum ContentCode {
 
     ITUNES_AEIM("aeIM", INTEGER),
     ITUNES_MEDIA_KIND("aeMk", "com.apple.itunes.mediakind", BYTE),
+    ITUNES_HAS_VIDEO("aeHV", "com.apple.itunes.has-video", BYTE),
 
     DACP_PLAY_STATUS("caps", INTEGER), // 3 = paused, 4 = playing
     DACP_SHUFFLE_STATUS("cash", INTEGER), // 0 = off, 1 = on

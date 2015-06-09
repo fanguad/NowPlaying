@@ -42,4 +42,8 @@ public class SpinningDialBusyIcon extends SpinningDial implements BusyIcon {
     public boolean isDeterminate() {
         return false;
     }
+
+    public void shutdown() {
+        setFrameInterval(0);
+    }
 }

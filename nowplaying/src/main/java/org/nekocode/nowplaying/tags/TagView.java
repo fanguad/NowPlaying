@@ -64,8 +64,9 @@ public class TagView extends JPanel
 	private JLabel busy;
 
 	private JComponent textfields;
+	private final SpinningDial spinningDial;
 
-    public TagView() {
+	public TagView() {
 		listeners = new HashSet<>();
 
 		setLayout(new BorderLayout());
@@ -104,7 +105,8 @@ public class TagView extends JPanel
 		};
 		tagHolder.addTagCloudEntryMouseListener(tagListener);
 
-		busy = new JLabel(new SpinningDial(32, 32));
+		spinningDial = new SpinningDial(32, 32);
+		busy = new JLabel(spinningDial);
 
 
 		addNew = new NekoLabel("+");
@@ -321,5 +323,11 @@ public class TagView extends JPanel
 		} catch (InterruptedException | InvocationTargetException e) {
 			log.error(e);
 		}
+	}
+
+	public void shutdown() {
+		log.info("shutting down TagView");
+		spinningDial.setFrameInterval(0);
+		log.info("finished shutting down TagView");
 	}
 }

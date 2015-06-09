@@ -354,12 +354,12 @@ public class NowPlayingView extends NekoFrame {
         for (final NowPlayingControl npc : modeControls) {
             executor.execute(npc::shutdown);
         }
+        executor.shutdown();
         try {
             executor.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             log.warn("interrupted while shutting down view", e);
         }
-        executor.shutdown();
         log.info("finished shutting down view");
     }
 

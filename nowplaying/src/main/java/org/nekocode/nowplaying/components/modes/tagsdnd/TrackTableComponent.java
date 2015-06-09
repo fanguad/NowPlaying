@@ -78,6 +78,7 @@ public class TrackTableComponent extends JPanel {
     private final TagModel tagModel;
     private final TrackTable trackTable;
     private final Collection<ChangeListener> changeListeners;
+    private final SpinningDialBusyIcon busyIcon;
 
     /**
      * Constructor.
@@ -110,7 +111,8 @@ public class TrackTableComponent extends JPanel {
         busyModel.setCancellable(false);
         busyModel.setDeterminate(false);
         BasicBusyLayerUI ui = new BasicBusyLayerUI();
-        ui.setBusyIcon(new SpinningDialBusyIcon(64, 64));
+        busyIcon = new SpinningDialBusyIcon(64, 64);
+        ui.setBusyIcon(busyIcon);
         busyComponent.setBusyLayerUI(ui);
 
         this.add(busyComponent, BorderLayout.CENTER);
@@ -222,6 +224,7 @@ public class TrackTableComponent extends JPanel {
 
     public void shutdown() {
         workerThread.shutdown();
+        busyIcon.shutdown();
     }
 
     /**

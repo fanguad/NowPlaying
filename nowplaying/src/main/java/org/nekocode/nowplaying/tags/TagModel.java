@@ -1112,12 +1112,14 @@ public class TagModel
 	public void shutdown() {
         log.info("closing tag model");
 		dbAccess.execute(this::__shutdown);
+		dbAccess.shutdown();
         try {
-            dbAccess.awaitTermination(10, TimeUnit.SECONDS);
+            if (!dbAccess.awaitTermination(10, TimeUnit.SECONDS)) {
+				log.warn("dbAccess terminated due to timeout - this may be a problem");
+			}
         } catch (InterruptedException e) {
             log.warn("Interrupted while shutting down database connection", e);
         }
-        dbAccess.shutdown();
         tagChangeExecutor.shutdown();
         log.info("closed tag model");
 	}

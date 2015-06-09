@@ -272,8 +272,13 @@ public class NowPlayingController
 				log.error("Exception during shutdown", e);
 			}
 
-		if (view != null)
+		if (view != null) {
 			view.shutdown();
+		}
+
+		if (tagView != null) {
+			tagView.shutdown();
+		}
 
 		if (trayIcon != null)
 			SystemTray.getSystemTray().remove(trayIcon);

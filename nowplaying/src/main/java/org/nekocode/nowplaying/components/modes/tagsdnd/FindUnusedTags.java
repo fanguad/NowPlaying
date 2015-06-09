@@ -34,7 +34,8 @@ import java.util.stream.Collectors;
  * @author fanguad
  */
 public class FindUnusedTags extends JBusyComponent<JPanel> {
-    
+
+    private final SpinningDialBusyIcon busyIcon;
     private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("FindUnusedTags", false));
     private BusyModel busyModel;
     private TagModel tagModel;
@@ -47,7 +48,8 @@ public class FindUnusedTags extends JBusyComponent<JPanel> {
         JPanel view = new JPanel(new BorderLayout());
         setView(view);
         BasicBusyLayerUI busyLayerUI = new BasicBusyLayerUI();
-        busyLayerUI.setBusyIcon(new SpinningDialBusyIcon(64, 64));
+        busyIcon = new SpinningDialBusyIcon(64, 64);
+        busyLayerUI.setBusyIcon(busyIcon);
 //        BusyLayerUI busyLayerUI = new BasicBusyLayerUI(0, 0.85f, Color.WHITE);
         setBusyLayerUI(busyLayerUI);
 
@@ -98,6 +100,7 @@ public class FindUnusedTags extends JBusyComponent<JPanel> {
     public void shutdown()
     {
         workerThread.shutdown();
+        busyIcon.shutdown();
     }
 
     private class FindUnusedTagsAction implements Runnable {

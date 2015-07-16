@@ -80,7 +80,7 @@ public class TrackMonitor implements Runnable, TrackChangeListener {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				SwingUtilities.invokeLater(TrackMonitor.this);
+				TrackMonitor.this.run();
 			}
 		};
 

@@ -26,7 +26,7 @@ import java.util.List;
  * at all for the basic functionality to work, although hooks may be added later to allow reacting
  * to events in the tag cloud.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class TagCloudButton2 extends NekoButton {

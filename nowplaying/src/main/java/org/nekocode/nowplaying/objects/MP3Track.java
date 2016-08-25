@@ -9,5 +9,5 @@ package org.nekocode.nowplaying.objects;
 import java.util.UUID;
 
 public interface MP3Track extends FileTrack {
-	public UUID getUUID();
+	UUID getUUID();
 }

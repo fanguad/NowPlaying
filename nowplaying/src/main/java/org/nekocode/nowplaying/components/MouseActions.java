@@ -18,19 +18,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Menu;
-import java.awt.MenuItem;
-import java.awt.Point;
-import java.awt.PopupMenu;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 
 import static java.lang.Math.*;
+import static java.lang.String.format;
 
 public class MouseActions extends MouseInputAdapter {
 
@@ -40,7 +33,7 @@ public class MouseActions extends MouseInputAdapter {
     // location of last mouse event (for dragging), so we don't process the same event multiple times
     private Point lastPoint;
 
-	private NekoFrame frame;
+	private final NekoFrame frame;
 	private JPopupMenu menu;
 
 	public MouseActions(NekoFrame frame) {
@@ -182,6 +175,9 @@ public class MouseActions extends MouseInputAdapter {
                 closestBounds = bounds;
             }
 		}
+
+		if (closestBounds == null)
+			throw new HeadlessException(format("Unable to find point [%d, %d] within the bounds of any screen device", x, y));
 
         return closestBounds;
     }

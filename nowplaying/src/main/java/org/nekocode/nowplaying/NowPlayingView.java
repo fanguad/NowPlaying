@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * Main window of the application.
@@ -57,38 +58,37 @@ import java.util.concurrent.TimeUnit;
  * The content area of this frame has a BorderLayout, but the CENTER location is already used. Any
  * other position is okay.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class NowPlayingView extends NekoFrame {
     @SuppressWarnings("unused")
     private static final Logger log = LogManager.getLogger(NowPlayingView.class);
 
-    private final static EnumSet<ChangeType> shouldUpdateArtwork = EnumSet.of(
-            ChangeType.CURRENT_SONG_CHANGE, ChangeType.FILE_CHANGE);
+    private final static EnumSet<ChangeType> shouldUpdateArtwork = EnumSet.of(ChangeType.CURRENT_SONG_CHANGE, ChangeType.FILE_CHANGE);
 
     // frame elements
-    private int size;
+    private final int size;
     private ArtPanel panel;
 
     // track elements
-    private NekoLabel title;
-    private NekoLabel artist;
-    private NekoLabel album;
-    private NekoLabel grouping;
+    private final NekoLabel title;
+    private final NekoLabel artist;
+    private final NekoLabel album;
+    private final NekoLabel grouping;
 
     // mode elements
-    private NekoButton currentMode;
-    private JPanel currentModeControls;
-    private Queue<String> modes = new LinkedList<>();
-    private Set<NowPlayingControl> modeControls = new HashSet<>();
+    private final NekoButton currentMode;
+    private final JPanel currentModeControls;
+    private final Queue<String> modes = new LinkedList<>();
+    private final Set<NowPlayingControl> modeControls = new HashSet<>();
 
     // miscellaneous elements
     private final ExecutorService executor;
 
     private Track track;
 
-    private Collection<ArtPanelProgressLayerUI> progressLayers = new ArrayList<>();
+    private final Collection<ArtPanelProgressLayerUI> progressLayers = new ArrayList<>();
 
     private JComponent content;
     /**
@@ -112,7 +112,7 @@ public class NowPlayingView extends NekoFrame {
         title = new NekoLabel("NowPlayingInfo", JLabel.CENTER);
         artist = new NekoLabel("by", JLabel.CENTER);
         album = new NekoLabel("fanguad", JLabel.CENTER);
-        grouping = new NekoLabel("fanguad@nekocode.org", JLabel.CENTER);
+        grouping = new NekoLabel("dan.clark@nekocode.org", JLabel.CENTER);
 
         // create mode objects
         currentMode = new NekoButton("", Rotation.COUNTER_CLOCKWISE);
@@ -162,9 +162,6 @@ public class NowPlayingView extends NekoFrame {
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, new HashSet<KeyStroke>());
 
         Action rotateMode = new AbstractAction() {
-            /* (non-Javadoc)
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 rotateMode();
@@ -230,12 +227,10 @@ public class NowPlayingView extends NekoFrame {
      * Initiates an update of the GUI.  This method is safe to call from any
      * thread.
      *
-     * @param trackChange
+     * @param trackChange track change event
      */
-    public void updateTrack(final TrackChangeEvent trackChange) {
+    public void updateTrack(TrackChangeEvent trackChange) {
         track = trackChange.getTrack();
-        if (track == null)
-            return;
         log.info("updateTrack: " + trackChange.getType());
 
         // update the text labels
@@ -248,9 +243,7 @@ public class NowPlayingView extends NekoFrame {
         SwingUtilities.invokeLater(updateInfo);
 
         // update all the mode controls
-        for (final NowPlayingControl npc : modeControls) {
-            executor.execute(() -> npc.updateTrack(trackChange));
-        }
+        modeControls.forEach(npc -> executor.execute(() -> npc.updateTrack(trackChange)));
 
         if (shouldUpdateArtwork.contains(trackChange.getType())) {
             // update the artwork
@@ -330,7 +323,7 @@ public class NowPlayingView extends NekoFrame {
      * Updates the displayed progress of the track.  Set it to the given
      * percentage (0-1).
      *
-     * @param percent
+     * @param percent progress of track [0, 1]
      */
     public void updateTrackProgress(double percent) {
         for (ArtPanelProgressLayerUI l : progressLayers) {
@@ -351,9 +344,7 @@ public class NowPlayingView extends NekoFrame {
         properties.put(NowPlayingProperties.WINDOW_POSITION.name(), positionProperty);
 
         // update all the mode controls
-        for (final NowPlayingControl npc : modeControls) {
-            executor.execute(npc::shutdown);
-        }
+        modeControls.forEach(npc -> executor.execute(npc::shutdown));
         executor.shutdown();
         try {
             executor.awaitTermination(10, TimeUnit.SECONDS);
@@ -363,18 +354,12 @@ public class NowPlayingView extends NekoFrame {
         log.info("finished shutting down view");
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.Component#addMouseListener(java.awt.event.MouseListener)
-     */
     @Override
     public synchronized void addMouseListener(MouseListener l) {
         content.addMouseListener(l);
         mouseListenerTarget.addMouseListener(l);
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.Component#addMouseMotionListener(java.awt.event.MouseMotionListener)
-     */
     @Override
     public synchronized void addMouseMotionListener(MouseMotionListener l) {
         content.addMouseMotionListener(l);

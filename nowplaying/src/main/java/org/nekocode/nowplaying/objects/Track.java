@@ -13,88 +13,87 @@ import java.util.Date;
 /**
  * A playable track.  Note that this can be local or remote, audio or video.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public interface Track {
 
-	public abstract String getAlbum();
+	String getAlbum();
 
-	public abstract String getArtist();
+	String getArtist();
 
-	public abstract Collection<ImageIcon> getArtwork(int size);
+	Collection<ImageIcon> getArtwork(int size);
 
-	public abstract String getComment();
+	String getComment();
 
-	public abstract boolean isCompilation();
+	boolean isCompilation();
 
-	public abstract String getComposer();
+	String getComposer();
 
-	public abstract int getDiscCount();
+	int getDiscCount();
 
-	public abstract int getDiscNumber();
+	int getDiscNumber();
 
-	public abstract boolean isEnabled();
+	boolean isEnabled();
 
-	public abstract String getGenre();
+	String getGenre();
 
-	public abstract String getGrouping();
+	String getGrouping();
 
-	public abstract int getPlayedCount();
+	int getPlayedCount();
 
-	public abstract Date getPlayedDate();
+	Date getPlayedDate();
 
-	public abstract int getRating();
+	int getRating();
 
-	public abstract String getTitle();
+	String getTitle();
 
-	public abstract int getTrackCount();
+	int getTrackCount();
 
-	public abstract int getTrackNumber();
+	int getTrackNumber();
 
-	public abstract int getVolumeAdjustment();
+	int getVolumeAdjustment();
 
-	public abstract int getYear();
+	int getYear();
 
-	public abstract int getBitRate();
+	int getBitRate();
 
-	public abstract int getBpm();
+	int getBpm();
 
-	public abstract Date getDateAdded();
+	Date getDateAdded();
 
     /**
      * @return duration of track in seconds
      */
-	public abstract double getDuration();
+	double getDuration();
 
-	public abstract Date getModificationDate();
+	Date getModificationDate();
 
-	public abstract int getSampleRate();
+	int getSampleRate();
 
-	public abstract int getSize();
+	int getSize();
 
-	public abstract String getTime();
+	String getTime();
 
 	/**
 	 * Gets the database-specific ID of this track.  This track id can vary between program executions (but not during the same one - probably).
 	 * 
 	 * @return
 	 */
-	public abstract int getTrackId();
+	int getTrackId();
 
     /**
      * Returns the database this track belongs to.
      *
      * @return
      */
-    public long getDatabaseId();
+	long getDatabaseId();
 
 	/**
 	 * Returns the native data object for this track.
 	 * 
 	 * @return
 	 */
-	public abstract Object getOriginal();
+	Object getOriginal();
 
-    public String getPersistentId();
-
+    String getPersistentId();
 }

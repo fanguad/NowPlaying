@@ -8,6 +8,7 @@ package org.nekocode.nowplaying;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.components.MouseActions;
 import org.nekocode.nowplaying.components.RatingChangeEvent;
 import org.nekocode.nowplaying.components.modes.control.ControlPanel;
@@ -40,7 +41,7 @@ import java.util.TimerTask;
 /**
  * MVC controller.  Entry point of application.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public class NowPlayingController
 {
@@ -98,7 +99,7 @@ public class NowPlayingController
 		mediaPlayer.addTrackChangeListener(view::updateTrack);
         mediaPlayer.addTrackChangeListener(monitor);
 		tagView.addTagChangeListener(new TagChangeListener() {
-			public void tagAdded(Track track, String tag) {
+			public void tagAdded(@NotNull Track track, @NotNull String tag) {
 				String metadata = null;
 				int separator = tag.indexOf(": ");
 				if (separator > 0) {
@@ -112,22 +113,22 @@ public class NowPlayingController
 			}
 
             @Override
-            public void tagsChanged(Track track) {
+            public void tagsChanged(@NotNull Track track) {
                 // no way to trigger this change
             }
 
-            public void tagRemoved(Track track, String tag) {
+            public void tagRemoved(@NotNull Track track, @NotNull String tag) {
 				tagModel.removeTag(track, tag);
 			}});
 
 		tagModel.addTagChangeListener(new TagChangeListener() {
 			@Override
-			public void tagAdded(Track track, String tag) {
+			public void tagAdded(@NotNull Track track, @NotNull String tag) {
                 tagsChanged(track);
 			}
 
             @Override
-            public void tagsChanged(Track track) {
+            public void tagsChanged(@NotNull Track track) {
                 if (track.getTrackId() == view.getCurrentTrack().getTrackId())	 {
                     TrackChangeEvent e = new TrackChangeEvent(track, ChangeType.TAG_CHANGE);
                     view.updateTrack(e);
@@ -135,7 +136,7 @@ public class NowPlayingController
             }
 
             @Override
-			public void tagRemoved(Track track, String tag) {
+			public void tagRemoved(@NotNull Track track, @NotNull String tag) {
                 tagsChanged(track);
 			}});
 

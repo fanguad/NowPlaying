@@ -19,7 +19,7 @@ import java.awt.Container;
  * The content pane of a NekoFrame. Items added to a NekoPanel will show up as
  * drawers on the specified side of the panel.
  * 
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class NekoPanel extends JPanel {

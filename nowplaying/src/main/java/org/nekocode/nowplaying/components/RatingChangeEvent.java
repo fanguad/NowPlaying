@@ -11,12 +11,11 @@ import javax.swing.event.ChangeEvent;
 /**
  * Event that is fired when the user manually changes the rating via the GUI.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
-@SuppressWarnings("serial")
 public class RatingChangeEvent extends ChangeEvent
 {
-   private int newRating;
+   private final int newRating;
 
    public RatingChangeEvent(Object source, int newRating)
    {

@@ -6,6 +6,7 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.events.TagChangeListener;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
@@ -217,7 +218,7 @@ public class TrackTableModel extends AbstractTableModel implements TagChangeList
      * @param tag name of tag removed
      */
     @Override
-    public void tagRemoved(Track track, String tag) {
+    public void tagRemoved(@NotNull Track track, @NotNull String tag) {
         if (tagCache.containsKey(track)) {
             tagCache.get(track).remove(tag);
             int index = tracks.indexOf(track);
@@ -233,7 +234,7 @@ public class TrackTableModel extends AbstractTableModel implements TagChangeList
      * @param tag name of tag added
      */
     @Override
-    public void tagAdded(Track track, String tag) {
+    public void tagAdded(@NotNull Track track, @NotNull String tag) {
         if (tagCache.containsKey(track)) {
             tagCache.get(track).add(tag);
             int index = tracks.indexOf(track);
@@ -248,7 +249,7 @@ public class TrackTableModel extends AbstractTableModel implements TagChangeList
      * @param track track whose tags changed
      */
     @Override
-    public void tagsChanged(Track track) {
+    public void tagsChanged(@NotNull Track track) {
         if (tagCache.containsKey(track)) {
             tagCache.remove(track);
             int index = tracks.indexOf(track);

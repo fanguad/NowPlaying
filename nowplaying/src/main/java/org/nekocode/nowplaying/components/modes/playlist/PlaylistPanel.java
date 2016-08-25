@@ -12,6 +12,7 @@ package org.nekocode.nowplaying.components.modes.playlist;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
@@ -31,10 +32,10 @@ import java.util.List;
  */
 public class PlaylistPanel extends NowPlayingControl {
 	private static final Logger log = LogManager.getLogger(PlaylistPanel.class);
-    private MediaPlayer mediaPlayer;
-    private NekoLabel next1Track;
-    private NekoLabel next2Track;
-    private NekoLabel next3Track;
+    private final MediaPlayer mediaPlayer;
+    private final NekoLabel next1Track;
+    private final NekoLabel next2Track;
+    private final NekoLabel next3Track;
 
     public PlaylistPanel(MediaPlayer mediaPlayer, TagModel tagModel) {
 		setLayout(new GridLayout(0, 1));
@@ -100,7 +101,7 @@ public class PlaylistPanel extends NowPlayingControl {
                 }
             }
 
-            final String empty = "";
+            String empty = "";
 
             if (nextTracks.size() > 0) {
                 next1Track.setText(nextTracks.get(0).getTitle());
@@ -136,7 +137,7 @@ public class PlaylistPanel extends NowPlayingControl {
 	 * @see org.nekocode.nowplaying.components.NowPlayingControl#updateTrack(org.nekocode.nowplaying.events.TrackChangeEvent)
 	 */
 	@Override
-	public void updateTrack(TrackChangeEvent trackChange) {
+	public void updateTrack(@NotNull TrackChangeEvent trackChange) {
         updateNextTracks();
 	}
 }

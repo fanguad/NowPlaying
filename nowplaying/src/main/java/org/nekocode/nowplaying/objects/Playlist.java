@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface Playlist {
     
-    public List<Track> getTracks();
+    List<Track> getTracks();
 
-    public int count();
+    int count();
 }

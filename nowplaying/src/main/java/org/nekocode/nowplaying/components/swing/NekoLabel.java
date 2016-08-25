@@ -16,7 +16,7 @@ import java.awt.Window;
 /**
  * Like a JLabel, but uses antialiased fonts and adds a glow effect.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class NekoLabel extends JLabel

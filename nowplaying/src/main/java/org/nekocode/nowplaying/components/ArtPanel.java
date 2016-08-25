@@ -31,12 +31,12 @@ import static java.lang.String.format;
 /**
  * A panel that draws album art.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class ArtPanel extends JPanel
 {
-	private static Logger log = LogManager.getLogger(ArtPanel.class);
+	private static final Logger log = LogManager.getLogger(ArtPanel.class);
 
 	/**
 	 * An ID that gets incremented each time the art changes.  This can be used
@@ -119,9 +119,6 @@ public class ArtPanel extends JPanel
 		setArt(art.getImage());
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-	 */
 	@Override
 	public void paintComponent(Graphics g)
 	{
@@ -180,9 +177,6 @@ public class ArtPanel extends JPanel
         g2.fillArc(x + width - curveDiameter, y + height - curveDiameter, curveDiameter, curveDiameter, 270, 90); // lower right
     }
 
-    /* (non-Javadoc)
-      * @see javax.swing.JComponent#getPreferredSize()
-      */
 	@Override
 	public Dimension getPreferredSize() {
 		Dimension size = super.getPreferredSize();

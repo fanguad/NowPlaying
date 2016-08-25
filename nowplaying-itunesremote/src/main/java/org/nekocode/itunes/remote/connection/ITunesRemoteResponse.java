@@ -21,6 +21,7 @@ import static java.lang.String.format;
  */
 public class ITunesRemoteResponse {
     private static final Logger log = LogManager.getLogger(ITunesRemoteResponse.class);
+    private static final ITunesRemoteResponse EMPTY = new ITunesRemoteResponse();
 
     private Map<ContentCode, ITunesRemoteResponse> childNodes;
     private Map<ContentCode, List<ITunesRemoteResponse>> childMultiNodes;
@@ -69,12 +70,9 @@ public class ITunesRemoteResponse {
         ITunesRemoteResponse response = this;
         int i = 0;
         for (; i < contentCodes.length - 1; i++) {
-            response = response.childNodes.get(contentCodes[i]);
+            response = response.childNodes.getOrDefault(contentCodes[i], EMPTY);
         }
-        if (response.childMultiNodes.containsKey(contentCodes[i])) {
-            return response.childMultiNodes.get(contentCodes[i]);
-        }
-        return Collections.emptyList();
+        return response.childMultiNodes.getOrDefault(contentCodes[i], Collections.emptyList());
     }
 
     /**
@@ -91,10 +89,7 @@ public class ITunesRemoteResponse {
         ITunesRemoteResponse response = this;
         int i = 0;
         for (; i < contentCodes.length; i++) {
-            response = response.childNodes.get(contentCodes[i]);
-            if (response == null) {
-                return new ITunesRemoteResponse();
-            }
+            response = response.childNodes.getOrDefault(contentCodes[i], EMPTY);
         }
         return response;
     }
@@ -105,12 +100,28 @@ public class ITunesRemoteResponse {
      * @param contentCode node contentCode
      * @param data data to store in leaf node
      */
-    public void addChild(ContentCode contentCode, Object data) {
-        if (data instanceof ITunesRemoteResponse) {
-            addChild(contentCode, (ITunesRemoteResponse)data);
-        } else {
-            leafNodes.put(contentCode, data);
-        }
+    public void addChild(ContentCode contentCode, String data) {
+        addChildObject(contentCode, data);
+    }
+
+    /**
+     * Add a leaf node containing data to this response.
+     *
+     * @param contentCode node contentCode
+     * @param data data to store in leaf node
+     */
+    public void addChild(ContentCode contentCode, Number data) {
+        addChildObject(contentCode, data);
+    }
+
+    /**
+     * Add a leaf node containing data to this response.  (Try not to use this one)
+     *
+     * @param contentCode node contentCode
+     * @param data data to store in leaf node
+     */
+    protected void addChildObject(ContentCode contentCode, Object data) {
+        leafNodes.put(contentCode, data);
     }
 
     /**

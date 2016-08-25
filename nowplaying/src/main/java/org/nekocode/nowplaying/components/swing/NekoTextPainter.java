@@ -41,7 +41,7 @@ class NekoTextPainter extends ComponentUI {
     private static final Color BACKGROUND_COLOR = new Color(.9f, .9f, .9f, 0);
     private static final Color GLOW_COLOR = new Color(.9f, .9f, .9f, .8f);
 
-    private Rotation rotation;
+    private final Rotation rotation;
 
     private BufferedImage tempBuffer1;
     private Dimension cachedSize;
@@ -49,9 +49,9 @@ class NekoTextPainter extends ComponentUI {
 
     // these rectangles get used a lot, so keep them as fields
     // (this pattern is copied from BasicLabelUI/BasicButtonUI)
-    private Rectangle paintIconR = new Rectangle();
-    private Rectangle paintTextR = new Rectangle();
-    private Rectangle paintViewR = new Rectangle();
+    private final Rectangle paintIconR = new Rectangle();
+    private final Rectangle paintTextR = new Rectangle();
+    private final Rectangle paintViewR = new Rectangle();
 
     public NekoTextPainter() {
         rotation = Rotation.NONE;
@@ -130,14 +130,6 @@ class NekoTextPainter extends ComponentUI {
     /**
      * Copied from BasicLabelUI/BasicButtonUI since {@link #layout(javax.swing.JLabel, java.awt.FontMetrics, int, int)}
      * is private.
-     *
-     * @param verticalAlignment
-     * @param horizontalAlignment
-     * @param verticalTextPosition
-     * @param horizontalTextPosition
-     * @param iconTextGap
-     * @param g graphics
-     * @param c component
      */
     public void paintText(Graphics g, JComponent c,
                           String text, Icon icon,

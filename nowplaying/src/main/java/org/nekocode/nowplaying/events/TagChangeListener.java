@@ -6,17 +6,18 @@
 
 package org.nekocode.nowplaying.events;
 
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.objects.Track;
 
 /**
  * Listens for changes to tags on tracks.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public interface TagChangeListener
 {
-    void tagRemoved(Track track, String tag);
-    void tagAdded(Track track, String tag);
+    void tagRemoved(@NotNull Track track, @NotNull String tag);
+    void tagAdded(@NotNull Track track, @NotNull String tag);
 
     /**
      * Called if the tags change, but only if {@link #tagAdded(org.nekocode.nowplaying.objects.Track, String)} or
@@ -24,5 +25,5 @@ public interface TagChangeListener
      *
      * @param track track whose tags changed
      */
-    void tagsChanged(Track track);
+    void tagsChanged(@NotNull Track track);
 }

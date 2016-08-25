@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.NowPlayingView;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
@@ -32,8 +33,8 @@ public class TagPanel extends NowPlayingControl {
 	private final static EnumSet<ChangeType> shouldUpdate = EnumSet.of(
 			ChangeType.CURRENT_SONG_CHANGE, ChangeType.TAG_CHANGE, ChangeType.FILE_CHANGE);
 
-	private TagView tagView;
-	private TagModel tagModel;
+	private final TagView tagView;
+	private final TagModel tagModel;
 
 	public TagPanel(TagModel model, TagView tagView) {
 		this.tagView = tagView;
@@ -49,7 +50,7 @@ public class TagPanel extends NowPlayingControl {
 	 * (either to a different track, or the data of the same track changes).
 	 */
 	@Override
-	public void updateTrack(TrackChangeEvent trackChange) {
+	public void updateTrack(@NotNull TrackChangeEvent trackChange) {
 		if (shouldUpdate.contains(trackChange.getType())) {
 			tagView.setLoadingTags();
             List<TagCloudEntry> tags = Collections.emptyList();
@@ -61,9 +62,6 @@ public class TagPanel extends NowPlayingControl {
         }
     }
 
-    /* (non-Javadoc)
-      * @see org.nekocode.nowplaying.components.NowPlayingControl#shutdown()
-      */
 	@Override
 	public void shutdown() {
 		// nothing particular to do

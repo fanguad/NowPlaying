@@ -69,6 +69,11 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.8.7</version>
         </dependency>
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>annotations</artifactId>
+            <version>12.0</version>
+        </dependency>
 
         <!-- from local repository -->
         <dependency>

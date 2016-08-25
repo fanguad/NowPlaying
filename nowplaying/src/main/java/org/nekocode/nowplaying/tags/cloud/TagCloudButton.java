@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
  * at all for the basic functionality to work, although hooks may be added later to allow reacting
  * to events in the tag cloud.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class TagCloudButton extends NekoButton {

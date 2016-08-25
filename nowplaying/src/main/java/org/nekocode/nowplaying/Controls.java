@@ -9,7 +9,7 @@ package org.nekocode.nowplaying;
 /**
  * Defines the controls NowPlayingInfo provides
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public enum Controls {
    PREVIOUS, PAUSE, NEXT, PLAY

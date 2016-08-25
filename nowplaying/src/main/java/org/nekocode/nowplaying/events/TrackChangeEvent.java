@@ -6,6 +6,7 @@
 
 package org.nekocode.nowplaying.events;
 
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.objects.Track;
 
 /**
@@ -13,7 +14,7 @@ import org.nekocode.nowplaying.objects.Track;
  * the information stored in the current track as well as notification when a
  * different track starts.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public class TrackChangeEvent {
 
@@ -24,14 +25,17 @@ public class TrackChangeEvent {
 		TAG_CHANGE
 	}
 
+	@NotNull
 	private Track track;
+	@NotNull
 	private ChangeType type;
 
-	public TrackChangeEvent(Track track, ChangeType type) {
+	public TrackChangeEvent(@NotNull Track track, @NotNull ChangeType type) {
 		this.track = track;
 		this.type = type;
 	}
 
+	@NotNull
 	public Track getTrack() {
 		return track;
 	}
@@ -39,6 +43,7 @@ public class TrackChangeEvent {
 	/**
 	 * @return the type
 	 */
+	@NotNull
 	public ChangeType getType() {
 		return type;
 	}

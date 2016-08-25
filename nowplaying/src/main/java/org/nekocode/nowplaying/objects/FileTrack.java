@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * A track that represents a file on disk.  It can be either audio or video.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public interface FileTrack extends Track {
 	/**

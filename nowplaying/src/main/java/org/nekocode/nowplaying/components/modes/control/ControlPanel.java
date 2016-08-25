@@ -6,6 +6,7 @@
 
 package org.nekocode.nowplaying.components.modes.control;
 
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.Controls;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.RatingChangeEvent;
@@ -44,10 +45,10 @@ public class ControlPanel extends NowPlayingControl {
 	private final static EnumSet<ChangeType> shouldUpdate = EnumSet.of(
 			ChangeType.CURRENT_SONG_CHANGE, ChangeType.FILE_CHANGE);
 
-	private Set<ChangeListener> ratingChangeListeners;
-	private Set<ChangeListener> controlListeners;
+	private final Set<ChangeListener> ratingChangeListeners;
+	private final Set<ChangeListener> controlListeners;
 
-	private RatingDisplay rating;
+	private final RatingDisplay rating;
 
 	/**
 	 * Creates basic play controls. The goal is to have them centered
@@ -99,7 +100,7 @@ public class ControlPanel extends NowPlayingControl {
 
 	}
 
-	private Action createControlAction(final Controls controlType) {
+	private Action createControlAction(Controls controlType) {
         return new AbstractAction() {
             /* (non-Javadoc)
              * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -110,7 +111,7 @@ public class ControlPanel extends NowPlayingControl {
             }};
 	}
 
-	private MouseListener createControlListener(final Controls controlType) {
+	private MouseListener createControlListener(Controls controlType) {
 		return new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e)
@@ -138,8 +139,6 @@ public class ControlPanel extends NowPlayingControl {
 	/**
 	 * Listener that will be called if the rating changes.  RatingChangeEvents
 	 * will created.
-	 *
-	 * @param l
 	 */
 	public void addRatingChangeListener(ChangeListener l) {
 		ratingChangeListeners.add(l);
@@ -161,8 +160,6 @@ public class ControlPanel extends NowPlayingControl {
 	/**
 	 * Listener that will be called if the rating changes.  The source will be
 	 * an enum from Controls.
-	 *
-	 * @param l
 	 */
 	public void addControlListener(ChangeListener l) {
 		controlListeners.add(l);
@@ -175,7 +172,7 @@ public class ControlPanel extends NowPlayingControl {
 	 * @param trackChange information about the new track
 	 */
 	@Override
-	public void updateTrack(final TrackChangeEvent trackChange) {
+	public void updateTrack(@NotNull TrackChangeEvent trackChange) {
 		if (shouldUpdate.contains(trackChange.getType())) {
 			SwingUtilities.invokeLater(() -> rating.setValue(trackChange.getTrack().getRating()));
 		}

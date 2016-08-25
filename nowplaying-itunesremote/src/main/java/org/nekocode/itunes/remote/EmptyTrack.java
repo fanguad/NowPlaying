@@ -19,7 +19,7 @@ import java.util.Date;
 public class EmptyTrack implements Track {
     @Override
     public String getAlbum() {
-        return "fanguad@nekocode.org";
+        return "dan.clark@nekocode.org";
     }
 
     @Override

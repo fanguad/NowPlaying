@@ -6,6 +6,8 @@
 
 package org.nekocode.nowplaying;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.nekocode.nowplaying.events.TrackChangeListener;
 import org.nekocode.nowplaying.objects.Playlist;
 import org.nekocode.nowplaying.objects.Track;
@@ -16,16 +18,21 @@ import java.util.List;
  * Represents the base application.  Provides an interface into the common
  * functionality of all media players.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public interface MediaPlayer {
+
+	enum PlayerState {
+		PLAYING, STOPPED
+	}
 
 	/**
 	 * Gets the currently playing (or paused) track.
 	 *
-	 * @return current track
+	 * @return current track, or null if player is not connected or stopped
 	 */
-	public Track getCurrentTrack();
+	@Nullable
+	Track getCurrentTrack();
 
 	/**
 	 * Register a listener for changes to the current playing track.  This
@@ -34,7 +41,7 @@ public interface MediaPlayer {
      *
      * @param l track change listener
      */
-	public void addTrackChangeListener(TrackChangeListener l);
+	void addTrackChangeListener(@NotNull TrackChangeListener l);
 
 	/**
 	 * Remove an already registered change listener.  If the listener is not
@@ -42,20 +49,20 @@ public interface MediaPlayer {
      * 
      * @param l track change listener
 	 */
-	public void removeTrackChangeListener(TrackChangeListener l);
+	void removeTrackChangeListener(@NotNull TrackChangeListener l);
 
-	public void play();
+	void play();
 
-	public void pause();
+	void pause();
 
-	public void next();
+	void next();
 
-	public void previous();
+	void previous();
 
 	/**
 	 * This method should be called before this object is destroyed.
 	 */
-	public void onShutdown();
+	void onShutdown();
 
 	/**
 	 * Assigns a new rating to the specified track.  newRating is on a scale
@@ -65,7 +72,7 @@ public interface MediaPlayer {
 	 * @param track		track to update
 	 * @param newRating	new rating of track
 	 */
-	public void updateTrackRating(Track track, int newRating);
+	void updateTrackRating(@NotNull Track track, int newRating);
 
 	/**
 	 * Returns the position in the current track in seconds.
@@ -76,17 +83,15 @@ public interface MediaPlayer {
 
     Playlist getCurrentPlaylist();
 
+	@Nullable
 	Track getTrack(int trackId);
-
-    static enum PlayerState {
-		PLAYING, STOPPED
-	}
 
 	/**
 	 * Indicates whether a track is currently playing or not.
 	 *
 	 * @return current state of media player
 	 */
+	@NotNull
 	PlayerState getPlayerState();
 
     /**
@@ -94,12 +99,14 @@ public interface MediaPlayer {
      *
      * @return list of tracks that match the search parameters
      */
-    List<Track> findTracks(String title, String artist, String album);
+	@NotNull
+    List<Track> findTracks(@Nullable String title, @Nullable String artist, @Nullable String album);
 
     /**
      * Finds tracks matching the specified input.
      *
      * @return list of track persistent ids that match the search parameters
      */
-    List<String> findTrackIds(String title, String artist, String album);
+	@NotNull
+    List<String> findTrackIds(@Nullable String title, @Nullable String artist, @Nullable String album);
 }

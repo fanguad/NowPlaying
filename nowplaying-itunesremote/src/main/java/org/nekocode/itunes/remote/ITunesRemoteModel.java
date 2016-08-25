@@ -8,6 +8,7 @@ package org.nekocode.itunes.remote;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.itunes.remote.connection.*;
 import org.nekocode.nowplaying.AbstractMediaPlayer;
 import org.nekocode.nowplaying.MediaPlayer;
@@ -278,7 +279,7 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
     }
 
     @Override
-    public void updateTrackRating(Track track, int newRating) {
+    public void updateTrackRating(@NotNull Track track, int newRating) {
         if (track.getTrackId() != currentTrack.getTrackId()) {
             log.warn("Attempted to set rating of track that isn't current track.  Rejecting execution.");
             return;
@@ -331,6 +332,7 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
         return null;
     }
 
+    @NotNull
     @Override
     public PlayerState getPlayerState() {
         if (session == null) {
@@ -342,6 +344,7 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
         return playStatus == 4 ? PlayerState.PLAYING : PlayerState.STOPPED;
     }
 
+    @NotNull
     @Override
     public List<Track> findTracks(String title, String artist, String album) {
         try {
@@ -366,6 +369,7 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
         }
     }
 
+    @NotNull
     @Override
     public List<String> findTrackIds(String title, String artist, String album) {
         try {

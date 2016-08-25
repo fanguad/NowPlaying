@@ -47,7 +47,7 @@ import static org.nekocode.nowplaying.tags.TagModel.StatementName.*;
  * need to wrapped in a Runnable/Callable, since they will only be access from
  * within the dbAccess thread.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public class TagModel
 {

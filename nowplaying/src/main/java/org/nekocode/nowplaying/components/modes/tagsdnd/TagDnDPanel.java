@@ -6,6 +6,7 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.swing.NekoButton;
@@ -86,7 +87,7 @@ public class TagDnDPanel extends NowPlayingControl {
     }
 
     @Override
-    public void updateTrack(TrackChangeEvent trackChange) {
+    public void updateTrack(@NotNull TrackChangeEvent trackChange) {
         // this panel has no dynamically updated information
     }
 

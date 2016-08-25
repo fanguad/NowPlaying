@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * A drawer that can be attached to the side of another window.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class NekoDrawer extends JWindow {

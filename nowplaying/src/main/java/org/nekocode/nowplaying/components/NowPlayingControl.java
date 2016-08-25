@@ -12,6 +12,7 @@ package org.nekocode.nowplaying.components;
 
 import javax.swing.JComponent;
 
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 
 /**
@@ -28,7 +29,7 @@ public abstract class NowPlayingControl extends JComponent {
 	 *
 	 * @param trackChange track change event containing new information
 	 */
-	public abstract void updateTrack(TrackChangeEvent trackChange);
+	public abstract void updateTrack(@NotNull TrackChangeEvent trackChange);
 
 	public abstract void shutdown();
 }

@@ -6,12 +6,14 @@
 
 package org.nekocode.nowplaying.events;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Class with which to register for notifications about changes to the currently
  * playing track.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public interface TrackChangeListener {
-   public void trackChanged(TrackChangeEvent e);
+   void trackChanged(@NotNull TrackChangeEvent e);
 }

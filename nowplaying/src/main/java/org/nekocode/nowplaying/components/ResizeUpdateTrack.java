@@ -16,8 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * To be run when the track has been updating.  Resizes the window to
- * maintain prettiness.
+ * To be run when the track has been updating.  Resizes the window to maintain prettiness.
  */
 public class ResizeUpdateTrack extends UpdateTrack {
 	@SuppressWarnings("unused")
@@ -47,18 +46,12 @@ public class ResizeUpdateTrack extends UpdateTrack {
 		// nothing special needs to be done
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.SwingWorker#doInBackground()
-	 */
 	@Override
 	protected ImageIcon doInBackground() throws Exception {
 		Deque<ImageIcon> artList = new ArrayDeque<>(newTrack.getArtwork(size));
 		return artList.poll();
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.SwingWorker#done()
-	 */
 	@Override
 	protected void done() {
 		ImageIcon artwork = null;

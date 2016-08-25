@@ -26,7 +26,7 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodyUFID;
 /**
  * Implements certain functionality on FileTracks that relates to MP3s.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public class MP3TrackWrapper {
 	private static final Logger log = LogManager.getLogger(MP3TrackWrapper.class);
@@ -133,7 +133,7 @@ public class MP3TrackWrapper {
 	 * Catch-all exception that instructs the caller to use a more generic
 	 * class than this.
 	 *
-	 * @author fanguad@nekocode.org
+	 * @author dan.clark@nekocode.org
 	 */
 	@SuppressWarnings("serial")
     public class CannotUseMP3TrackException extends Exception {

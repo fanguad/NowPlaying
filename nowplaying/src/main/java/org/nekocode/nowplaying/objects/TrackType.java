@@ -9,7 +9,7 @@ package org.nekocode.nowplaying.objects;
 /**
  * 
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public enum TrackType {
 	FILE, CD, URL

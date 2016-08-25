@@ -25,6 +25,7 @@ import javax.swing.plaf.LayerUI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeListener;
 
@@ -38,9 +39,8 @@ import static java.lang.Math.PI;
  * @author dan.clark@nekocode.org
  */
 public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements TrackChangeListener {
-	private static Logger log = LogManager.getLogger(ArtPanelProgressLayerUI.class);
-    private static final Map<Key, Object> RENDERING_HINTS =
-        Collections.singletonMap(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
+	private static final Logger log = LogManager.getLogger(ArtPanelProgressLayerUI.class);
+    private static final Map<Key, Object> RENDERING_HINTS = Collections.singletonMap(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
     private static final String DIRTY_SONG = "dirty song";
     private static final String DIRTY = "dirty";
 
@@ -314,11 +314,8 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> implements Trac
         return rotate;
     }
 
-    /* (non-Javadoc)
-      * @see org.nekocode.nowplaying.events.TrackChangeListener#trackChanged(org.nekocode.nowplaying.events.TrackChangeEvent)
-      */
 	@Override
-	public void trackChanged(TrackChangeEvent e) {
+	public void trackChanged(@NotNull TrackChangeEvent e) {
         dirtySong = true;
         firePropertyChange(DIRTY_SONG, false, true);
 	}

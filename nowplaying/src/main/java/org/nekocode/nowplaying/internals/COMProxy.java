@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
  * by extending this class, the proxy object has the ability to execute all of
  * its actions on a single thread - a requirement for proper access to COM objects.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public class COMProxy {
 	private static final Logger log = LogManager.getLogger(COMProxy.class);

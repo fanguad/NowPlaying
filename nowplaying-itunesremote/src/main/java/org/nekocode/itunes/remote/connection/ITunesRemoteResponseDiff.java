@@ -10,7 +10,7 @@ import java.util.Objects;
 
 /**
  * Calculates the difference between two iTunes Remote responses.
- * New or updated values will be retained in this objected.
+ * New or updated values will be retained in this object.
  * Deleted values will not be tracked (possible future work, if necessary).
  *
  * @author fanguad
@@ -28,7 +28,7 @@ public class ITunesRemoteResponseDiff extends ITunesRemoteResponse {
             Object originalLeaf = original.getLeaf(leafId);
             Object updateLeaf = update.getLeaf(leafId);
             if (!Objects.deepEquals(originalLeaf, updateLeaf)) {
-                storage.addChild(leafId, updateLeaf);
+                storage.addChildObject(leafId, updateLeaf);
             }
         }
 

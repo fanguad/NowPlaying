@@ -30,9 +30,8 @@ import java.util.Set;
 /**
  * JComponent that displays rating, and allows for updates to rating.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
-@SuppressWarnings("serial")
 public class RatingDisplay extends JComponent
 {
    private static final Logger log = LogManager.getLogger(RatingDisplay.class);
@@ -54,7 +53,7 @@ public class RatingDisplay extends JComponent
    private int value;
    private int xoffset; // offset from 0 horizontal # that the image is drawn
 
-   private Set<ChangeListener> listeners = new HashSet<>();
+   private final Set<ChangeListener> listeners = new HashSet<>();
 
    public RatingDisplay() {
       // by default, all hearts are empty
@@ -65,13 +64,10 @@ public class RatingDisplay extends JComponent
          @Override
          public void mouseClicked(MouseEvent e)
          {
-        	 changeValue(getRatingFromLocation(e.getPoint()));
+        	 setRating(getRatingFromLocation(e.getPoint()));
          }});
 
       Action setRating = new AbstractAction() {
-    	  /* (non-Javadoc)
-    	   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-    	   */
     	  @Override
     	  public void actionPerformed(ActionEvent e) {
     		  int value = Integer.parseInt(e.getActionCommand());
@@ -80,7 +76,7 @@ public class RatingDisplay extends JComponent
     		  } else {
     			  value *= 10;
     		  }
-    		  changeValue(value);
+    		  setRating(value);
     	  }};
       for (char i = '0'; i <= '9'; i++) {
           getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(i), "setRating");
@@ -88,9 +84,6 @@ public class RatingDisplay extends JComponent
       getActionMap().put("setRating", setRating);
 
       Action changeRating = new AbstractAction() {
-    	  /* (non-Javadoc)
-    	   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-    	   */
     	  @Override
     	  public void actionPerformed(ActionEvent e) {
     		  int value;
@@ -101,7 +94,7 @@ public class RatingDisplay extends JComponent
     		  }
     		  value = Math.max(value, 0);
     		  value = Math.min(value, 100);
-    		  changeValue(value);
+    		  setRating(value);
     	  }};
       getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('-'), "changeRating");
       getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('+'), "changeRating");
@@ -111,8 +104,8 @@ public class RatingDisplay extends JComponent
 
    /**
     * Gets the rating value based on the specified point inside the component
-    * @param p
-    * @return
+    * @param p x,y point inside the rating display component
+    * @return rating, from [0-10]
     */
    public int getRatingFromLocation(Point p) {
       int hearts = (p.x - xoffset) / one_width + 1; // +1 since the first heart is 1, not 0
@@ -155,9 +148,6 @@ public class RatingDisplay extends JComponent
       return size;
    }
 
-   /* (non-Javadoc)
-    * @see javax.swing.JComponent#getMinimumSize()
-    */
    @Override
    public Dimension getMinimumSize() {
 	   return size;
@@ -188,10 +178,10 @@ public class RatingDisplay extends JComponent
    /**
     * Sets the value, and fires an event to any listeners.
     *
-    * @param value
+    * @param newRating new Track rating. range is [0-100]
     */
-   private void changeValue(int value) {
-	   setValue(value);
+   private void setRating(int newRating) {
+	   setValue(newRating);
 	   fireChangeEvent();
    }
 }

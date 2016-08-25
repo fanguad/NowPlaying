@@ -13,7 +13,7 @@ import java.util.logging.LogManager;
 /**
  * Make all the logging in libraries used by NowPlaying... be quiet.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public final class LogMuter {
 	public static void muteLogging() {

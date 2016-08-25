@@ -11,18 +11,19 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeListener;
 
 /**
  * Implements common functionality for MediaPlayers
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 public abstract class AbstractMediaPlayer implements MediaPlayer {
 	private static final Logger log = LogManager.getLogger(AbstractMediaPlayer.class);
 
-	protected Set<TrackChangeListener> trackChangeListeners;
+	protected final Set<TrackChangeListener> trackChangeListeners;
 
 	public AbstractMediaPlayer() {
 		trackChangeListeners = new HashSet<>();
@@ -35,15 +36,15 @@ public abstract class AbstractMediaPlayer implements MediaPlayer {
      * 
      * @param l
      */
-	public void addTrackChangeListener(TrackChangeListener l) {
+	public void addTrackChangeListener(@NotNull TrackChangeListener l) {
 		trackChangeListeners.add(l);
 	}
 
-	public void removeTrackChangeListener(TrackChangeListener l) {
+	public void removeTrackChangeListener(@NotNull TrackChangeListener l) {
 		trackChangeListeners.remove(l);
     }
 	
-	protected void fireTrackChanged(TrackChangeEvent e) {
+	protected void fireTrackChanged(@NotNull TrackChangeEvent e) {
 		for (TrackChangeListener listener : trackChangeListeners) {
 			listener.trackChanged(e);
 		}

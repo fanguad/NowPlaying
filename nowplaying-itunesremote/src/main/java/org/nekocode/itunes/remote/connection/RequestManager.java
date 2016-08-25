@@ -255,7 +255,7 @@ public class RequestManager {
         if (identifier == ContentCode.NOW_PLAYING) {
             byte[] bytes = new byte[length];
             data.readFully(bytes);
-            response.addChild(identifier, bytes);
+//            response.addChild(identifier, bytes); // no need to store the raw values, since no one uses them
 
             // this is a special identifier that hold multiple values
             if (length != 16) {

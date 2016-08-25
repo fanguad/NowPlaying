@@ -45,7 +45,7 @@ import java.util.Set;
 /**
  * A Panel that allows the user to create and edit tags on files.
  *
- * @author fanguad@nekocode.org
+ * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
 public class TagView extends JPanel

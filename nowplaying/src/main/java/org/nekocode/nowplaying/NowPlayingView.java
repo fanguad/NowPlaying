@@ -233,6 +233,12 @@ public class NowPlayingView extends NekoFrame {
         track = trackChange.getTrack();
         log.info("updateTrack: " + trackChange.getType());
 
+        if (track == null)
+        {
+            log.error("TrackChangeEvent received with null track (should not happen)");
+            return;
+        }
+
         // update the text labels
         Runnable updateInfo = () -> {
             title.setText(track.getTitle());

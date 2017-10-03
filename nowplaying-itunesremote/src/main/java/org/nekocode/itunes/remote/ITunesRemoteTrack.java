@@ -15,6 +15,7 @@ import org.nekocode.nowplaying.objects.Track;
 import javax.swing.ImageIcon;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import static org.nekocode.itunes.remote.connection.ContentCode.*;
 
@@ -77,7 +78,13 @@ public class ITunesRemoteTrack implements Track {
             item = response;
         } else {
             ContentCode listType = response.hasChild(DAAP_DATABASE_SONGS) ? DAAP_DATABASE_SONGS : DAAP_PLAYLIST_SONGS;
-            item = response.getMultiBranch(listType, DMAP_LIST, DMAP_LIST_ITEM).get(0);
+            List<ITunesRemoteResponse> itemList = response.getMultiBranch(listType, DMAP_LIST, DMAP_LIST_ITEM);
+            if (itemList.isEmpty())
+            {
+                log.error("Did not receive a response for dbId " + databaseId);
+                return;
+            }
+            item = itemList.get(0);
         }
         trackId = item.getInt(DMAP_ITEM_ID);
         persistentId = item.hasLeaf(DMAP_PERSISTENT_ID) ? item.getHexNumber(DMAP_PERSISTENT_ID) : Integer.toString(trackId); // TODO MonkeyTunes doesn't seem to provide this

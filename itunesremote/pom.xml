@@ -19,9 +19,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jmdns</groupId>
+            <groupId>javax.jmdns</groupId>
             <artifactId>jmdns</artifactId>
-            <version>1.0</version>
+            <version>3.4.1</version>
         </dependency>
     </dependencies>
 

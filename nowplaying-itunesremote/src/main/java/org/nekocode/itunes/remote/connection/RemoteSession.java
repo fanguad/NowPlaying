@@ -159,10 +159,10 @@ public class RemoteSession {
         byte[] name = new byte[20];
         random.nextBytes(name);
 
-        ServiceInfo pairservice = new ServiceInfo(REMOTE_TYPE, getHex(name), LISTEN_PORT, 0, 0, values);
+        ServiceInfo pairservice = ServiceInfo.create(REMOTE_TYPE, "nowplaying", LISTEN_PORT, 0, 0, values);
 
         InetAddress addr = InetAddress.getLocalHost();
-        JmDNS zeroConf = new JmDNS(addr);
+        JmDNS zeroConf = JmDNS.create(addr, "nowplaying");
         zeroConf.registerService(pairservice);
 
         // listen for a response

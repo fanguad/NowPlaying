@@ -61,15 +61,13 @@ public class ITunesRemoteModel extends AbstractMediaPlayer {
         if (remoteSession == null) {
             log.info("Unable to connect using existing pairing: " + playerGUID);
 
-            Runnable pairingServer = new Runnable() {
-                public void run() {
-                    // we were unable to connect using a previous GUID, so initiate a new pairing
-                    try {
-                        RemoteSession remoteSession = RemoteSession.pairWithITunes();
-                        setSession(remoteSession);
-                    } catch (IOException e) {
-                        log.error("Unable to pair", e);
-                    }
+            Runnable pairingServer = () -> {
+                // we were unable to connect using a previous GUID, so initiate a new pairing
+                try {
+                    RemoteSession remoteSession1 = RemoteSession.pairWithITunes();
+                    setSession(remoteSession1);
+                } catch (IOException e) {
+                    log.error("Unable to pair", e);
                 }
             };
             Thread pairingServerThread = new Thread(pairingServer);

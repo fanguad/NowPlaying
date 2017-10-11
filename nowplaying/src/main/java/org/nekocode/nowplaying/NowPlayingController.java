@@ -208,7 +208,7 @@ public class NowPlayingController
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         if (gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSPARENT)) {
-            view.setBackground(new Color(0, 0, 0, 0));
+//            view.setBackground(new Color(0, 0, 0, 0));
         } else {
             LogManager.getLogger(getClass()).warn("Per pixel transparency not supported.");
         }

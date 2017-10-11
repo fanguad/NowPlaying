@@ -7,11 +7,8 @@
 package org.nekocode.nowplaying.components.swing;
 
 import com.jhlabs.image.ConvolveFilter;
-import sun.swing.SwingUtilities2;
 
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
@@ -110,7 +107,7 @@ class NekoTextPainter extends ComponentUI {
         tempGraphics1_2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         tempGraphics1_2.setColor(GLOW_COLOR);
-        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY);
+        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY - TEXT_INSET);
 
         GROW_AND_BLUR_FILTER.filter(tempBuffer1, tempBuffer2);
 
@@ -121,7 +118,7 @@ class NekoTextPainter extends ComponentUI {
         tempGraphics1_2.setComposite(originalComposite);
 
         tempGraphics1_2.setColor(foreground);
-        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY);
+        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY - TEXT_INSET);
         tempGraphics1_2.dispose();
 
         g.drawImage(tempBuffer1, 0, 0, null);

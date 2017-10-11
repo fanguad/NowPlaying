@@ -8,7 +8,6 @@ package org.nekocode.nowplaying.components.swing;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.swing.SwingUtilities2;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonModel;

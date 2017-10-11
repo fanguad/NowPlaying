@@ -109,20 +109,20 @@ public class TagCloud extends ScrollableFlowPanel {
 		this.tags = tags;
 		removeAll();
 		for (TagCloudEntry tag : tags) {
-			NekoLabel tagLabel = new NekoLabel(renderer.getText(tag));
-			if (tag.getMetadata() != null) {
-				tagLabel.setToolTipText(tag.getMetadata());
-			}
-
 			float fontSize = 8 + (1.0f * tag.getScale() / TagCloudEntry.NUM_LEVELS) * 10;
 			Font newFont = fontCache.get(fontSize);
 			if (newFont == null) {
 				newFont = baseFont.deriveFont(fontSize);
                 fontCache.put(fontSize, newFont);
 			}
-			tagLabel.setFont(newFont);
-
+			NekoLabel tagLabel = new NekoLabel(renderer.getText(tag));
 			tagLabel.setForeground(tag.getColor());
+			tagLabel.setFont(newFont);
+            tagLabel.setPreferredSize(tagLabel.getPreferredSize());
+
+			if (tag.getMetadata() != null) {
+				tagLabel.setToolTipText(tag.getMetadata());
+			}
 
 //			log.debug(String.format("%s (%d) = %.1f", tag.getTag(), tag.getScale(), fontSize));
 

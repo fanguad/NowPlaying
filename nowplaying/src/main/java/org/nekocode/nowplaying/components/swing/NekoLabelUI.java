@@ -40,6 +40,7 @@ class NekoLabelUI extends BasicLabelUI {
     public Dimension getPreferredSize(JComponent c) {
         Dimension dim = super.getPreferredSize(c);
         dim.width += NekoTextPainter.TEXT_INSET * 2;
+        dim.height += NekoTextPainter.TEXT_INSET * 2;
         if (rotated) {
             dim = new Dimension(dim.height, dim.width);
         }

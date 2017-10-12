@@ -1,0 +1,3 @@
+include 'nowplaying'
+include 'nowplaying-itunesremote'
+include 'dist'

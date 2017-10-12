@@ -1,0 +1,15 @@
+apply plugin: 'java-library-distribution'
+
+dependencies {
+    compile project(':nowplaying')
+    compile project(':nowplaying-itunesremote')
+}
+
+distributions {
+    main{
+        baseName = 'NowPlaying'
+        contents {
+            from { 'src/dist' }
+        }
+    }
+}

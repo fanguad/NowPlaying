@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':nowplaying')
+    compile group: 'javax.jmdns', name: 'jmdns', version: '3.4.1'
+
+}

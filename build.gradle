@@ -1,0 +1,17 @@
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "lib"
+        }
+    }
+
+    dependencies {
+        compile 'org.apache.logging.log4j:log4j-api:2.9.1'
+        compile 'org.apache.logging.log4j:log4j-core:2.9.1'
+        compile 'org.jetbrains:annotations:15.0'
+    }
+}

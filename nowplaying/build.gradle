@@ -1,7 +1,4 @@
 dependencies {
-    testCompile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
-    testCompile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
-
     compile group: 'org.divxdede', name: 'jbusycomponent', version: '1.2.3'
     compile group: 'org', name: 'jaudiotagger', version: '2.0.3'
     compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'

@@ -12,16 +12,7 @@ import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.Kernel;
 
@@ -77,6 +68,16 @@ class NekoTextPainter extends ComponentUI {
             return;
         }
 
+        int yOffSet;
+        if (c instanceof NekoLabel)
+        {
+            yOffSet = -2;
+        }
+        else // NekoButton
+        {
+            yOffSet = 0;
+        }
+
         cachedSize = c.getSize();
         cachedString = s;
 
@@ -107,7 +108,7 @@ class NekoTextPainter extends ComponentUI {
         tempGraphics1_2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         tempGraphics1_2.setColor(GLOW_COLOR);
-        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY - TEXT_INSET);
+        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY + yOffSet);
 
         GROW_AND_BLUR_FILTER.filter(tempBuffer1, tempBuffer2);
 
@@ -118,7 +119,7 @@ class NekoTextPainter extends ComponentUI {
         tempGraphics1_2.setComposite(originalComposite);
 
         tempGraphics1_2.setColor(foreground);
-        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY - TEXT_INSET);
+        tempGraphics1_2.drawString(s, textX + TEXT_INSET, textY + yOffSet);
         tempGraphics1_2.dispose();
 
         g.drawImage(tempBuffer1, 0, 0, null);

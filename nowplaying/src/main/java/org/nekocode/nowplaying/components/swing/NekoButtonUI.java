@@ -9,18 +9,9 @@ package org.nekocode.nowplaying.components.swing;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.AbstractButton;
-import javax.swing.ButtonModel;
-import javax.swing.Icon;
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 /**
@@ -46,10 +37,8 @@ public class NekoButtonUI extends BasicButtonUI {
     @Override
     public Dimension getPreferredSize(JComponent c) {
         Dimension dim = super.getPreferredSize(c);
-//        int width = dim.width + NekoTextPainter.TEXT_INSET * 2;
-//        int height = dim.height + NekoTextPainter.TEXT_INSET * 2;
-        int width = dim.width;
-        int height = dim.height;
+        int width = dim.width + NekoTextPainter.TEXT_INSET * 2;
+        int height = dim.height + NekoTextPainter.TEXT_INSET * 2;
         if (rotated) {
             dim = new Dimension(height, width);
         } else {

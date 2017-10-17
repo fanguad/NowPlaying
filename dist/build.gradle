@@ -1,5 +1,11 @@
 apply plugin: 'java-library-distribution'
+apply plugin: 'com.github.johnrengelman.shadow'
 
+buildscript {
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
 dependencies {
     compile project(':nowplaying')
     compile project(':nowplaying-itunesremote')
@@ -12,4 +18,14 @@ distributions {
             from { 'src/dist' }
         }
     }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.nekocode.nowplaying.NowPlayingController'
+    }
+}
+
+shadowJar {
+    baseName = 'NowPlaying'
 }

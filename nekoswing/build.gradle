@@ -1,0 +1,8 @@
+dependencies {
+//    compile group: 'org.divxdede', name: 'jbusycomponent', version: '1.2.3'
+    compile group: 'com.jhlabs', name: 'filters', version: '2.0.235'
+    compile project(':jbusycomponent')
+    compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
+
+    compile group: 'furbelow', name: 'furbelow', version: '1.0'
+}

@@ -1,17 +1,7 @@
 dependencies {
-    compile group: 'org.divxdede', name: 'jbusycomponent', version: '1.2.3'
+    compile project(':nekoswing')
+
     compile group: 'org', name: 'jaudiotagger', version: '2.0.3'
     compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.8.7'
-
-    compile group: 'furbelow', name: 'furbelow', version: '1.0'
 }
-
-/*
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
- */

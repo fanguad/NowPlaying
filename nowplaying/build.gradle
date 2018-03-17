@@ -1,5 +1,7 @@
 dependencies {
     compile project(':nekoswing')
+    compile project(':nowplaying-ui')
+    compile project(':properties')
 
     compile group: 'org', name: 'jaudiotagger', version: '2.0.3'
     compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'

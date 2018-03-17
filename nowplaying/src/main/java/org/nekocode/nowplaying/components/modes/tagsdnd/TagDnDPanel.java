@@ -79,9 +79,9 @@ public class TagDnDPanel extends NowPlayingControl {
         dialog.setModal(false);
         dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         dialog.pack();
-        // set initial width to be 2x smallest available width
+        // set initial width to be 1.5x smallest available width
         Dimension d = dialog.getSize();
-        d.width *= 2;
+        d.width *= 1.5;
         dialog.setSize(d);
         dialog.setLocationByPlatform(true);
     }

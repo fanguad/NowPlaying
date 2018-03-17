@@ -25,7 +25,6 @@ import org.nekocode.nowplaying.tags.TagView;
 
 import javax.swing.ImageIcon;
 import java.awt.AWTException;
-import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.GraphicsEnvironment;
@@ -33,8 +32,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 

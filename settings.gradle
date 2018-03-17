@@ -1,6 +1,12 @@
-include 'nowplaying'
-include 'nowplaying-itunesremote'
 include 'nekoswing'
 include 'jxlayer'
 include 'jbusycomponent'
+
+include 'properties'
+include 'nowplaying-ui'
+include 'nowplaying'
+include 'nowplaying-itunesremote'
+
 include 'dist'
+
+include 'scratchpad'

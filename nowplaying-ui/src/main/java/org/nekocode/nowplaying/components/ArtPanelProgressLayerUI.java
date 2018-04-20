@@ -10,7 +10,18 @@
  */
 package org.nekocode.nowplaying.components;
 
-import java.awt.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.JComponent;
+import javax.swing.JLayer;
+import javax.swing.plaf.LayerUI;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints.Key;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -19,12 +30,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.util.Collections;
 import java.util.Map;
-import javax.swing.JComponent;
-import javax.swing.JLayer;
-import javax.swing.plaf.LayerUI;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
@@ -199,7 +204,7 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 			g.fill(new Rectangle2D.Double(cornerRadius, 0, filledLength, borderSize));
 			break;
 		case 7:
-            g.setTransform(createCornerTransform(270, cornerRadius, cornerRadius, cornerRadius, 0));
+            g.transform(createCornerTransform(270, cornerRadius, cornerRadius, cornerRadius, 0));
             g.drawImage(getPartialCorner(degrees), 0, 0, null);
             break;
 		case 6:
@@ -207,7 +212,7 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 			g.fill(new Rectangle2D.Double(0, cornerRadius + side - filledLength, borderSize, filledLength));
 			break;
 		case 5:
-            g.setTransform(createCornerTransform(180, cornerRadius, height - cornerRadius, cornerRadius, height - cornerDiameter));
+            g.transform(createCornerTransform(180, cornerRadius, height - cornerRadius, cornerRadius, height - cornerDiameter));
             g.drawImage(getPartialCorner(degrees), 0, 0, null);
 			break;
 		case 4:
@@ -216,7 +221,7 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
                     height - borderSize, filledLength, borderSize));
 			break;
 		case 3:
-            g.setTransform(createCornerTransform(90, width - cornerRadius, height - cornerRadius, width - cornerRadius, height - cornerDiameter));
+            g.transform(createCornerTransform(90, width - cornerRadius, height - cornerRadius, width - cornerRadius, height - cornerDiameter));
             g.drawImage(getPartialCorner(degrees), 0, 0, null);
 			break;
 		case 2:
@@ -245,21 +250,21 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
         AffineTransform originalTransform = g.getTransform();
         switch (section) {
             case 7:
-                g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(270), cornerRadius, cornerRadius));
+                g.transform(AffineTransform.getRotateInstance(Math.toRadians(270), cornerRadius, cornerRadius));
                 g.drawImage(corner, cornerRadius, 0, null);
                 break;
             case 6:
                 g.fill(new Rectangle2D.Double(0, cornerRadius, borderSize, side));
                 break;
             case 5:
-                g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(180), cornerRadius, height - cornerRadius));
+                g.transform(AffineTransform.getRotateInstance(Math.toRadians(180), cornerRadius, height - cornerRadius));
                 g.drawImage(corner, cornerRadius, height - cornerDiameter, null);
                 break;
             case 4:
                 g.fill(new Rectangle2D.Double(cornerRadius, height - borderSize, bottom, borderSize));
                 break;
             case 3:
-                g.setTransform(AffineTransform.getRotateInstance(Math.toRadians(90), width - cornerRadius, height - cornerRadius));
+                g.transform(AffineTransform.getRotateInstance(Math.toRadians(90), width - cornerRadius, height - cornerRadius));
                 g.drawImage(corner, width - cornerRadius, height - cornerDiameter, null);
                 break;
             case 2:

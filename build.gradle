@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 subprojects {
     buildscript {
         repositories {
@@ -19,5 +22,10 @@ subprojects {
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
         compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
         compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
+    }
+
+    clean.doLast {
+        // easy way to delete directory recursively?  or mark dir as something that should be cleaned up
+//        Files.deleteIfExists(project.getProjectDir().toPath().resolve('out'))
     }
 }

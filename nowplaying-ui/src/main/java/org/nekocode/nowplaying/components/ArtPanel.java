@@ -73,6 +73,7 @@ public class ArtPanel extends JPanel
         if (cornerRadiusString != null) {
             try {
                 cornerRadiusPercent = Double.parseDouble(cornerRadiusString);
+                // TODO throw exception if radius is out of bounds
             } catch (NumberFormatException e) {
                 // leave as default
             }
@@ -235,7 +236,7 @@ public class ArtPanel extends JPanel
 
 		// make the corners transparent
 		g.setComposite(AlphaComposite.DstIn);
-        maskImage(g, size.width, size.height, 0, 0, cornerRadius, transparency); // for the default white background
+        maskImage(g, size.width, size.height, 0, 0, cornerRadius, transparency);
 
 		g.dispose();
 

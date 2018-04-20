@@ -25,6 +25,7 @@ import org.nekocode.nowplaying.tags.TagView;
 
 import javax.swing.ImageIcon;
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.GraphicsEnvironment;
@@ -205,7 +206,7 @@ public class NowPlayingController
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         if (gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSPARENT)) {
-//            view.setBackground(new Color(0, 0, 0, 0));
+            view.setBackground(new Color(0, 0, 0, 0));
         } else {
             LogManager.getLogger(getClass()).warn("Per pixel transparency not supported.");
         }

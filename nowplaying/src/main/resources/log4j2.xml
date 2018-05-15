@@ -8,7 +8,7 @@
 <Configuration>
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT">
-            <PatternLayout pattern="%-6r [%-5p] %c{1} %x - %m%n"/>
+            <PatternLayout pattern="%-6r [%-5p] %c{1} [%t] - %m%n"/>
             <!--<PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n"/>-->
         </Console>
         <File name="LOG_FILE" fileName="nowplaying.log" append="false">

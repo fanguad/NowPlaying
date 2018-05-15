@@ -34,6 +34,10 @@ import java.util.Map;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.lang.Math.PI;
+import static java.lang.Math.cos;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.sin;
 
 /**
  * A layer that draws a progress bar around the ArtPanel.
@@ -41,12 +45,12 @@ import static java.lang.Math.PI;
  * @author dan.clark@nekocode.org
  */
 public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
-	private static final Logger log = LogManager.getLogger(ArtPanelProgressLayerUI.class);
+    private static final Logger log = LogManager.getLogger(ArtPanelProgressLayerUI.class);
     private static final Map<Key, Object> RENDERING_HINTS = Collections.singletonMap(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
     private static final String DIRTY_SONG = "dirty song";
     private static final String DIRTY = "dirty";
 
-	private final int borderSize;
+    private final int borderSize;
 	private final Color progressColor;
 
 	/**
@@ -83,12 +87,8 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 	private int bottom;
 	private int topHalf;
 
-	// clip regions, so we don't have to unnecessarily draw stuff
+	// precalculated clip region
 	private Rectangle clipAll;
-    private Rectangle clipNE;
-    private Rectangle clipSE;
-    private Rectangle clipSW;
-    private Rectangle clipNW;
 
     public ArtPanelProgressLayerUI(ArtPanel artPanel, int borderSize, Color progressColor) {
 		this.borderSize = borderSize;
@@ -113,7 +113,7 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 
 		// has the song changed, or time gone down?
 		if (dirtySong || dirtyPanel) {
-			log.debug(String.format("song: %s, panel: %s", dirtySong, dirtyPanel));
+			log.debug("song: {}, panel: {}", dirtySong, dirtyPanel);
 
 			initializeLayer(component);
 		}
@@ -162,11 +162,6 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 		sectionLengths[8] = perimeter; // do I need this one?
 
 		clipAll = new Rectangle(0, 0, width, height);
-
-        clipNE = new Rectangle(width- cornerRadius, 0, cornerRadius, cornerRadius);
-        clipSE = new Rectangle(width- cornerRadius, height- cornerRadius, cornerRadius, cornerRadius);
-        clipSW = new Rectangle(0, height- cornerRadius, cornerRadius, cornerRadius);
-        clipNW = new Rectangle(0, 0, cornerRadius, cornerRadius);
 	}
 
     /**
@@ -178,9 +173,9 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
     private void drawTrackProgress(Graphics g2) {
 		double filledLength = currentFilledLength;
 
-		Graphics2D g = (Graphics2D) g2;
+        Graphics2D g = (Graphics2D) g2;
         g.setRenderingHints(RENDERING_HINTS);
-		g.setColor(progressColor);
+        g.setColor(progressColor);
 
         // find out which section we're currently in by looping
         int i = 0;
@@ -190,13 +185,13 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 			fillSection(g, i);
 		}
 
-        log.debug(String.format("Drawing Progress [%s]: %s", i, filledLength));
+        log.trace("Drawing Progress [{}]: {}", i, filledLength);
         if (i > 0) {
             // change filledLength from the total # of pixels filled into the number
             // of pixels filled of the current section
             filledLength -= sectionLengths[i-1];
         }
-        double degrees = (int) (filledLength / cornerLength * -90);
+        double degrees = filledLength / cornerLength * -90;
         AffineTransform originalTransform = g.getTransform();
 
         switch (i) {
@@ -235,7 +230,7 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 			break;
 		}
         g.setTransform(originalTransform);
-	}
+    }
 
     /**
      * Completely fill in a progress bar section.
@@ -316,21 +311,18 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
         return rotate;
     }
 
-	public void invalidate()
-    {
-        dirtySong = true;
-        firePropertyChange(DIRTY_SONG, false, true);
-    }
-
     /**
 	 * Set the layer's progress bar to the specified percent complete.
 	 *
 	 * @param percent percent complete
 	 */
 	public void setTrackProgress(double percent) {
-		log.debug("track progress: " + percent);
-
 		double filledLength = percent * perimeter;
+        if (filledLength == currentFilledLength)
+            return;
+
+        log.trace("track progress: {}", percent);
+
 		if (currentFilledLength > filledLength) {
 			dirtySong = true;
 
@@ -378,8 +370,15 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
      *
      * @return clip region for current update
      */
-	public Rectangle getClip() {
+    private Rectangle getClip() {
         int i = getSection(currentFilledLength);
+
+        if (i < 0 || i > 8) {
+            log.warn("bad progress bar section: {} due to currentFilledLength = {} / {} pixels",
+                    i, currentFilledLength, perimeter);
+            // if we don't understand the input, redraw everything
+            return clipAll;
+        }
 
         int sectionCurrentFill = (int) Math.ceil(currentFilledLength);
         int sectionLastFill = (int) Math.floor(lastFilledLength);
@@ -394,33 +393,53 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
             // TODO need to handle special case for when currentFilledLength and lastFilledLength aren't on the same section of the border
         }
 
-        // TODO create small clip bounds for corners
-
         // +2 on the end for 1 pixel overage on each side
         int changeSize = sectionCurrentFill - sectionLastFill + 2;
         switch (i) {
-		case 0:
+        case 0:
             return new Rectangle(width / 2 + sectionLastFill - 1, 0, changeSize, borderSize);
-		case 8:
+        case 8:
             return new Rectangle(cornerRadius + sectionLastFill - 1, 0, changeSize, borderSize);
-		case 2:
-            return new Rectangle(width- borderSize, cornerRadius + sectionLastFill - 1, borderSize, changeSize);
-		case 4:
-			return new Rectangle(width - cornerRadius - sectionCurrentFill - 1, height- borderSize, changeSize, borderSize );
-		case 6:
+        case 2:
+            return new Rectangle(width - borderSize, cornerRadius + sectionLastFill - 1, borderSize, changeSize);
+        case 4:
+            return new Rectangle(width - cornerRadius - sectionCurrentFill - 1, height - borderSize, changeSize, borderSize);
+        case 6:
             return new Rectangle(0, height - cornerRadius - sectionCurrentFill - 1, borderSize, changeSize);
-		case 7:
-            return clipNW;
-		case 5:
-            return clipSW;
-		case 3:
-            return clipSE;
-		case 1:
-            return clipNE;
-		default:
-			// if we don't understand the input, redraw everything
-			return clipAll;
-		}
+        }
+
+        // calculate small clip bounds for corners
+        double PI_2 = Math.PI / 2;
+        double lastFillRadians = (1 - (sectionLastFill / cornerLength)) * PI_2;
+        double currentFillRadians = (1 - (sectionCurrentFill / cornerLength)) * PI_2;
+//        log.trace("{} -> {} (of {})", sectionLastFill, sectionCurrentFill, cornerLength);
+
+        double lastXOffset = cornerRadius * cos(lastFillRadians);
+        double lastYOffset = cornerRadius * sin(lastFillRadians);
+        double currentXOffset = cornerRadius * cos(currentFillRadians);
+        double currentYOffset = cornerRadius * sin(currentFillRadians);
+
+        int buffer = borderSize + 2;
+        int minX = (int) min(lastXOffset, currentXOffset);
+        int maxX = (int) max(lastXOffset, currentXOffset);
+        int minY = (int) Math.ceil(min(lastYOffset, currentYOffset));
+        int maxY = (int) Math.ceil(max(lastYOffset, currentYOffset));
+        int clipWidth = (int) Math.ceil(maxX - minX) + buffer * 2;
+        int clipHeight = (int) Math.ceil(maxY - minY) + buffer * 2;
+
+        switch (i) {
+        case 7:
+            return new Rectangle(cornerRadius - minY - buffer, cornerRadius - minX - buffer, clipWidth, clipHeight);
+        case 5:
+            return new Rectangle(cornerRadius - minX - buffer, height - cornerRadius + minY - buffer, clipWidth, clipHeight);
+        case 3:
+            return new Rectangle(width - cornerRadius + minY - buffer, height - cornerRadius + minX - buffer, clipWidth, clipHeight);
+        case 1:
+            return new Rectangle(width - cornerRadius + minX - buffer, cornerRadius - minY - buffer, clipWidth, clipHeight);
+        }
+
+        // if we don't understand the input, redraw everything
+        return clipAll;
 	}
 
     /**
@@ -440,7 +459,7 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
      * @param fillLength length (in pixels) of progress bar location
      * @return section number of progress bar location
      */
-    public int getSection(double fillLength) {
+    private int getSection(double fillLength) {
         int i = 0;
         for (; i < sectionLengths.length && sectionLengths[i] < fillLength; i++);
         return i;

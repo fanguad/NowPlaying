@@ -194,7 +194,11 @@ public class ArtPanel extends JPanel
 		size.height = Math.max(height, size.height);
 		size.width = Math.max(width, size.width);
 
-		// even if it isn't fixed width, the minimum size is still constrained
+        // ensure that the height and width are big enough to allow corners
+        size.height = Math.max(size.height, cornerRadius * 2);
+        size.width = Math.max(size.width, cornerRadius * 2);
+
+        // even if it isn't fixed width, the minimum size is still constrained
 		size.height = Math.min(maxSize, size.height);
 		size.width = Math.min(maxSize, size.width);
 

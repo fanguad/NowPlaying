@@ -24,7 +24,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -100,7 +107,13 @@ public class FindRemovedTracks extends JBusyComponent<JPanel> {
             busyModel.setBusy(true);
 
             // load all track ids from tagModel
+            log.info("Loading all track ids in database");
             List<String> trackIdsFromDatabase = tagModel.getAllTrackIds();
+            int databaseSize = trackIdsFromDatabase.size();
+            log.info("Found {} tracks in database", databaseSize);
+
+            Vector<Vector<String>> dataVector = new Vector<>();
+            tableModel.setDataVector(dataVector, new Vector<>(Arrays.asList("Track Id", "Tags")));
 
             // MonkeyTunes doesn't do a "find all" search the same way as iTunes
             List<String> trackIdsFromPlayer;
@@ -110,43 +123,44 @@ public class FindRemovedTracks extends JBusyComponent<JPanel> {
             } else {
                 // this bit probably wouldn't work properly in iTunes, since persistentId and itemId aren't the same
                 trackIdsFromPlayer = new ArrayList<>();
-                for (String trackId : trackIdsFromDatabase) {
+                for (int i = 0; i < databaseSize; i++) {
+                    String trackId = trackIdsFromDatabase.get(i);
+                    log.debug("Checking track {} ({} of {})", trackId, i, databaseSize);
                     try {
                         Track track = mediaPlayer.getTrack(Integer.parseInt(trackId));
                         if (track != null) {
                             trackIdsFromPlayer.add(trackId);
+//                            log.debug("Track {} is present in media player", trackId);
+                        }
+                        else {
+                            log.debug("Track {} is not present in media player", trackId);
+
+                            List<TagCloudEntry> tags = tagModel.getTagsById(trackId, false);
+
+                            int oldSize = dataVector.size();
+                            dataVector.add(new Vector<>(Arrays.asList(trackId, toString(tags))));
+                            tableModel.fireTableRowsInserted(oldSize, oldSize);
                         }
                     } catch (NumberFormatException e) {
                         // the id wasn't an integer - this will remove any badly-formed (by MonkeyTunes standards, at least) ids
                     }
                 }
             }
-
-            Set<String> difference = new HashSet<>(trackIdsFromDatabase);
-            difference.removeAll(trackIdsFromPlayer);
+            busyModel.setBusy(false);
 
             if (log.isDebugEnabled()) {
+                Set<String> difference = new HashSet<>(trackIdsFromDatabase);
+                difference.removeAll(trackIdsFromPlayer);
+
                 Collections.sort(trackIdsFromDatabase);
                 Collections.sort(trackIdsFromPlayer);
-                log.debug("tracks from database: " + trackIdsFromDatabase.size());
+                log.debug("tracks from database: " + databaseSize);
                 log.debug("tracks from database: " + trackIdsFromDatabase);
                 log.debug("tracks from player:   " + trackIdsFromPlayer.size());
                 log.debug("tracks from player:   " + trackIdsFromPlayer);
                 log.debug("difference:           " + difference.size());
                 log.debug("difference:           " + difference);
             }
-
-            Map<String, List<TagCloudEntry>> tags = tagModel.getTagsById(difference, false);
-
-            Object[][] dataVector = new Object[tags.size()][];
-            int i = 0;
-            for (Map.Entry<String, List<TagCloudEntry>> e : tags.entrySet()) {
-                dataVector[i++] = new Object[] {e.getKey(), toString(e.getValue())};
-            }
-
-            tableModel.setDataVector(dataVector, new Object[] {"Track Id", "Tags"});
-
-            busyModel.setBusy(false);
         }
         
         /**

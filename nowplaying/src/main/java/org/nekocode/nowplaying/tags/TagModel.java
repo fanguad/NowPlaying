@@ -32,11 +32,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static org.nekocode.nowplaying.tags.TagModel.StatementName.*;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.addTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.addTrackTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.addTrackTagBatch;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackFromDuplicates;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackFromGroups;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackIdToUUID;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackTags;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getAllTrackIds;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getDuplicateId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getDuplicates;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getGroupId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getGroups;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getMaxDuplicateId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getMaxGroupId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getMaxTagCount;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTagCounts;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTagId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTagIdsForTrack;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTrackIdUUIDSelect;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTrackUUIDInsert;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTrackUUIDSelect;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.removeTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.setDuplicate;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.setGroup;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.setTrackGroup;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.updateTagCount;
 
 /**
  * Tag model. Keeps track of tags.
@@ -915,17 +947,37 @@ public class TagModel
     }
 
     /**
+     * Gets the tags for the input track.
+     *
+     * @param trackId a collection of tracks to retrieve tags for
+     * @return all tags found for the selected tracks
+     */
+    public List<TagCloudEntry> getTagsById(String trackId, boolean includeGroups) {
+		Callable<List<TagCloudEntry>> getTagsById = () -> {
+			String uuid = getUUIDFromTrackId(trackId);
+			return __getTags(uuid, includeGroups);
+		};
+		List<TagCloudEntry> tags = Collections.emptyList();
+
+        try {
+            tags = dbAccess.submit(getTagsById).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error getting tags for multiple tracks", e);
+        }
+        return tags;
+    }
+
+    /**
      * Gets the tags for all the input tracks.
      *
      * @param tracks a collection of tracks to retrieve tags for
      * @return all tags found for the selected tracks
      */
     public Map<String, List<TagCloudEntry>> getTagsById(final Collection<String> tracks, boolean includeGroups) {
-        Callable<Map<String, List<TagCloudEntry>>> getTags = () -> __getTagsById(tracks, includeGroups);
-        Map<String, List<TagCloudEntry>> tags = new HashMap<>();
+		Map<String, List<TagCloudEntry>> tags = Collections.emptyMap();
 
         try {
-            tags = dbAccess.submit(getTags).get();
+            tags = dbAccess.submit(() -> __getTagsById(tracks, includeGroups)).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error getting tags for multiple tracks", e);
         }

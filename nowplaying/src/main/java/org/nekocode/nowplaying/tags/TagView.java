@@ -9,6 +9,7 @@ package org.nekocode.nowplaying.tags;
 import furbelow.SpinningDial;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
 import org.nekocode.nowplaying.events.TagChangeListener;
 import org.nekocode.nowplaying.objects.Track;
@@ -60,6 +61,7 @@ public class TagView extends JPanel
 
 	public TagCloud tagHolder;
 
+	private NekoButton autoTag;
 	private NekoLabel addNew;
 	private JLabel busy;
 
@@ -89,6 +91,10 @@ public class TagView extends JPanel
 					removeItem.setText("Remove Tag");
 					removeItem.addActionListener(e1 -> removeTag(value));
 					contextMenu.add(removeItem);
+					JMenuItem editMetadata = new JMenuItem();
+					editMetadata.setText("Edit Tag Metadata");
+					// TODO set action for this menu item
+					contextMenu.add(editMetadata);
 					contextMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
@@ -108,12 +114,16 @@ public class TagView extends JPanel
 		spinningDial = new SpinningDial(32, 32);
 		busy = new JLabel(spinningDial);
 
+		autoTag = new NekoButton("autotag");
+		autoTag.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				addAutomaticTags();
+			}
+		});
 
 		addNew = new NekoLabel("+");
 		addNew.addMouseListener(new MouseAdapter() {
-			/* (non-Javadoc)
-			 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
-			 */
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				toggleTagInput();
@@ -211,6 +221,7 @@ public class TagView extends JPanel
 		SwingUtilities.invokeLater(() -> {
             tagHolder.setTagEntries(tagsCopy);
             tagHolder.add(addNew);
+//            tagHolder.add(autoTag); // TODO implement auto-tagging based on MP3 metadata
 
             pack();
         });
@@ -287,6 +298,18 @@ public class TagView extends JPanel
 	 */
 	public boolean isTagInputVisible() {
 		return textfields.isVisible();
+	}
+
+	private void addAutomaticTags() {
+		// get list of automatic tags
+//		setBusy();
+
+		log.info("automatic tag: {}", track.getArtist());  // split on '; '
+		log.info("automatic tag: {}", track.getGenre());  // doesn't work?
+//		log.info("automatic tag: {}", track.getMood());
+//		log.info("automatic tag: {}", track.getAnime());
+//		log.info("automatic tag: {}", track.getGame());
+		// TODO if "suggested" tags ever gets implemented, include them here
 	}
 
 	private void addTag(String tag) {

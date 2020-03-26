@@ -50,7 +50,16 @@
         <Logger name="org.nekocode.itunes.remote.connection.RequestManager" level="debug" additivity="false">
             <AppenderRef ref="DACP_MESSAGES"/>
         </Logger>
-        <Root level="debug">
+        <Logger name="org.nekocode.itunes.remote.ITunesRemoteTrack" level="warn" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+        <Logger name="org.nekocode.nowplaying.components.modes.tagsdnd.FindRemovedTracks" level="debug" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOG_FILE"/>
+        </Logger>
+
+        <Root level="info">
             <AppenderRef ref="CONSOLE"/>
             <AppenderRef ref="LOG_FILE"/>
         </Root>

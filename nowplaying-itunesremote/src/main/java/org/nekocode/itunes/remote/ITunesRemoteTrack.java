@@ -17,7 +17,20 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import static org.nekocode.itunes.remote.connection.ContentCode.*;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_DATABASE_SONGS;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_PLAYLIST_SONGS;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_SONG_ALBUM;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_SONG_ARTIST;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_SONG_GROUPING;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_SONG_TIME;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_SONG_TRACK_COUNT;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_SONG_TRACK_NUMBER;
+import static org.nekocode.itunes.remote.connection.ContentCode.DAAP_SONG_USER_RATING;
+import static org.nekocode.itunes.remote.connection.ContentCode.DMAP_ITEM_ID;
+import static org.nekocode.itunes.remote.connection.ContentCode.DMAP_ITEM_NAME;
+import static org.nekocode.itunes.remote.connection.ContentCode.DMAP_LIST;
+import static org.nekocode.itunes.remote.connection.ContentCode.DMAP_LIST_ITEM;
+import static org.nekocode.itunes.remote.connection.ContentCode.DMAP_PERSISTENT_ID;
 
 /**
  * A Track that loads data from ITunesRemoteResponse objects
@@ -86,6 +99,9 @@ public class ITunesRemoteTrack implements Track {
             }
             item = itemList.get(0);
         }
+
+        log.info(item);
+
         trackId = item.getInt(DMAP_ITEM_ID);
         persistentId = item.hasLeaf(DMAP_PERSISTENT_ID) ? item.getHexNumber(DMAP_PERSISTENT_ID) : Integer.toString(trackId); // TODO MonkeyTunes doesn't seem to provide this
         title = item.getString(DMAP_ITEM_NAME);

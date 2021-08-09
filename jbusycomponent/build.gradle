@@ -1,5 +1,7 @@
+apply plugin: 'java-library'
+
 dependencies {
-    compile project(':jxlayer')
-    compile group: 'org.divxdede', name: 'commons', version: '0.2.3'
-    compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
+    api project(':jxlayer')
+    implementation group: 'org.divxdede', name: 'commons', version: '0.2.3'
+    implementation group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
 }

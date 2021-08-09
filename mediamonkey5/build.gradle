@@ -1,0 +1,7 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation project(':nowplaying')
+    // https://github.com/kklisura/chrome-devtools-java-client
+    implementation group: 'com.github.kklisura.cdt', name: 'cdt-java-client', version: '2.1.0'
+}

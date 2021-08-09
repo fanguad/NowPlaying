@@ -7,13 +7,14 @@ buildscript {
     }
 }
 dependencies {
-    compile project(':nowplaying')
-    compile project(':nowplaying-itunesremote')
+    implementation project(':nowplaying')
+    implementation project(':nowplaying-itunesremote')
+    implementation project(':mediamonkey5')
 }
 
 distributions {
     main{
-        baseName = 'NowPlaying'
+        distributionBaseName = 'NowPlaying'
         contents {
             from { 'src/dist' }
         }

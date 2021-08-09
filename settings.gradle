@@ -6,7 +6,6 @@ include 'properties'
 include 'nowplaying-ui'
 include 'nowplaying'
 include 'nowplaying-itunesremote'
+include 'mediamonkey5'
 
 include 'dist'
-
-include 'scratchpad'

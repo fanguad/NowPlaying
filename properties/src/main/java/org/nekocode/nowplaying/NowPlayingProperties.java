@@ -10,15 +10,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
  * Defines the properties that appear in the nowplaying.properties file
+ *
+ * TODO make me JSON with specific configuration for each remote model
  *
  * @author dan.clark@nekocode.org
  */
@@ -30,6 +28,7 @@ public enum NowPlayingProperties {
     CORNER_RADIUS,
     MEDIA_PLAYER_GUID,
     REMOTE_MACHINE,
+    REMOTE_PORT,
     WINDOW_ANCHOR,
     WINDOW_POSITION,
     ;

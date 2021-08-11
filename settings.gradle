@@ -8,4 +8,5 @@ include 'nowplaying'
 include 'nowplaying-itunesremote'
 include 'mediamonkey5'
 
-include 'dist'
+//include 'dist'
+include 'spring'

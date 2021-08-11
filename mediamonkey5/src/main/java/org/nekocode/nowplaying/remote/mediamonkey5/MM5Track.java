@@ -1,50 +1,68 @@
 package org.nekocode.nowplaying.remote.mediamonkey5;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.objects.Track;
 
 import javax.swing.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
+import java.awt.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class MM5Track implements Track {
     private static final Logger LOG = LogManager.getLogger(MM5Track.class);
+    private final MM5Connection connection;
+    private final int persistentId;
     private final String title;
     private final String artist;
     private final String album;
     private final int rating;
+    private final String genre;
+    private final String comment;
+    private final String grouping1;
+    private final double duration;
+    private final Object artworkLock = new Object();
+    private final Collection<ImageIcon> artwork = new ArrayList<>();
 
-    public static Track getInstance(Map<String, Object> trackProperties)
-    {
+    public static Track getCurrentTrack(MM5Connection connection) {
         try {
-            String title = (String) trackProperties.get("title");
-            String artist = (String) trackProperties.get("artist");
-            String album = (String) trackProperties.get("album");
-//        String genre = trackProperties.get("genre");
-//        String path = trackProperties.get("path");
-//        String custom1 = trackProperties.get("custom1");
-//        String custom2 = trackProperties.get("custom2");
-//        int idsong = trackProperties.get("idsong"); // also id, persistentID
-        int rating = (Integer) trackProperties.get("rating");
-//        int songLength = trackProperties.get("songLength");
-//        int percentPlayed = trackProperties.get("percentPlayed");
-//        int playbackPos = trackProperties.get("playbackPos");
-            return new MM5Track(title, artist, album, rating);
+            Map<String, Object> trackProperties = connection.evaluate("app.player.getCurrentTrack()");
+            return createMM5Track(connection, trackProperties);
         } catch (Exception e) {
             LOG.error("Error parsing property map", e);
-        return ErrorTrack.ERROR_TRACK;
+            return ErrorTrack.ERROR_TRACK;
         }
     }
 
-    private MM5Track(String title, String artist, String album, int rating) {
+    public static Track getTrack(MM5Connection connection, int trackId) {
+        try {
+            Map<String, Object> trackProperties = connection.evaluate(
+                    "app.getObject('track', { id: %d })".formatted(trackId));
+            return createMM5Track(connection, trackProperties);
+        } catch (Exception e) {
+            LOG.error("Error parsing property map", e);
+            return ErrorTrack.ERROR_TRACK;
+        }
+    }
 
-        this.title = title;
-        this.artist = artist;
-        this.album = album;
-        this.rating = rating;
+    @NotNull
+    private static MM5Track createMM5Track(MM5Connection connection, Map<String, Object> trackProperties) {
+        String title = (String) trackProperties.get("title");
+        String artist = (String) trackProperties.get("artist");
+        String album = (String) trackProperties.get("album");
+        String genre = (String) trackProperties.get("genre");
+        String comment = (String) trackProperties.get("commentShort");
+//        String path = trackProperties.get("path");
+        String grouping1 = (String) trackProperties.get("custom1"); // anime series
+//        String custom2 = trackProperties.get("custom2"); // anime
+        Integer id = (Integer) trackProperties.get("id"); // idsong and persistentID contain the same value
+        int rating = (Integer) trackProperties.get("rating");
+        double songLength = (Integer) trackProperties.get("songLength") / 1000d; // units are MS
+
+        return new MM5Track(connection, id, title, artist, album, rating, genre, comment, grouping1, songLength);
     }
 
     @Override
@@ -58,13 +76,8 @@ public class MM5Track implements Track {
     }
 
     @Override
-    public Collection<ImageIcon> getArtwork(int size) {
-        return Collections.emptyList();
-    }
-
-    @Override
     public String getComment() {
-        return null;
+        return comment;
     }
 
     @Override
@@ -89,17 +102,17 @@ public class MM5Track implements Track {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     @Override
     public String getGenre() {
-        return null;
+        return genre;
     }
 
     @Override
     public String getGrouping() {
-        return null;
+        return grouping1;
     }
 
     @Override
@@ -159,7 +172,7 @@ public class MM5Track implements Track {
 
     @Override
     public double getDuration() {
-        return 0;
+        return duration;
     }
 
     @Override
@@ -184,7 +197,7 @@ public class MM5Track implements Track {
 
     @Override
     public int getTrackId() {
-        return 0;
+        return persistentId;
     }
 
     @Override
@@ -199,6 +212,62 @@ public class MM5Track implements Track {
 
     @Override
     public String getPersistentId() {
-        return null;
+        return persistentId + "";
+    }
+
+    @Override
+    public Collection<ImageIcon> getArtwork(int size) {
+        synchronized (artworkLock) {
+            if (!artwork.isEmpty()) {
+                return artwork.stream()
+                        .map(image -> resizeArt(image, size))
+                        .collect(Collectors.toList());
+            }
+        }
+
+        // asynchronously acquire a reference to the artwork
+        // TODO figure out how to do this synchronously
+        String getCover = """
+                    app.getObject('track', { id: %d })
+                        .then(function(track) {
+                            if (track) {
+                                var cover = track.getThumbAsync(%d, %d,
+                                    function(thumb) {
+                                        console.debug('thumbnail:%d:' + thumb);
+                                    });
+                            }
+                        });
+                """.formatted(persistentId, size, size, persistentId);
+        try {
+            connection.evaluateAsync(getCover);
+        } catch (ScriptException e) {
+            LOG.error("Error loading cover art", e);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * only scales down
+     */
+    private ImageIcon resizeArt(ImageIcon imageIcon, int size) {
+        if (imageIcon.getIconWidth() > size || imageIcon.getIconHeight() > size) {
+            Image image = imageIcon.getImage();
+            int height = imageIcon.getIconHeight() >= imageIcon.getIconWidth()
+                    ? size
+                    : -1;
+            int width = imageIcon.getIconWidth() >= imageIcon.getIconHeight()
+                    ? size
+                    : -1;
+            Image newimg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+            return new ImageIcon(newimg);
+        } else {
+            return imageIcon;
+        }
+    }
+
+    public void addArtwork(ImageIcon imageIcon) {
+        synchronized (artworkLock) {
+            artwork.add(imageIcon);
+        }
     }
 }

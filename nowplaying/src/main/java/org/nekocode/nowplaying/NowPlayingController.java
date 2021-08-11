@@ -23,14 +23,9 @@ import org.nekocode.nowplaying.resources.images.Icons;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.TagView;
 
-import javax.swing.ImageIcon;
-import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.GraphicsDevice;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.GraphicsDevice.WindowTranslucency;
-import java.awt.GraphicsEnvironment;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Timer;
@@ -45,7 +40,7 @@ public class NowPlayingController
 {
 	@SuppressWarnings("unused")
 	private static final Logger log = LogManager.getLogger(NowPlayingController.class);
-	private MediaPlayer mediaPlayer;
+	private final MediaPlayer mediaPlayer;
 	private NowPlayingView view;
 	private TagView tagView;
 	private TagModel tagModel;
@@ -53,15 +48,9 @@ public class NowPlayingController
 	private TrackMonitor monitor;
     private boolean shutdown;
 
-    public static void main(String... args) {
-		LogMuter.muteLogging();
-		NowPlayingController controller = new NowPlayingController();
-		controller.start();
-	}
-
-	public NowPlayingController() {
+	public NowPlayingController(MediaPlayer mediaPlayer) {
+    	this.mediaPlayer = mediaPlayer;
         shutdown = false;
-        String mediaPlayerClassName = NowPlayingProperties.loadProperties().getProperty(NowPlayingProperties.MEDIA_PLAYER.name());
         try {
 //            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 //                if ("Nimbus".equals(info.getName())) {
@@ -71,12 +60,6 @@ public class NowPlayingController
 //            }
 //            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             // the font gets changed, and the tag editor look *terrible* if I change the UI...
-
-            if (mediaPlayerClassName == null) {
-                throw new RuntimeException("MediaPlayer was not supplied.  Cannot proceed");
-            }
-            Class<?> mediaPlayerClass = Class.forName(mediaPlayerClassName);
-            mediaPlayer = (MediaPlayer) mediaPlayerClass.newInstance();
 
             tagModel = new TagModel();
             view = new NowPlayingView();

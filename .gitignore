@@ -7,3 +7,4 @@ notes.txt
 nowplaying.properties
 */build
 */out
+*.log

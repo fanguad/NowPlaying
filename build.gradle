@@ -1,14 +1,13 @@
 subprojects {
     buildscript {
         repositories {
-            jcenter()
+            mavenCentral()
         }
     }
 
     apply plugin: 'java'
 
     repositories {
-        mavenLocal()
         mavenCentral()
         maven {
             url "../lib"
@@ -20,10 +19,5 @@ subprojects {
         implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.1'
         // https://mvnrepository.com/artifact/org.jetbrains/annotations
         implementation group: 'org.jetbrains', name: 'annotations', version: '19.0.0'
-    }
-
-    clean.doLast {
-        // easy way to delete directory recursively?  or mark dir as something that should be cleaned up
-//        Files.deleteIfExists(project.getProjectDir().toPath().resolve('out'))
     }
 }

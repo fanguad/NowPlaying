@@ -19,7 +19,6 @@ import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeListener;
 import org.nekocode.nowplaying.objects.Track;
 
-import javax.swing.SwingUtilities;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -180,6 +179,7 @@ public class TrackMonitor implements Runnable, TrackChangeListener {
             case PLAY_STATE_CHANGE:
             case CURRENT_SONG_CHANGE:
             case FILE_CHANGE:
+            case ART_CHANGE:
                 // force a full update
                 forceRefresh = true;
                 break;

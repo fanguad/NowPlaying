@@ -73,14 +73,14 @@ public class MM5Connection {
                     var seekChange = e => console.debug('seekChange:' + e);
                     var playbackState = e => console.debug('playbackState:' + e);
                     var playbackEnd = e => console.debug('playbackEnd:' + e);
-                    
+                                        
                     app.listen(app.player, 'seekChange', seekChange);
                     app.listen(app.player, 'playbackState', playbackState);
                     app.listen(app.player, 'playbackEnd', playbackEnd);
                     """;
 
             evaluateAsync(callbacks);
-            runtime.onConsoleAPICalled(e->{
+            runtime.onConsoleAPICalled(e -> {
                 e.getArgs().forEach(a -> {
                     String value = a.getValue().toString();
                     if (isUniqueNotification(value))
@@ -99,7 +99,6 @@ public class MM5Connection {
                             playbackStateListeners.firePropertyChange(chunks[0], null, chunks[1]);
                         }
                         case "thumbnail" -> {
-//                            C:\Users\fangu\AppData\Local\
                             String url = String.join(":", List.of(chunks).subList(2, chunks.length));
                             playbackStateListeners.firePropertyChange(chunks[0], chunks[1], url);
                         }
@@ -124,19 +123,15 @@ public class MM5Connection {
     /**
      * A notification is unique if enough time has passed, or the strings are different.
      */
-    private boolean isUniqueNotification(String notificationValue)
-    {
-        synchronized (notificationLock)
-        {
+    private boolean isUniqueNotification(String notificationValue) {
+        synchronized (notificationLock) {
             return System.currentTimeMillis() > (lastNotificationTime + DUPLICATE_NOTIFICATION_WINDOW_MS)
                     || !Objects.equals(lastNotificationValue, notificationValue);
         }
     }
 
-    private void setLastNotification(String notificationValue)
-    {
-        synchronized (notificationLock)
-        {
+    private void setLastNotification(String notificationValue) {
+        synchronized (notificationLock) {
             lastNotificationTime = System.currentTimeMillis();
             lastNotificationValue = notificationValue;
         }

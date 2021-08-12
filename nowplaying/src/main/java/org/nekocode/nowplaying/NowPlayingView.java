@@ -19,34 +19,13 @@ import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JLayer;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.KeyboardFocusManager;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Properties;
 import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +43,10 @@ public class NowPlayingView extends NekoFrame {
     @SuppressWarnings("unused")
     private static final Logger log = LogManager.getLogger(NowPlayingView.class);
 
-    private final static EnumSet<ChangeType> shouldUpdateArtwork = EnumSet.of(ChangeType.CURRENT_SONG_CHANGE, ChangeType.FILE_CHANGE);
+    private final static EnumSet<ChangeType> shouldUpdateArtwork = EnumSet.of(
+            ChangeType.CURRENT_SONG_CHANGE,
+            ChangeType.FILE_CHANGE,
+            ChangeType.ART_CHANGE);
 
     // frame elements
     private final int size;

@@ -12,22 +12,12 @@ import org.nekocode.nowplaying.objects.Track;
 import javax.swing.*;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.*;
 
 public class MM5RemoteModel extends AbstractMediaPlayer {
-
-    /*
-     * example of returning specific items only
-     *
-               String trackPosition = """
-                    var currentTrackPosition={
-                         'trackLengthMS':app.player.trackLengthMS,
-                         'trackPositionMS':app.player.trackPositionMS};
-                    currentTrackPosition
-                    """;
-     */
 
     private static final Logger LOG = LogManager.getLogger(MM5RemoteModel.class);
     private final MM5Connection connection;
@@ -51,7 +41,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
                             MM5RemoteModel.this.currentTrack = MM5Track.getCurrentTrack(connection);
                             fireTrackChanged(new TrackChangeEvent(MM5RemoteModel.this.currentTrack, CURRENT_SONG_CHANGE));
                         }
-                        case "play", "pause" -> {
+                        case "play", "pause", "unpause" -> {
                             Track currentTrack = getCurrentTrack();
                             if (currentTrack != null) {
                                 fireTrackChanged(new TrackChangeEvent(currentTrack, PLAY_STATE_CHANGE));
@@ -75,7 +65,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
                             Path fullPath = Path.of(System.getProperty("java.io.tmpdir")).resolve(mmPath);
                             LOG.info("thumbnail for track {} available at: {}", trackId, fullPath);
                             mmTrack.addArtwork(new ImageIcon(fullPath.toString()));
-                            fireTrackChanged(new TrackChangeEvent(currentTrack, FILE_CHANGE));
+                            fireTrackChanged(new TrackChangeEvent(currentTrack, ART_CHANGE));
                         }
                     }
                 }
@@ -90,44 +80,38 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
         return currentTrack;
     }
 
+    private void asyncCommand(String command)
+    {
+        try {
+            connection.evaluateAsync("app.player.%sAsync()".formatted(command));
+        } catch (ScriptException e) {
+            LOG.error("Error in '%s':".formatted(command), e);
+        }
+    }
+
     @Override
     public void play() {
-        try {
-            connection.evaluateAsyncAndWait("app.player.playAsync()");
-        } catch (ScriptException e) {
-            LOG.error("Error in 'play':", e);
-        }
+        asyncCommand("play");
     }
 
     @Override
     public void pause() {
-        try {
-            connection.evaluateAsyncAndWait("app.player.pauseAsync()");
-        } catch (ScriptException e) {
-            LOG.error("Error in 'pause':", e);
-        }
+        asyncCommand("pause");
     }
 
     @Override
     public void next() {
-        try {
-            connection.evaluateAsyncAndWait("app.player.nextAsync()");
-        } catch (ScriptException e) {
-            LOG.error("Error in 'next':", e);
-        }
+        asyncCommand("next");
     }
 
     @Override
     public void previous() {
-        try {
-            connection.evaluateAsyncAndWait("app.player.prevAsync()");
-        } catch (ScriptException e) {
-            LOG.error("Error in 'previous':", e);
-        }
+        asyncCommand("prev");
     }
 
     @Override
     public void onShutdown() {
+        // TODO unregister callbacks
         connection.close();
     }
 
@@ -141,7 +125,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
                     """;
             connection.evaluateAsyncAndWait(ratingCommand.formatted(track.getTrackId(), newRating));
         } catch (ScriptException e) {
-            LOG.error("Error in 'pause':", e);
+            LOG.error("Error updating rating:", e);
         }
     }
 
@@ -168,12 +152,20 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
     @Override
     public @NotNull PlayerState getPlayerState() {
         try {
-            boolean isPlaying = connection.evaluate("app.player.isPlaying");
-            return isPlaying
+            String playStateQuery = """
+                    var playState = {
+                         'isPlaying': app.player.isPlaying,
+                         'paused': app.player.paused};
+                    playState
+                    """;
+            Map<String, Object> playState = connection.evaluate(playStateQuery);
+            Boolean isPlaying = (Boolean) playState.getOrDefault("isPlaying", Boolean.FALSE);
+            Boolean paused = (Boolean) playState.getOrDefault("paused", Boolean.FALSE);
+            return isPlaying && !paused
                     ? PlayerState.PLAYING
                     : PlayerState.STOPPED;
         } catch (ScriptException e) {
-            LOG.error("Error in 'pause':", e);
+            LOG.error("Error in 'getPlayerState':", e);
             return PlayerState.STOPPED;
         }
     }

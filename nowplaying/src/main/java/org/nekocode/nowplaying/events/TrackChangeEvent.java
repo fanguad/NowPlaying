@@ -22,7 +22,11 @@ public class TrackChangeEvent {
 		PLAY_STATE_CHANGE,
 		CURRENT_SONG_CHANGE,
 		FILE_CHANGE,
-		TAG_CHANGE
+		TAG_CHANGE,
+		/**
+		 * Art for the current track became available.  Track did not actually change
+		 */
+		ART_CHANGE,
 	}
 
 	@NotNull

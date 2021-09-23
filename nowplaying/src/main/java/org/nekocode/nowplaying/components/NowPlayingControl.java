@@ -10,10 +10,10 @@
  */
 package org.nekocode.nowplaying.components;
 
-import javax.swing.JComponent;
-
 import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
+
+import javax.swing.JComponent;
 
 /**
  * Interface for a control section of NowPlayingView that receives track update
@@ -32,4 +32,6 @@ public abstract class NowPlayingControl extends JComponent {
 	public abstract void updateTrack(@NotNull TrackChangeEvent trackChange);
 
 	public abstract void shutdown();
+
+    public abstract String getModeName();
 }

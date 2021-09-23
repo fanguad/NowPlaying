@@ -133,7 +133,12 @@ public class PlaylistPanel extends NowPlayingControl {
 
 	}
 
-	/* (non-Javadoc)
+    @Override
+    public String getModeName() {
+        return "playlists";
+    }
+
+    /* (non-Javadoc)
 	 * @see org.nekocode.nowplaying.components.NowPlayingControl#updateTrack(org.nekocode.nowplaying.events.TrackChangeEvent)
 	 */
 	@Override

@@ -12,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.components.MouseActions;
 import org.nekocode.nowplaying.components.RatingChangeEvent;
 import org.nekocode.nowplaying.components.modes.control.ControlPanel;
-import org.nekocode.nowplaying.components.modes.tag.TagPanel;
-import org.nekocode.nowplaying.components.modes.tagsdnd.TagDnDPanel;
 import org.nekocode.nowplaying.events.TagChangeListener;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
@@ -23,9 +21,14 @@ import org.nekocode.nowplaying.resources.images.Icons;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.TagView;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsDevice.WindowTranslucency;
+import java.awt.GraphicsEnvironment;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Timer;
@@ -48,9 +51,19 @@ public class NowPlayingController
 	private TrackMonitor monitor;
     private boolean shutdown;
 
-	public NowPlayingController(MediaPlayer mediaPlayer) {
+	public NowPlayingController(MediaPlayer mediaPlayer,
+								TagModel tagModel,
+								TrackMonitor monitor,
+								NowPlayingView nowPlayingView,
+								TagView tagView,
+								ControlPanel controls
+	) {
     	this.mediaPlayer = mediaPlayer;
-        shutdown = false;
+		this.tagModel = tagModel;
+		this.monitor = monitor;
+		this.view = nowPlayingView;
+		this.tagView = tagView;
+		shutdown = false;
         try {
 //            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 //                if ("Nimbus".equals(info.getName())) {
@@ -61,13 +74,7 @@ public class NowPlayingController
 //            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             // the font gets changed, and the tag editor look *terrible* if I change the UI...
 
-            tagModel = new TagModel();
-            view = new NowPlayingView();
-            tagView = new TagView();
-
-            monitor = new TrackMonitor(view, mediaPlayer);
-
-            connectComponents();
+            connectComponents(controls);
         } catch (Exception e) {
             log.fatal("Fatal error", e);
             // try to shut down smoothly
@@ -75,32 +82,10 @@ public class NowPlayingController
         }
     }
 
-	private void connectComponents() {
+	private void connectComponents(ControlPanel controls) {
 	    // hook everything up
 		mediaPlayer.addTrackChangeListener(view::updateTrack);
         mediaPlayer.addTrackChangeListener(monitor);
-		tagView.addTagChangeListener(new TagChangeListener() {
-			public void tagAdded(@NotNull Track track, @NotNull String tag) {
-				String metadata = null;
-				int separator = tag.indexOf(": ");
-				if (separator > 0) {
-					// TODO hack to get metadata in there
-					metadata = tag.substring(0, separator);
-					tag = tag.substring(separator+2);
-					log.debug(String.format("HACK for splitting metadata from tag: %s/%s", tag, metadata));
-				}
-
-				tagModel.addTag(track, tag, metadata);
-			}
-
-            @Override
-            public void tagsChanged(@NotNull Track track) {
-                // no way to trigger this change
-            }
-
-            public void tagRemoved(@NotNull Track track, @NotNull String tag) {
-				tagModel.removeTag(track, tag);
-			}});
 
 		tagModel.addTagChangeListener(new TagChangeListener() {
 			@Override
@@ -121,41 +106,18 @@ public class NowPlayingController
                 tagsChanged(track);
 			}});
 
-		ControlPanel controls = new ControlPanel();
 		controls.addRatingChangeListener(e -> {
             RatingChangeEvent rce = (RatingChangeEvent) e;
             mediaPlayer.updateTrackRating(mediaPlayer.getCurrentTrack(), rce.getNewRating());
         });
 		controls.addControlListener(e -> {
-            Controls controlType = (Controls)e.getSource();
-            switch (controlType) {
-            case PLAY:
-                mediaPlayer.play();
-                break;
-            case PAUSE:
-                mediaPlayer.pause();
-                break;
-            case NEXT:
-                mediaPlayer.next();
-                break;
-            case PREVIOUS:
-                mediaPlayer.previous();
-                break;
-            }
+			switch ((Controls)e.getSource()) {
+				case PLAY -> mediaPlayer.play();
+				case PAUSE -> mediaPlayer.pause();
+				case NEXT -> mediaPlayer.next();
+				case PREVIOUS -> mediaPlayer.previous();
+			}
         });
-
-		TagPanel tags = new TagPanel(tagModel, tagView);
-//		TagOperationsPanel tagOps = new TagOperationsPanel(mediaPlayer, tagModel);
-//		PlaylistPanel playlist = new PlaylistPanel(mediaPlayer, tagModel);
-        TagDnDPanel tagsdnd = new TagDnDPanel(mediaPlayer, tagModel);
-
-		view.addMode("controls", controls);
-		view.addMode("tags", tags);
-		view.addMode("tags ops", tagsdnd);
-//		view.addMode("tag ops", tagOps);
-//		view.addMode("playlist", playlist);
-
-		view.setMode("controls");
     }
 
 	public void start() {

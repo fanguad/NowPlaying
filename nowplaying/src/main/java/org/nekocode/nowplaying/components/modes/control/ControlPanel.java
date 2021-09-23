@@ -182,4 +182,9 @@ public class ControlPanel extends NowPlayingControl {
 	public void shutdown() {
 		// nothing to do
 	}
+
+	@Override
+	public String getModeName() {
+		return "controls";
+	}
 }

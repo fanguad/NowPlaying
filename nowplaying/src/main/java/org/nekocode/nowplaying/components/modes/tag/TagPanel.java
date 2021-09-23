@@ -6,11 +6,6 @@
 
 package org.nekocode.nowplaying.components.modes.tag;
 
-import java.awt.BorderLayout;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +16,11 @@ import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.TagView;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
+
+import java.awt.BorderLayout;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
 /**
  * A Panel containing controls for manipulating tags.
@@ -65,5 +65,10 @@ public class TagPanel extends NowPlayingControl {
 	@Override
 	public void shutdown() {
 		// nothing particular to do
+	}
+
+	@Override
+	public String getModeName() {
+		return "tags";
 	}
 }

@@ -9,6 +9,7 @@ package org.nekocode.nowplaying.tags;
 import furbelow.SpinningDial;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
 import org.nekocode.nowplaying.events.TagChangeListener;
@@ -68,7 +69,7 @@ public class TagView extends JPanel
 	private JComponent textfields;
 	private final SpinningDial spinningDial;
 
-	public TagView() {
+	public TagView(TagModel tagModel) {
 		listeners = new HashSet<>();
 
 		setLayout(new BorderLayout());
@@ -172,6 +173,29 @@ public class TagView extends JPanel
 		addNew.getActionMap().put("showNewTag", showNewTag);
 		addNew.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "hideNewTag");
 		addNew.getActionMap().put("hideNewTag", hideNewTag);
+
+		addTagChangeListener(new TagChangeListener() {
+			public void tagAdded(@NotNull Track track, @NotNull String tag) {
+				String metadata = null;
+				int separator = tag.indexOf(": ");
+				if (separator > 0) {
+					// TODO hack to get metadata in there
+					metadata = tag.substring(0, separator);
+					tag = tag.substring(separator+2);
+					log.debug(String.format("HACK for splitting metadata from tag: %s/%s", tag, metadata));
+				}
+
+				tagModel.addTag(track, tag, metadata);
+			}
+
+			@Override
+			public void tagsChanged(@NotNull Track track) {
+				// no way to trigger this change
+			}
+
+			public void tagRemoved(@NotNull Track track, @NotNull String tag) {
+				tagModel.removeTag(track, tag);
+			}});
 	}
 
 	static class NekoTextFieldFocusListener implements FocusListener {

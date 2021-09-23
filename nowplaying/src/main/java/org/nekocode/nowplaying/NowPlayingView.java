@@ -12,20 +12,46 @@ import org.nekocode.nowplaying.components.ArtPanel;
 import org.nekocode.nowplaying.components.ArtPanelProgressLayerUI;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.ResizeUpdateTrack;
-import org.nekocode.nowplaying.components.swing.*;
+import org.nekocode.nowplaying.components.swing.NekoButton;
+import org.nekocode.nowplaying.components.swing.NekoFrame;
+import org.nekocode.nowplaying.components.swing.NekoLabel;
+import org.nekocode.nowplaying.components.swing.NekoPanel;
 import org.nekocode.nowplaying.components.swing.NekoPanel.BorderPositions;
+import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JLayer;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 import java.util.Queue;
-import java.util.*;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -80,7 +106,7 @@ public class NowPlayingView extends NekoFrame {
     /**
      * Creates a NowPlayingView, the GUI portion of the application.
      */
-    public NowPlayingView() {
+    public NowPlayingView(List<NowPlayingControl> modes) {
         super("Now Playing...");
 
         executor = Executors.newCachedThreadPool(new NamedThreadFactory("NowPlayingView", false));
@@ -151,6 +177,11 @@ public class NowPlayingView extends NekoFrame {
         contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke("TAB"), "rotateMode");
         contentPane.getActionMap().put("rotateMode", rotateMode);
+
+        modes.forEach(mode -> addMode(mode.getModeName(), mode));
+        modes.stream().findFirst()
+                .map(NowPlayingControl::getModeName)
+                .ifPresent(this::setMode);
     }
 
     /**

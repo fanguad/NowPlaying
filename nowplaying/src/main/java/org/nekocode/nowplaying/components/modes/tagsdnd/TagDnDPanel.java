@@ -99,4 +99,9 @@ public class TagDnDPanel extends NowPlayingControl {
         editTags.dispose();
         dbUtils.dispose();
     }
+
+    @Override
+    public String getModeName() {
+        return "tags ops";
+    }
 }

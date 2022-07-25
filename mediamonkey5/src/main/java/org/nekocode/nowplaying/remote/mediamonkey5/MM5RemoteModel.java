@@ -9,13 +9,15 @@ import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.objects.Playlist;
 import org.nekocode.nowplaying.objects.Track;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.*;
+import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.ART_CHANGE;
+import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.CURRENT_SONG_CHANGE;
+import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.PLAY_STATE_CHANGE;
 
 public class MM5RemoteModel extends AbstractMediaPlayer {
 
@@ -61,7 +63,9 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
                         if (Objects.equals(mmTrack.getPersistentId(), trackId)) {
                             // TODO do in background
                             String url = (String) e.getNewValue();
-                            Path mmPath = Path.of(url.replace("file:///temp/", ""));
+                            String filterTemp = url.replace("file:///temp/", "");
+                            filterTemp = filterTemp.replace("file:///", "");
+                            Path mmPath = Path.of(filterTemp);
                             Path fullPath = Path.of(System.getProperty("java.io.tmpdir")).resolve(mmPath);
                             LOG.info("thumbnail for track {} available at: {}", trackId, fullPath);
                             mmTrack.addArtwork(new ImageIcon(fullPath.toString()));

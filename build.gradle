@@ -1,13 +1,17 @@
 subprojects {
     buildscript {
         repositories {
+            mavenLocal()
             mavenCentral()
         }
     }
 
+    // TODO lombok
+
     apply plugin: 'java'
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url "../lib"
@@ -15,9 +19,8 @@ subprojects {
     }
 
     dependencies {
-        implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.1'
-        implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.1'
-        // https://mvnrepository.com/artifact/org.jetbrains/annotations
-        implementation group: 'org.jetbrains', name: 'annotations', version: '19.0.0'
+        implementation(libs.log4j.api)
+        runtimeOnly(libs.log4j.core)
+        implementation(libs.jetbrains.annotations)
     }
 }

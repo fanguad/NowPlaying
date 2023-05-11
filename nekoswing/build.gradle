@@ -1,8 +1,6 @@
 dependencies {
-//    compile group: 'org.divxdede', name: 'jbusycomponent', version: '1.2.3'
-    implementation group: 'com.jhlabs', name: 'filters', version: '2.0.235'
     implementation project(':jbusycomponent')
-    implementation group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
-
-    implementation group: 'furbelow', name: 'furbelow', version: '1.0'
+    implementation(libs.swingx)
+    implementation(libs.jhlabs.filters)
+    implementation(libs.furbelow)
 }

@@ -1,4 +1,4 @@
 dependencies {
     implementation project(':nowplaying')
-    implementation group: 'javax.jmdns', name: 'jmdns', version: '3.4.1'
+    implementation(libs.jmdns)
 }

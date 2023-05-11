@@ -6,9 +6,8 @@ dependencies {
     api project(':properties')
     implementation project(':jbusycomponent')
 
-    implementation group: 'org', name: 'jaudiotagger', version: '2.0.3'
-    implementation group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
-    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.8.7'
-    implementation group: 'furbelow', name: 'furbelow', version: '1.0'
-
+    implementation(libs.jaudiotagger)
+    implementation(libs.swingx)
+    implementation(libs.sqlite.jdbc)
+    implementation(libs.furbelow)
 }

@@ -1,3 +1,26 @@
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            library("jhlabs_filters", 'com.jhlabs:filters:2.0.235')
+            library("swingx", 'org.swinglabs.swingx:swingx-core:1.6.5-1')
+            library("furbelow", 'furbelow:furbelow:1.0')
+            library("divxdede_commons", 'org.divxdede:commons:0.2.3')
+            // https://github.com/kklisura/chrome-devtools-java-client
+            library("cdt_java_client", 'com.github.kklisura.cdt:cdt-java-client:2.1.0')
+
+            library("jaudiotagger", 'org:jaudiotagger:2.0.3')
+            library("sqlite_jdbc", 'org.xerial:sqlite-jdbc:3.8.7')
+            library("jmdns", 'javax.jmdns:jmdns:3.4.1')
+
+            library("log4j_api", 'org.apache.logging.log4j:log4j-api:2.13.1')
+            library("log4j_core", 'org.apache.logging.log4j:log4j-core:2.13.1')
+            library("jetbrains_annotations", 'org.jetbrains:annotations:19.0.0');
+
+        }
+    }
+}
+
 include 'nekoswing'
 include 'jxlayer'
 include 'jbusycomponent'

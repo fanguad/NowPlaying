@@ -14,9 +14,6 @@
         <File name="LOG_FILE" fileName="nowplaying.log" append="false">
             <PatternLayout pattern="%-6r [%-5p] [%t] %-5p %c %x - %m%n"/>
         </File>
-        <File name="DACP_MESSAGES" fileName="dacp_messages.log" append="false">
-            <PatternLayout pattern="%-6r [%t] %-5p %c %x - %m%n"/>
-        </File>
     </Appenders>
     <Loggers>
         <Logger name="org.nekocode.nowplaying.components.ArtPanel" level="info" additivity="false">
@@ -44,13 +41,6 @@
             <AppenderRef ref="LOG_FILE"/>
         </Logger>
         <Logger name="org.nekocode.itunes.remote.connection.RemoteSession" level="info" additivity="false">
-            <AppenderRef ref="CONSOLE"/>
-            <AppenderRef ref="LOG_FILE"/>
-        </Logger>
-        <Logger name="org.nekocode.itunes.remote.connection.RequestManager" level="debug" additivity="false">
-            <AppenderRef ref="DACP_MESSAGES"/>
-        </Logger>
-        <Logger name="org.nekocode.itunes.remote.ITunesRemoteTrack" level="warn" additivity="false">
             <AppenderRef ref="CONSOLE"/>
             <AppenderRef ref="LOG_FILE"/>
         </Logger>

@@ -11,7 +11,6 @@ dependencyResolutionManagement {
 
             library("jaudiotagger", 'org:jaudiotagger:2.0.3')
             library("sqlite_jdbc", 'org.xerial:sqlite-jdbc:3.8.7')
-            library("jmdns", 'javax.jmdns:jmdns:3.4.1')
 
             library("log4j_api", 'org.apache.logging.log4j:log4j-api:2.13.1')
             library("log4j_core", 'org.apache.logging.log4j:log4j-core:2.13.1')
@@ -28,8 +27,6 @@ include 'jbusycomponent'
 include 'properties'
 include 'nowplaying-ui'
 include 'nowplaying'
-include 'nowplaying-itunesremote'
 include 'mediamonkey5'
 
-//include 'dist'
 include 'spring'

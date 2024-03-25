@@ -1,9 +1,18 @@
+# IntelliJ project files
 *.iml
-*.db
-.gradle
-.idea
-notes.txt
-nowplaying.properties
-*/build
+.idea/*
+!.idea/codeStyles
 */out
+
+# Gradle project
+.gradle
+*/build
+
+# Program outputs
+*.db
+**/nowplaying.properties
+nowplaying.properties
 *.log
+
+# Other
+notes.txt

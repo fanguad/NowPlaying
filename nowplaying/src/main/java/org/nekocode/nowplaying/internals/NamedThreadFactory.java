@@ -28,19 +28,11 @@ public class NamedThreadFactory implements ThreadFactory {
     private final boolean daemon;
 
     public NamedThreadFactory(String namePrefix, boolean daemon) {
-        SecurityManager s = System.getSecurityManager();
-        group = (s != null)? s.getThreadGroup() :
-                             Thread.currentThread().getThreadGroup();
+        group = Thread.currentThread().getThreadGroup();
         this.daemon = daemon;
-//        namePrefix = "daemon-pool-" +
-//                      poolNumber.getAndIncrement() +
-//                     "-thread-";
         this.namePattern = namePrefix + "-%s" + (daemon ? " (daemon)" : "");
     }
 
-	/* (non-Javadoc)
-	 * @see java.util.concurrent.ThreadFactory#newThread(java.lang.Runnable)
-	 */
 	@Override
     public Thread newThread(Runnable r) {
         Thread t = new Thread(group, r,

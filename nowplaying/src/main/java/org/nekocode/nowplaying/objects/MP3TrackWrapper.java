@@ -5,6 +5,7 @@
 package org.nekocode.nowplaying.objects;
 
 import lombok.extern.log4j.Log4j2;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -39,11 +40,11 @@ public class MP3TrackWrapper {
 	        mp3file = new MP3File(file, MP3File.LOAD_ALL, !writable);
         } catch (ReadOnlyFileException e) {
         	// ignore, the rest of the class will work around this
-        } catch (IOException | InvalidAudioFrameException | TagException e) {
+        } catch (IOException | CannotReadException | InvalidAudioFrameException | TagException e) {
         	throw new CannotUseMP3TrackException(e);
         }
 
-		getUUID();
+        getUUID();
 
         if (mp3file == null)
         	throw new CannotUseMP3TrackException("File was not an MP3 file");

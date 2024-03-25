@@ -12,11 +12,13 @@ dependencyResolutionManagement {
             library('jackson-databind', 'com.fasterxml.jackson.core:jackson-databind:2.16.0')
             bundle("chrome_devtools", ['cdt_java_client', 'jackson-databind'])
 
-            library("jaudiotagger", 'org:jaudiotagger:2.0.3')
+            library("jaudiotagger", 'net.jthink:jaudiotagger:3.0.1')
             library("sqlite_jdbc", 'org.xerial:sqlite-jdbc:3.44.1.0')
 
-            library("log4j_api", 'org.apache.logging.log4j', 'log4j-api').version(log4j_version)
-            library("log4j_core", 'org.apache.logging.log4j', 'log4j-core').version(log4j_version)
+            version("log4j_version", '2.20.0')
+            library("log4j_api", 'org.apache.logging.log4j', 'log4j-api').versionRef("log4j_version")
+            library("log4j_core", 'org.apache.logging.log4j', 'log4j-core').versionRef("log4j_version")
+
             library("jetbrains_annotations", 'org.jetbrains:annotations:22.0.0');
             library('lombok', 'org.projectlombok:lombok:1.18.24')
         }

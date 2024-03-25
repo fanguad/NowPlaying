@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2011, dan.clark@nekocode.org
-  ~
-  ~ Licensed under FreeBSD license.  See README for details.
-  -->
-
 <Configuration>
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT">

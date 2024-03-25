@@ -1,16 +1,19 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.3'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.1.0'
 }
 
 apply plugin: 'java'
 
 dependencies {
     implementation project(':nowplaying')
-    implementation project(':nowplaying-itunesremote')
     implementation project(':mediamonkey5')
 
     dependencies {
         implementation 'org.springframework.boot:spring-boot'
     }
+}
+
+bootRun {
+    mainClass = 'org.nekocode.nowplaying.Main'
 }

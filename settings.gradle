@@ -12,8 +12,8 @@ dependencyResolutionManagement {
             library("jaudiotagger", 'org:jaudiotagger:2.0.3')
             library("sqlite_jdbc", 'org.xerial:sqlite-jdbc:3.8.7')
 
-            library("log4j_api", 'org.apache.logging.log4j:log4j-api:2.13.1')
-            library("log4j_core", 'org.apache.logging.log4j:log4j-core:2.13.1')
+            library("log4j_api", 'org.apache.logging.log4j:log4j-api:2.20.0')
+            library("log4j_core", 'org.apache.logging.log4j:log4j-core:2.20.0')
             library("jetbrains_annotations", 'org.jetbrains:annotations:19.0.0');
 
         }

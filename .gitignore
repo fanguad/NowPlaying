@@ -1,6 +1,5 @@
 *.iml
 *.db
-fullsize
 .gradle
 .idea
 notes.txt

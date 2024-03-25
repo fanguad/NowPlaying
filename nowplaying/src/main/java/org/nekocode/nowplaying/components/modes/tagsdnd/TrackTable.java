@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
@@ -10,13 +8,11 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.nekocode.nowplaying.resources.images.Icons;
 
-import javax.swing.ImageIcon;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.Component;
+import java.awt.*;
 
 import static java.lang.Math.max;
 

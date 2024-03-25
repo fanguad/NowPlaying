@@ -1,22 +1,11 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
-/*
- * Filename:   ScrollableFlowPanel.java
- * Created On: Apr 7, 2008
- */
 package org.nekocode.nowplaying.tags.cloud;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Rectangle;
-import javax.swing.JPanel;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * http://forum.java.sun.com/thread.jspa?forumID=57&threadID=701797&start=2

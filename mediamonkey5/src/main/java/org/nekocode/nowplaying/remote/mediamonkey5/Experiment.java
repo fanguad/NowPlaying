@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024. Dan Clark
+ */
+
 package org.nekocode.nowplaying.remote.mediamonkey5;
 
 import com.github.kklisura.cdt.protocol.commands.Runtime;
@@ -55,6 +59,10 @@ public class Experiment {
                 null,
                 true,
                 null,
+                null,
+                null,
+                null,
+                null,
                 null);
         checkException(evaluate.getExceptionDetails());
         RemoteObject evaluateResult = evaluate.getResult();
@@ -78,6 +86,10 @@ public class Experiment {
                 null,
                 null,
                 true,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -108,6 +120,10 @@ public class Experiment {
                 null,
                 null,
                 true,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null);
         checkException(evaluate.getExceptionDetails());

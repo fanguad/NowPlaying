@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
@@ -109,9 +107,6 @@ public class TrackTableComponent extends JPanel {
 
         // create an action that will delete the selected rows if the delete key is pressed
         Action deleteRow = new AbstractAction() {
-              /* (non-Javadoc)
-               * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-               */
               @Override
               public void actionPerformed(ActionEvent e) {
                   trackTable.deleteSelectedRows();

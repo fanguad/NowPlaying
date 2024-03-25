@@ -1,16 +1,10 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
-/*
- * Filename:   TagCloudGroup.java
- * Created On: Sep 18, 2009
- */
 package org.nekocode.nowplaying.tags.cloud;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * A tag cloud entry that represents a group of tracks instead of a tag.
@@ -28,9 +22,6 @@ public class TagCloudGroup extends TagCloudEntry {
 		super(groupName, 0, -1);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nekocode.nowplaying.tags.cloud.TagCloudEntry#getColor()
-	 */
 	@Override
 	public Color getColor() {
 		return Color.blue;

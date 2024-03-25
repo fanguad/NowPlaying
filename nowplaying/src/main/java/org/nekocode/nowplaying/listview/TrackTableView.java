@@ -1,13 +1,7 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
-/*
- * Filename:   TrackTableView.java
- * Created On: Jun 20, 2008
- */
 package org.nekocode.nowplaying.listview;
 
 import lombok.extern.log4j.Log4j2;
@@ -55,33 +49,21 @@ public class TrackTableView extends JXTable {
 			fireTableDataChanged();
 		}
 
-		/* (non-Javadoc)
-		 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
-		 */
 		@Override
 		public String getColumnName(int column) {
 			return Columns.values()[column].name();
 		}
 
-		/* (non-Javadoc)
-		 * @see javax.swing.table.TableModel#getColumnCount()
-		 */
 		@Override
 		public int getColumnCount() {
 			return Columns.values().length;
 		}
 
-		/* (non-Javadoc)
-		 * @see javax.swing.table.TableModel#getRowCount()
-		 */
 		@Override
 		public int getRowCount() {
 			return tracks.size();
 		}
 
-		/* (non-Javadoc)
-		 * @see javax.swing.table.TableModel#getValueAt(int, int)
-		 */
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Track track = tracks.get(rowIndex);

@@ -1,12 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
- */
-
-/*
- * Filename:   TagCloud.java
- * Created On: Apr 7, 2008
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.tags.cloud;
@@ -127,9 +120,6 @@ public class TagCloud extends ScrollableFlowPanel {
 	 */
 	private class TagCloudEntryMouseListener implements MouseListener {
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			for (MouseListener l : mouseListeners) {
@@ -137,9 +127,6 @@ public class TagCloud extends ScrollableFlowPanel {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-		 */
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			for (MouseListener l : mouseListeners) {
@@ -147,9 +134,6 @@ public class TagCloud extends ScrollableFlowPanel {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-		 */
 		@Override
 		public void mouseExited(MouseEvent e) {
 			for (MouseListener l : mouseListeners) {
@@ -157,9 +141,6 @@ public class TagCloud extends ScrollableFlowPanel {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-		 */
 		@Override
 		public void mousePressed(MouseEvent e) {
 			for (MouseListener l : mouseListeners) {
@@ -167,9 +148,6 @@ public class TagCloud extends ScrollableFlowPanel {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-		 */
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			for (MouseListener l : mouseListeners) {

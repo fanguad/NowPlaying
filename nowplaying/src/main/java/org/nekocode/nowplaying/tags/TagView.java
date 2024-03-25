@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.tags;
@@ -128,17 +126,11 @@ public class TagView extends JPanel
         });
 
 		Action showNewTag = new AbstractAction() {
-			/* (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setTagInputVisible(true);
 			}};
 		Action hideNewTag = new AbstractAction() {
-			/* (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setTagInputVisible(false);

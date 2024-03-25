@@ -1,13 +1,7 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
-/*
- * Filename:   TrackMonitor.java
- * Created On: Apr 16, 2008
- */
 package org.nekocode.nowplaying.internals;
 
 import lombok.extern.log4j.Log4j2;

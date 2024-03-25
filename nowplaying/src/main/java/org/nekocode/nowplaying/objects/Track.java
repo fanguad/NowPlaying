@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.objects;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 import java.util.Collection;
 import java.util.Date;
 

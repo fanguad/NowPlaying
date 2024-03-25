@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.tags.cloud;
@@ -56,9 +54,6 @@ public class TagCloudEntry implements Comparable<TagCloudEntry> {
 			scale = NUM_LEVELS-1;
 		this.scale = scale;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
 	public int compareTo(TagCloudEntry o) {
 		return tag.compareTo(o.tag);
@@ -75,24 +70,15 @@ public class TagCloudEntry implements Comparable<TagCloudEntry> {
 	public void setMetadata(String metadata) {
 		this.metadata = metadata;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return getTag();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof TagCloudEntry && tag.equals(((TagCloudEntry) obj).tag);
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return tag.hashCode();

@@ -1,19 +1,13 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
-/*
- * Filename:   NowPlayingControl.java
- * Created On: Dec 20, 2007
- */
 package org.nekocode.nowplaying.components;
 
 import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 
 /**
  * Interface for a control section of NowPlayingView that receives track update

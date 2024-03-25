@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.components.swing;
+
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,6 +23,7 @@ public class NekoPanel extends JPanel {
 		LINE_END(BorderLayout.LINE_END, Rotation.CLOCKWISE);
 
 		private final String position;
+		@Getter
 		private final Rotation rotation;
 		private BorderPositions(String layoutPosition, Rotation rotation) {
 			this.position = layoutPosition;
@@ -31,26 +32,15 @@ public class NekoPanel extends JPanel {
 		public String getLayoutPosition() {
 			return position;
 		}
-		public Rotation getRotation() {
-			return rotation;
-		}
+
 		public BorderPositions getOpposite() {
-			BorderPositions opposite;
-			switch (this) {
-			case LINE_END:
-				opposite = LINE_START;
-				break;
-			case LINE_START:
-				opposite = LINE_END;
-				break;
-			case PAGE_START:
-				opposite = PAGE_END;
-				break;
-			case PAGE_END:
-			default:
-				opposite = PAGE_START;
-			}
-			return opposite;
+			BorderPositions opposite = switch (this) {
+                case LINE_END -> LINE_START;
+                case LINE_START -> LINE_END;
+                case PAGE_START -> PAGE_END;
+                default -> PAGE_START;
+            };
+            return opposite;
 		}
 	}
 
@@ -61,9 +51,6 @@ public class NekoPanel extends JPanel {
 		super(new BorderLayout());
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.Container#add(java.awt.Component, java.lang.Object)
-	 */
 	@Override
 	public void add(Component comp, Object constraints) {
 		if (constraints instanceof BorderPositions) {
@@ -75,9 +62,9 @@ public class NekoPanel extends JPanel {
 
 	/**
      * Adds the specified component to a drawer in the specified position.
-     * 
-	 * @param comp
-	 * @param constraints
+     *
+	 * @param comp         The component to be added to the drawer.
+	 * @param constraints  The position of the drawer where the component will be added.
 	 */
 	public void add(Component comp, BorderPositions constraints) {
 		NekoDrawer bw = new NekoDrawer(getTopLevelFrame(this), constraints.rotation, comp, 64);
@@ -87,9 +74,9 @@ public class NekoPanel extends JPanel {
 	/**
     * Finds this panel's top-level frame (to which the drawers will be
     * attached).
-    * 
-    * @param parent
-    * @return
+    *
+	 * @param parent the NekoPanel from which to start searching for the top-level frame
+	 * @return the top-level JFrame that the drawers will be attached to
     */
 	private static JFrame getTopLevelFrame(NekoPanel parent) {
         // find the top level frame

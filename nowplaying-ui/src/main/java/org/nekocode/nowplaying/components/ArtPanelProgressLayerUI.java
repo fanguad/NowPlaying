@@ -1,12 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
- */
-
-/*
- * Filename:   ArtPanelProgressLayerUI.java
- * Created On: Oct 1, 2009
+ * Copyright (c) 2011-2024. Dan Clark
  */
 package org.nekocode.nowplaying.components;
 

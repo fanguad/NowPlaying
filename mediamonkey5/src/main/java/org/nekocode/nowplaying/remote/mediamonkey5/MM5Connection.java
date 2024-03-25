@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024. Dan Clark
+ */
+
 package org.nekocode.nowplaying.remote.mediamonkey5;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -174,6 +178,10 @@ public class MM5Connection {
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
+                null,
                 null);
         handleException(evaluate.getExceptionDetails());
         RemoteObject evaluateResult = evaluate.getResult();
@@ -195,6 +203,10 @@ public class MM5Connection {
                 null,
                 true,
                 null,
+                null,
+                null,
+                null,
+                null,
                 null);
         handleException(evaluate.getExceptionDetails());
     }
@@ -210,6 +222,10 @@ public class MM5Connection {
                 null,
                 null,
                 false,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null);
         handleException(evaluate.getExceptionDetails());

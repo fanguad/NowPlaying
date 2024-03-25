@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.components.modes.control;
@@ -15,17 +13,10 @@ import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
 import org.nekocode.nowplaying.resources.images.Icons;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -102,9 +93,6 @@ public class ControlPanel extends NowPlayingControl {
 
 	private Action createControlAction(Controls controlType) {
         return new AbstractAction() {
-            /* (non-Javadoc)
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 fireControlEvent(controlType);

@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying.tags.cloud;
@@ -63,9 +61,6 @@ public class TagCloudButton extends NekoButton {
 			this.tagModel = tagModel;
 		}
 
-		/* (non-Javadoc)
-		 * @see javax.swing.SwingWorker#doInBackground()
-		 */
 		@Override
 		protected List<TagCloudEntry> doInBackground() throws Exception {
             Collection<TagCloudEntry> allTags = tagModel.getAllTags(MINIMUM_ENTRIES);
@@ -78,9 +73,6 @@ public class TagCloudButton extends NekoButton {
 			return sorted;
 		}
 
-		/* (non-Javadoc)
-		 * @see javax.swing.SwingWorker#done()
-		 */
 		@Override
 		protected void done() {
 			TagCloudEntryRenderer renderer = entry -> String.format("%s (%d)", entry.getTag(), entry.getCount());

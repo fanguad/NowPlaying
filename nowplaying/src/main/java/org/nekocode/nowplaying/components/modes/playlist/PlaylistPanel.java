@@ -1,13 +1,7 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
-/*
- * Filename:   PlaylistPanel.java
- * Created On: Sep 23, 2008
- */
 package org.nekocode.nowplaying.components.modes.playlist;
 
 import lombok.extern.log4j.Log4j2;
@@ -124,9 +118,6 @@ public class PlaylistPanel extends NowPlayingControl {
         }
     }
 
-	/* (non-Javadoc)
-	 * @see org.nekocode.nowplaying.components.NowPlayingControl#shutdown()
-	 */
 	@Override
 	public void shutdown() {
 
@@ -137,9 +128,6 @@ public class PlaylistPanel extends NowPlayingControl {
         return "playlists";
     }
 
-    /* (non-Javadoc)
-	 * @see org.nekocode.nowplaying.components.NowPlayingControl#updateTrack(org.nekocode.nowplaying.events.TrackChangeEvent)
-	 */
 	@Override
 	public void updateTrack(@NotNull TrackChangeEvent trackChange) {
         updateNextTracks();

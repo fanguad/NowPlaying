@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, dan.clark@nekocode.org
- *
- * Licensed under FreeBSD license.  See README for details.
+ * Copyright (c) 2011-2024. Dan Clark
  */
 
 package org.nekocode.nowplaying;
@@ -38,7 +36,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author dan.clark@nekocode.org
  */
-@SuppressWarnings("serial")
 @Log4j2
 public class NowPlayingView extends NekoFrame {
     private final static EnumSet<ChangeType> shouldUpdateArtwork = EnumSet.of(

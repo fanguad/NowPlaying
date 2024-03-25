@@ -13,7 +13,7 @@ import java.awt.*;
  * A square Icon of arbitrary size that has nothing in it.  For use with JBusyComponent.
  */
  public class EmptyIcon implements Icon {
-        private int size;
+        private final int size;
 
         public EmptyIcon(int size) {
             this.size = size;

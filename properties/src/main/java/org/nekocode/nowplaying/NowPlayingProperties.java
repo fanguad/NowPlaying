@@ -6,8 +6,7 @@
 
 package org.nekocode.nowplaying;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -20,6 +19,7 @@ import java.util.Properties;
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public enum NowPlayingProperties {
     ALBUM_ART_SIZE,
     TRANSPARENCY,
@@ -34,7 +34,6 @@ public enum NowPlayingProperties {
     ;
 
     public static final String PROPERTIES_FILE = "nowplaying.properties";
-    private static final Logger log = LogManager.getLogger(NowPlayingProperties.class);
     private static Properties properties;
 
     @NotNull

@@ -11,40 +11,31 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
 
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Displays a cloud of tags.
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class TagCloud extends ScrollableFlowPanel {
-
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(TagCloud.class);
-
 	private Collection<TagCloudEntry> tags;
 
 	private final Map<Float, Font> fontCache;
 
-	private TagCloudEntryMouseListener tagListener;
-	private Set<MouseListener> mouseListeners;
+	private final TagCloudEntryMouseListener tagListener;
+	private final Set<MouseListener> mouseListeners;
 
-	private TagCloudEntryRenderer defaultRenderer = TagCloudEntry::getTag;
+	private final TagCloudEntryRenderer defaultRenderer = TagCloudEntry::getTag;
 	private TagCloudEntryRenderer renderer = defaultRenderer;
-    private Font baseFont;
+    private final Font baseFont;
 
     /**
 	 * Creates a new TagCloud with no tags.

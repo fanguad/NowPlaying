@@ -6,31 +6,20 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.LayoutStyle;
-import javax.swing.UIManager;
-import java.awt.BorderLayout;
-import java.awt.Insets;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A single dialog that contains all the different kind of tag editing functionality.
  *
  * @author fanguad
  */
+@Log4j2
 public class UnifiedTagEditorDialog extends JDialog {
-
-    private static final Logger log = LogManager.getLogger(UnifiedTagEditorDialog.class);
     private final TagMultipleTracks tagMultipleTracks;
     private final ChangeTags changeTags;
     private final TagDuplicateTracks tagDuplicateTracks;

@@ -115,7 +115,7 @@ public class BasicBusyLayerUI extends AbstractBusyLayerUI {
     private int            alpha              = 0;
     private Timer          timer              = null;
     private Painter        painter            = null;
-    private AtomicBoolean  repainted          = new AtomicBoolean(false);
+    private final AtomicBoolean  repainted          = new AtomicBoolean(false);
 
     /** Insets used
      */

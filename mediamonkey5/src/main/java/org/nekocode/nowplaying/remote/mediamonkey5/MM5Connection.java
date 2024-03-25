@@ -10,8 +10,7 @@ import com.github.kklisura.cdt.protocol.types.runtime.RemoteObject;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
 import com.github.kklisura.cdt.services.impl.ChromeServiceImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.NowPlayingProperties;
 
 import java.beans.PropertyChangeListener;
@@ -22,13 +21,22 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 
+@Log4j2
 public class MM5Connection {
-    private static final Logger LOG = LogManager.getLogger(MM5Connection.class);
     private final Runtime runtime;
     private final ChromeDevToolsService devToolsService;
     private final ObjectMapper objectMapper;
 
     private final PropertyChangeSupport playbackStateListeners;
+
+    private final Object notificationLock = new Object();
+    /**
+     * minimum time that must pass between identical notifications before they
+     * are not considered a duplicate of the same event
+     */
+    private final static long DUPLICATE_NOTIFICATION_WINDOW_MS = 100;
+    private long lastNotificationTime;
+    private String lastNotificationValue;
 
 
     public MM5Connection() {
@@ -91,11 +99,11 @@ public class MM5Connection {
                     String[] chunks = value.split(":");
                     switch (chunks[0]) {
                         case "seekChange" -> {
-                            LOG.info("event [{}] with value [{}]", chunks[0], chunks[1]);
+                            log.info("event [{}] with value [{}]", chunks[0], chunks[1]);
                             playbackStateListeners.firePropertyChange(chunks[0], null, chunks[1]);
                         }
                         case "playbackState" -> {
-                            LOG.info("event [{}] with value [{}]", chunks[0], chunks[1]);
+                            log.info("event [{}] with value [{}]", chunks[0], chunks[1]);
                             playbackStateListeners.firePropertyChange(chunks[0], null, chunks[1]);
                         }
                         case "thumbnail" -> {
@@ -107,18 +115,9 @@ public class MM5Connection {
             });
 
         } catch (ScriptException e) {
-            LOG.error("Error registering listeners:", e);
+            log.error("Error registering listeners:", e);
         }
     }
-
-    private final Object notificationLock = new Object();
-    /**
-     * minimum time that must pass between identical notifications before they
-     * are not considered a duplicate of the same event
-     */
-    private final static long DUPLICATE_NOTIFICATION_WINDOW_MS = 100;
-    private long lastNotificationTime;
-    private String lastNotificationValue;
 
     /**
      * A notification is unique if enough time has passed, or the strings are different.
@@ -140,14 +139,14 @@ public class MM5Connection {
     private void handleRuntimeException(ExceptionThrown exceptionThrown) {
         try {
             String exceptionDetails = objectMapper.writeValueAsString(exceptionThrown);
-            LOG.error("Exception from Chrome Dev Tools: {}", exceptionDetails);
+            log.error("Exception from Chrome Dev Tools: {}", exceptionDetails);
         } catch (JsonProcessingException e) {
-            LOG.error("Exception serializing Chrome Dev Tools exception");
+            log.error("Exception serializing Chrome Dev Tools exception");
         }
     }
 
     private void handleException(ExceptionDetails exceptionDetails) throws ScriptException {
-        Consumer<String> logMessage = it -> LOG.error("Script Error: {}.  Details: {}", it, exceptionDetails.getText());
+        Consumer<String> logMessage = it -> log.error("Script Error: {}.  Details: {}", it, exceptionDetails.getText());
         Optional.ofNullable(exceptionDetails)
                 .map(ExceptionDetails::getException)
                 .map(RemoteObject::getDescription)

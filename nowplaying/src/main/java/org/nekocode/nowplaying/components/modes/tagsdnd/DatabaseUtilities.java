@@ -6,23 +6,20 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import javax.swing.JDialog;
-import javax.swing.JTabbedPane;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This panel provides utilities to search for and correct database issues.
  *
  * @author fanguad
  */
+@Log4j2
 public class DatabaseUtilities extends JDialog {
-
-    private static final Logger log = LogManager.getLogger(DatabaseUtilities.class);
     private final FindUnusedTags findUnusedTags;
     private final FindRemovedTracks findRemovedTracks;
 

@@ -6,8 +6,7 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.divxdede.swing.busy.BusyModel;
 import org.divxdede.swing.busy.JBusyComponent;
 import org.divxdede.swing.busy.ui.BasicBusyLayerUI;
@@ -18,20 +17,11 @@ import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.awt.*;
 import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,17 +31,17 @@ import java.util.concurrent.Executors;
  *
  * @author fanguad
  */
+@Log4j2
 public class FindRemovedTracks extends JBusyComponent<JPanel> {
-    private static final Logger log = LogManager.getLogger(FindRemovedTracks.class);
     private final SpinningDialBusyIcon busyIcon;
 
-    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("FindRemovedTracks", false));
+    private final ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("FindRemovedTracks", false));
     
-    private MediaPlayer mediaPlayer;
-    private TagModel tagModel;
-    private DefaultTableModel tableModel;
-    private JTable tagTable;
-    private BusyModel busyModel;
+    private final MediaPlayer mediaPlayer;
+    private final TagModel tagModel;
+    private final DefaultTableModel tableModel;
+    private final JTable tagTable;
+    private final BusyModel busyModel;
 
     public FindRemovedTracks(MediaPlayer mediaPlayer, TagModel tagModel) {
         this.mediaPlayer = mediaPlayer;

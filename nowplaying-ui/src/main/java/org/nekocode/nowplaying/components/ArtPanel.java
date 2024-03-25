@@ -6,18 +6,11 @@
 
 package org.nekocode.nowplaying.components;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.NowPlayingProperties;
 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.RenderingHints.Key;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
@@ -34,10 +27,9 @@ import static java.lang.String.format;
  * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
+@Log4j2
 public class ArtPanel extends JPanel
 {
-	private static final Logger log = LogManager.getLogger(ArtPanel.class);
-
 	/**
 	 * An ID that gets incremented each time the art changes.  This can be used
 	 * by outside components to see if they are out of date.
@@ -47,12 +39,12 @@ public class ArtPanel extends JPanel
 	private Image art;
 	private Image background;
 	private int fixedWidth;
-	private int maxSize;
+	private final int maxSize;
 	private float transparency;
 
 	private int artXOffset;
 
-	private int cornerRadius;
+	private final int cornerRadius;
     private static final Map<Key, Object> RENDERING_HINTS = Collections.singletonMap(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
 
     /**

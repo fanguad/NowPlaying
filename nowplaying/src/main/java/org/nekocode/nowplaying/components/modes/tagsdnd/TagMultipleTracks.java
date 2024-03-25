@@ -6,21 +6,13 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
+import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -30,17 +22,15 @@ import java.util.concurrent.Executors;
 /**
  * A dialog that tags files in bulk.  Has a TrackTableComponent for loading and displaying tracks.
  */
+@Log4j2
 public class TagMultipleTracks extends JPanel {
+    private final ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("TagMultipleTracks", false));
 
-    private static final Logger log = LogManager.getLogger(TagMultipleTracks.class);
+    private final TagModel tagModel;
+    private final JTextField tagInput;
 
-    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("TagMultipleTracks", false));
-
-    private TagModel tagModel;
-    private JTextField tagInput;
-
-    private Runnable applyTags = new ApplyTags();
-    private TrackTableComponent table;
+    private final Runnable applyTags = new ApplyTags();
+    private final TrackTableComponent table;
 
     public TagMultipleTracks(TrackTableComponent table, TagModel tagModel) {
         this.table = table;
@@ -85,7 +75,7 @@ public class TagMultipleTracks extends JPanel {
             tagInput.selectAll();
             List<Track> tracks = table.getTracks();
             String tag = tagInput.getText();
-            if (tracks.isEmpty() || tag.length() == 0) {
+            if (tracks.isEmpty() || tag.isEmpty()) {
                 // quit early if we're not going to do anything
                 log.debug("unlocking GUI - nothing to do");
                 setBusy(false);
@@ -103,12 +93,7 @@ public class TagMultipleTracks extends JPanel {
 
             // remove any bad tracks
             LinkedList<Track> filteredTracks = new LinkedList<>(tracks);
-            Iterator<Track> i = filteredTracks.iterator();
-            while (i.hasNext()) {
-                if (i.next().getPersistentId() == null) {
-                    i.remove();
-                }
-            }
+            filteredTracks.removeIf(track -> track.getPersistentId() == null);
 
             if (!filteredTracks.isEmpty()) {
                 try {

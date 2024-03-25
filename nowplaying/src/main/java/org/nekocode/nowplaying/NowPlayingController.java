@@ -6,8 +6,7 @@
 
 package org.nekocode.nowplaying;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.components.MouseActions;
 import org.nekocode.nowplaying.components.RatingChangeEvent;
@@ -21,14 +20,9 @@ import org.nekocode.nowplaying.resources.images.Icons;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.TagView;
 
-import javax.swing.ImageIcon;
-import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.GraphicsDevice;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.GraphicsDevice.WindowTranslucency;
-import java.awt.GraphicsEnvironment;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Timer;
@@ -39,16 +33,15 @@ import java.util.TimerTask;
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class NowPlayingController
 {
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(NowPlayingController.class);
 	private final MediaPlayer mediaPlayer;
-	private NowPlayingView view;
-	private TagView tagView;
-	private TagModel tagModel;
+	private final NowPlayingView view;
+	private final TagView tagView;
+	private final TagModel tagModel;
 	private TrayIcon trayIcon;
-	private TrackMonitor monitor;
+	private final TrackMonitor monitor;
     private boolean shutdown;
 
 	public NowPlayingController(MediaPlayer mediaPlayer,
@@ -153,7 +146,7 @@ public class NowPlayingController
         if (gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSPARENT)) {
             view.setBackground(new Color(0, 0, 0, 0));
         } else {
-            LogManager.getLogger(getClass()).warn("Per pixel transparency not supported.");
+            log.warn("Per pixel transparency not supported.");
         }
         trayIcon = null;
 		if (SystemTray.isSupported()) {

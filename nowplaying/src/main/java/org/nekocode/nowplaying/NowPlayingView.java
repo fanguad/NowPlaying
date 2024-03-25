@@ -6,52 +6,26 @@
 
 package org.nekocode.nowplaying;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.components.ArtPanel;
 import org.nekocode.nowplaying.components.ArtPanelProgressLayerUI;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.ResizeUpdateTrack;
-import org.nekocode.nowplaying.components.swing.NekoButton;
-import org.nekocode.nowplaying.components.swing.NekoFrame;
-import org.nekocode.nowplaying.components.swing.NekoLabel;
-import org.nekocode.nowplaying.components.swing.NekoPanel;
+import org.nekocode.nowplaying.components.swing.*;
 import org.nekocode.nowplaying.components.swing.NekoPanel.BorderPositions;
-import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JLayer;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.KeyboardFocusManager;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -65,10 +39,8 @@ import java.util.concurrent.TimeUnit;
  * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
+@Log4j2
 public class NowPlayingView extends NekoFrame {
-    @SuppressWarnings("unused")
-    private static final Logger log = LogManager.getLogger(NowPlayingView.class);
-
     private final static EnumSet<ChangeType> shouldUpdateArtwork = EnumSet.of(
             ChangeType.CURRENT_SONG_CHANGE,
             ChangeType.FILE_CHANGE,

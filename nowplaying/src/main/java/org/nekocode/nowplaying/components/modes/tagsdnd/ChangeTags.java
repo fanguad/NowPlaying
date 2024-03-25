@@ -6,29 +6,14 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import javax.swing.*;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,20 +25,18 @@ import static java.lang.String.format;
  * Changes differ from a delete followed by an add in that only tracks that had the tag
  * to begin with are changed.
  */
+@Log4j2
 public class ChangeTags extends JPanel {
+    private final ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("ChangeTags", false));
 
-    private static final Logger log = LogManager.getLogger(ChangeTags.class);
+    private final TagModel tagModel;
+    private final JComboBox tagListPullDown;
+    private final JTextField newTagName;
 
-    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("ChangeTags", false));
-
-    private TagModel tagModel;
-    private JComboBox tagListPullDown;
-    private JTextField newTagName;
-
-    private TagNameComboBoxModel tagListModel;
-    private TrackTableComponent table;
-    private Runnable deleteTag = new DeleteTag();
-    private Runnable changeTag = new ChangeTag();
+    private final TagNameComboBoxModel tagListModel;
+    private final TrackTableComponent table;
+    private final Runnable deleteTag = new DeleteTag();
+    private final Runnable changeTag = new ChangeTag();
 
     public ChangeTags(TrackTableComponent table, TagModel tagModel) {
         this.table = table;

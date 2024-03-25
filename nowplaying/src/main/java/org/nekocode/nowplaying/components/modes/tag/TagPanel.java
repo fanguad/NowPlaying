@@ -6,10 +6,7 @@
 
 package org.nekocode.nowplaying.components.modes.tag;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.nekocode.nowplaying.NowPlayingView;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
@@ -17,7 +14,7 @@ import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.TagView;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -28,8 +25,6 @@ import java.util.List;
  * @author dan.clark@nekocode.org
  */
 public class TagPanel extends NowPlayingControl {
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(NowPlayingView.class);
 	private final static EnumSet<ChangeType> shouldUpdate = EnumSet.of(
 			ChangeType.CURRENT_SONG_CHANGE, ChangeType.TAG_CHANGE, ChangeType.FILE_CHANGE);
 

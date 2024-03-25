@@ -6,21 +6,13 @@
 
 package org.nekocode.nowplaying.components;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.resources.images.Icons;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -32,10 +24,9 @@ import java.util.Set;
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class RatingDisplay extends JComponent
 {
-   private static final Logger log = LogManager.getLogger(RatingDisplay.class);
-
    private static final Image heart_full;
    private static final Image heart_empty;
    private static final Dimension size;

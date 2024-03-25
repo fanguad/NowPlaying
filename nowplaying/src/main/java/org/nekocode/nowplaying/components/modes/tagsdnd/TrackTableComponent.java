@@ -6,8 +6,7 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.divxdede.swing.busy.BusyModel;
 import org.divxdede.swing.busy.JBusyComponent;
 import org.divxdede.swing.busy.ui.BasicBusyLayerUI;
@@ -23,29 +22,18 @@ import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.objects.UnknownTrack;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,9 +51,8 @@ import static java.lang.String.format;
  * <li>Table is contained in a JScrollPane</li>
  * </ul>
  */
+@Log4j2
 public class TrackTableComponent extends JPanel {
-    private static final Logger log = LogManager.getLogger(TrackTableComponent.class);
-
     private final ExecutorService workerThread = Executors.newSingleThreadExecutor(
             new NamedThreadFactory("TrackTable-AddFiles", false));
     private final MediaPlayer mediaPlayer;

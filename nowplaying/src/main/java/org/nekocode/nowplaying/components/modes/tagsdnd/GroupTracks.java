@@ -6,30 +6,14 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.LayoutStyle;
+import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,19 +22,19 @@ import static java.lang.String.format;
 /**
  * A dialog that adds files to a group.  Has a TrackTableComponent for loading and displaying tracks.
  */
+@Log4j2
 public class GroupTracks extends JPanel {
 
-    private static final Logger log = LogManager.getLogger(GroupTracks.class);
     private static final String GROUP_NAME_DEFAULT = "New group name...";
 
-    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("GroupTracks", false));
+    private final ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("GroupTracks", false));
 
-    private TagModel tagModel;
-    private JComboBox groupNamePullDown;
-    private GroupNameComboBoxModel groupNameModel;
+    private final TagModel tagModel;
+    private final JComboBox groupNamePullDown;
+    private final GroupNameComboBoxModel groupNameModel;
 
-    private Runnable setGroup = new SetGroup();
-    private TrackTableComponent table;
+    private final Runnable setGroup = new SetGroup();
+    private final TrackTableComponent table;
 
     public GroupTracks(TrackTableComponent table, TagModel tagModel) {
         this.table = table;

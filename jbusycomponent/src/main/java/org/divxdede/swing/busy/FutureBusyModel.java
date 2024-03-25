@@ -51,7 +51,7 @@ public class FutureBusyModel extends DefaultBusyModel implements Disposable {
 
     /** Listener of {@link SwingWorker} that listen "progress" property
      */
-    private PropertyChangeListener listener     = new PropertyChangeListener() {
+    private final PropertyChangeListener listener     = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             synchronized(FutureBusyModel.this) {
                 if( evt.getSource() == trackedFuture && ( evt.getSource() instanceof SwingWorker ) && evt.getPropertyName().equals("progress") ) {

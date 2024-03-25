@@ -6,14 +6,12 @@
 
 package org.nekocode.nowplaying;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeListener;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Implements common functionality for MediaPlayers
@@ -21,8 +19,6 @@ import org.nekocode.nowplaying.events.TrackChangeListener;
  * @author dan.clark@nekocode.org
  */
 public abstract class AbstractMediaPlayer implements MediaPlayer {
-	private static final Logger log = LogManager.getLogger(AbstractMediaPlayer.class);
-
 	protected final Set<TrackChangeListener> trackChangeListeners;
 
 	public AbstractMediaPlayer() {

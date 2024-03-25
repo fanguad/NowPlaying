@@ -10,8 +10,7 @@
  */
 package org.nekocode.nowplaying.components.modes.playlist;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.NowPlayingControl;
@@ -21,7 +20,7 @@ import org.nekocode.nowplaying.objects.Playlist;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import java.awt.GridLayout;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +29,8 @@ import java.util.List;
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class PlaylistPanel extends NowPlayingControl {
-	private static final Logger log = LogManager.getLogger(PlaylistPanel.class);
     private final MediaPlayer mediaPlayer;
     private final NekoLabel next1Track;
     private final NekoLabel next2Track;

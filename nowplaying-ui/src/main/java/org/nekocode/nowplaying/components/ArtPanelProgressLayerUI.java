@@ -10,18 +10,11 @@
  */
 package org.nekocode.nowplaying.components;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
-import javax.swing.JComponent;
-import javax.swing.JLayer;
+import javax.swing.*;
 import javax.swing.plaf.LayerUI;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.RenderingHints.Key;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -33,19 +26,15 @@ import java.util.Map;
 
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.lang.Math.PI;
-import static java.lang.Math.cos;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.sin;
+import static java.lang.Math.*;
 
 /**
  * A layer that draws a progress bar around the ArtPanel.
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
-    private static final Logger log = LogManager.getLogger(ArtPanelProgressLayerUI.class);
     private static final Map<Key, Object> RENDERING_HINTS = Collections.singletonMap(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
     private static final String DIRTY_SONG = "dirty song";
     private static final String DIRTY = "dirty";
@@ -76,7 +65,7 @@ public class ArtPanelProgressLayerUI extends LayerUI<JComponent> {
 	// cached information about the current panel
 	private int cornerDiameter;
 	private int cornerRadius;
-	private int[] sectionLengths;
+	private final int[] sectionLengths;
 	private int height;
 	private int width;
 	// total length (in pixels) of the layer's perimeter

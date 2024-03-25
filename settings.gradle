@@ -6,16 +6,19 @@ dependencyResolutionManagement {
             library("swingx", 'org.swinglabs.swingx:swingx-core:1.6.5-1')
             library("furbelow", 'furbelow:furbelow:1.0')
             library("divxdede_commons", 'org.divxdede:commons:0.2.3')
+
             // https://github.com/kklisura/chrome-devtools-java-client
-            library("cdt_java_client", 'com.github.kklisura.cdt:cdt-java-client:2.1.0')
+            library("cdt_java_client", 'com.github.kklisura.cdt:cdt-java-client:4.0.0')
+            library('jackson-databind', 'com.fasterxml.jackson.core:jackson-databind:2.16.0')
+            bundle("chrome_devtools", ['cdt_java_client', 'jackson-databind'])
 
             library("jaudiotagger", 'org:jaudiotagger:2.0.3')
-            library("sqlite_jdbc", 'org.xerial:sqlite-jdbc:3.8.7')
+            library("sqlite_jdbc", 'org.xerial:sqlite-jdbc:3.44.1.0')
 
-            library("log4j_api", 'org.apache.logging.log4j:log4j-api:2.20.0')
-            library("log4j_core", 'org.apache.logging.log4j:log4j-core:2.20.0')
-            library("jetbrains_annotations", 'org.jetbrains:annotations:19.0.0');
-
+            library("log4j_api", 'org.apache.logging.log4j', 'log4j-api').version(log4j_version)
+            library("log4j_core", 'org.apache.logging.log4j', 'log4j-core').version(log4j_version)
+            library("jetbrains_annotations", 'org.jetbrains:annotations:22.0.0');
+            library('lombok', 'org.projectlombok:lombok:1.18.24')
         }
     }
 }

@@ -6,12 +6,11 @@
 
 package org.nekocode.nowplaying.internals;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Base class of an object that provides a proxy to a COM object.  Specifically,
@@ -20,9 +19,8 @@ import org.apache.logging.log4j.Logger;
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class COMProxy {
-	private static final Logger log = LogManager.getLogger(COMProxy.class);
-
 	protected ExecutorService executor;
 
 	public COMProxy() {

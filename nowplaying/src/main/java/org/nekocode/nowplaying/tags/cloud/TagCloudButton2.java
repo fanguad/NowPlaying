@@ -6,20 +6,15 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import javax.swing.JLabel;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * A button that, when pressed, opens up the tag cloud viewer. No actions need to be hooked up to it
@@ -28,11 +23,10 @@ import java.util.List;
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 @SuppressWarnings("serial")
 public class TagCloudButton2 extends NekoButton {
-	@SuppressWarnings("unused")
-    private static final Logger log = LogManager.getLogger(TagCloudButton2.class);
-	private TagModel tagModel;
+	private final TagModel tagModel;
 	private static final int MINIMUM_ENTRIES = 5;
 
 	public TagCloudButton2(TagModel tagModel, Rotation r) {

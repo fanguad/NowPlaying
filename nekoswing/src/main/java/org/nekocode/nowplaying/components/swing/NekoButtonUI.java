@@ -6,9 +6,6 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
@@ -19,10 +16,9 @@ import java.awt.geom.AffineTransform;
  */
 public class NekoButtonUI extends BasicButtonUI {
 
-    private static final Logger log = LogManager.getLogger(NekoButtonUI.class);
     private static final int ARC_SIZE = 20;
 
-    private NekoTextPainter textPainter;
+    private final NekoTextPainter textPainter;
     private boolean rotated;
 
     public NekoButtonUI() {

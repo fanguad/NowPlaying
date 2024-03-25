@@ -6,21 +6,16 @@
 
 package org.nekocode.nowplaying.components;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.SwingWorker;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.objects.Track;
+
+import javax.swing.*;
 
 /**
  * Interface that will be called by the view to update the view
  */
+@Log4j2
 public abstract class UpdateTrack extends SwingWorker<ImageIcon, Object> {
-
-    private static final Logger log = LogManager.getLogger(UpdateTrack.class);
-
 	protected Track newTrack;
 
 	/**

@@ -18,7 +18,7 @@ class NekoLabelUI extends BasicLabelUI {
     /**
      * 1 for dilation of text, 1 for blurring
      */
-    private NekoTextPainter textPainter;
+    private final NekoTextPainter textPainter;
 
     private boolean rotated;
 

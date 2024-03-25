@@ -6,17 +6,10 @@
 
 package org.nekocode.nowplaying.components;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.nekocode.nowplaying.components.swing.NekoFrame;
 import org.nekocode.nowplaying.components.swing.NekoFrame.AnchorPosition;
 
-import javax.swing.AbstractAction;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,15 +19,12 @@ import static java.lang.Math.*;
 import static java.lang.String.format;
 
 public class MouseActions extends MouseInputAdapter {
-
-    private static final Logger log = LogManager.getLogger(MouseActions.class);
-
 	private Point offset;
     // location of last mouse event (for dragging), so we don't process the same event multiple times
     private Point lastPoint;
 
 	private final NekoFrame frame;
-	private JPopupMenu menu;
+	private final JPopupMenu menu;
 
 	public MouseActions(NekoFrame frame) {
 		this.frame = frame;

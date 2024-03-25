@@ -7,8 +7,7 @@
 package org.nekocode.nowplaying.tags;
 
 import furbelow.SpinningDial;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.NekoLabel;
@@ -17,32 +16,12 @@ import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.cloud.TagCloud;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A Panel that allows the user to create and edit tags on files.
@@ -50,23 +29,21 @@ import java.util.Set;
  * @author dan.clark@nekocode.org
  */
 @SuppressWarnings("serial")
+@Log4j2
 public class TagView extends JPanel
 {
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(TagView.class);
-
 	public JTextField newTag;
-	private Set<TagChangeListener> listeners;
+	private final Set<TagChangeListener> listeners;
 
 	private Track track;
 
 	public TagCloud tagHolder;
 
-	private NekoButton autoTag;
-	private NekoLabel addNew;
-	private JLabel busy;
+	private final NekoButton autoTag;
+	private final NekoLabel addNew;
+	private final JLabel busy;
 
-	private JComponent textfields;
+	private final JComponent textfields;
 	private final SpinningDial spinningDial;
 
 	public TagView(TagModel tagModel) {

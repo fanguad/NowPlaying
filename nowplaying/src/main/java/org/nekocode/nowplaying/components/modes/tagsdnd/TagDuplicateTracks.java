@@ -6,18 +6,12 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.TagModel;
 
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.LayoutStyle;
+import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -29,16 +23,14 @@ import java.util.concurrent.Executors;
  * A dialog that marks tracks as duplicates of each other.
  * Has a TrackTableComponent for loading and displaying tracks.
  */
+@Log4j2
 public class TagDuplicateTracks extends JPanel {
+    private final ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("TagDuplicateTracks", false));
 
-    private static final Logger log = LogManager.getLogger(TagDuplicateTracks.class);
+    private final TagModel tagModel;
 
-    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("TagDuplicateTracks", false));
-
-    private TagModel tagModel;
-
-    private Runnable setDuplicates = new SetDuplicates();
-    private TrackTableComponent table;
+    private final Runnable setDuplicates = new SetDuplicates();
+    private final TrackTableComponent table;
 
     public TagDuplicateTracks(TrackTableComponent table, TagModel tagModel) {
         this.table = table;

@@ -79,7 +79,7 @@ import java.util.List;
  */
 public class BoundedRangeModelHub implements ChangeListener, Iterable<BoundedRangeModel>, Sizable, Disposable {
 
-    private List<WeightBoundedRangeModel> subs = new ArrayList<WeightBoundedRangeModel>();
+    private final List<WeightBoundedRangeModel> subs = new ArrayList<WeightBoundedRangeModel>();
     private BoundedRangeModel master = null;
     private float totalWeight = 0f;
     private boolean changing = false;

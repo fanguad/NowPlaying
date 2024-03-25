@@ -6,13 +6,7 @@
 
 package org.nekocode.nowplaying.objects;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.UUID;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -23,13 +17,18 @@ import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.ID3v24Frames;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyUFID;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.UUID;
+
 /**
  * Implements certain functionality on FileTracks that relates to MP3s.
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class MP3TrackWrapper {
-	private static final Logger log = LogManager.getLogger(MP3TrackWrapper.class);
 	//TODO move this to a property somewhere
 	public static final String UFID_OWNER = "nekocode.org";
 

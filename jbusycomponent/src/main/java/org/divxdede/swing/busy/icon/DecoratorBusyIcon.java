@@ -53,7 +53,7 @@ public abstract class DecoratorBusyIcon extends AbstractBusyIcon {
 
     private Icon           icon          = null;
     private BufferedImage  iconFrame     = null;
-    private FrameObserver  frameObserver = new FrameObserver();
+    private final FrameObserver  frameObserver = new FrameObserver();
     private Insets         insets        = null;
 
     /** Default constructor

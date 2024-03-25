@@ -30,9 +30,9 @@ public class TrackChangeEvent {
 	}
 
 	@NotNull
-	private Track track;
+	private final Track track;
 	@NotNull
-	private ChangeType type;
+	private final ChangeType type;
 
 	public TrackChangeEvent(@NotNull Track track, @NotNull ChangeType type) {
 		this.track = track;

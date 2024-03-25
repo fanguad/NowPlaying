@@ -6,22 +6,18 @@
 
 package org.nekocode.nowplaying.components;
 
+import lombok.extern.log4j.Log4j2;
+
+import javax.swing.*;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.ExecutionException;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * To be run when the track has been updating.  Resizes the window to maintain prettiness.
  */
+@Log4j2
 public class ResizeUpdateTrack extends UpdateTrack {
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(ResizeUpdateTrack.class);
-
 	private JFrame view;
 	private int size;
 	private ArtPanel artworkPanel;

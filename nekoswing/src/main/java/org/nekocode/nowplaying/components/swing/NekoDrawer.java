@@ -6,8 +6,7 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,10 +25,9 @@ import java.io.IOException;
  *
  * @author dan.clark@nekocode.org
  */
-@SuppressWarnings("serial")
+@Log4j2
 public class NekoDrawer extends JWindow {
-	private static final Logger log = LogManager.getLogger(NekoDrawer.class);
-	
+
 	// TODO: make images not hard-coded
 	/** left side of tab - right side is same, but flipped **/
 	private static final BufferedImage tab_left;
@@ -71,15 +69,15 @@ public class NekoDrawer extends JWindow {
         tab_right = op.filter(tab_left, null);	
 	}
 	
-	private Rotation rotation;
-	private Component content;
+	private final Rotation rotation;
+	private final Component content;
 	
-	private Window owner;
+	private final Window owner;
 	private boolean open;
 
-	private ImageIcon closedTab;
+	private final ImageIcon closedTab;
 
-	private NekoButton tab;
+	private final NekoButton tab;
 
 	/**
 	 * Creates a new NekoDrawer attached the specified window.  The width of the

@@ -13,14 +13,7 @@ import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,9 +23,9 @@ public class TrackTableModel extends AbstractTableModel implements TagChangeList
     static enum Columns {
         FoundInMediaPlayer, Title, Artist, Album, Track, Tags
     }
-    private TagModel tagModel;
-    private List<Track> tracks;
-    private Map<Track, SortedSet<String>> tagCache;
+    private final TagModel tagModel;
+    private final List<Track> tracks;
+    private final Map<Track, SortedSet<String>> tagCache;
 
     public TrackTableModel(TagModel tagModel) {
         this.tagModel = tagModel;

@@ -10,24 +10,22 @@
  */
 package org.nekocode.nowplaying.listview;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.table.AbstractTableModel;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.JXTable;
 import org.nekocode.nowplaying.objects.Track;
+
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays a list of tracks in tabular format.
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 public class TrackTableView extends JXTable {
-	private static final Logger log = LogManager.getLogger(TrackTableView.class);
-
-	private TrackTableModel model;
+	private final TrackTableModel model;
 
 	// for now, all columns are always shown
 	enum Columns {

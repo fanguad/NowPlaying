@@ -6,8 +6,7 @@
 
 package org.nekocode.nowplaying.tags;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteJDBCLoader;
 
@@ -16,11 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,11 +25,10 @@ import java.util.Map;
  *
  * @author fanguad
  */
+@Log4j2
 public class TagDatabase {
-    private static final Logger log = LogManager.getLogger(TagDatabase.class);
-
-    private Connection conn;
-    private Map<Object, PreparedStatement> preparedStatements;
+    private final Connection conn;
+    private final Map<Object, PreparedStatement> preparedStatements;
 
     /**
      * Opens the tag database, creating a new one if necessary.

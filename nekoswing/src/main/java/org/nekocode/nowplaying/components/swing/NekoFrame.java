@@ -6,16 +6,15 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 import javax.swing.*;
 import java.awt.*;
 
-@SuppressWarnings("serial")
+@Getter
+@Log4j2
 public class NekoFrame extends JFrame {
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(NekoFrame.class);
 	private AnchorPosition anchor;
 
 	public enum AnchorPosition {
@@ -71,11 +70,7 @@ public class NekoFrame extends JFrame {
 		this.anchor = anchor == null ? AnchorPosition.NORTHWEST : anchor;
 	}
 
-    public AnchorPosition getAnchor() {
-        return anchor;
-    }
-
-    /**
+	/**
      * Gets the x location of the corner that is anchored.
      *
      * @return anchor corner

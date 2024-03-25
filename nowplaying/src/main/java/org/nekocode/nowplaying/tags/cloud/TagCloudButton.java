@@ -6,24 +6,18 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloud.TagCloudEntryRenderer;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.SwingWorker;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -33,11 +27,10 @@ import java.util.concurrent.ExecutionException;
  *
  * @author dan.clark@nekocode.org
  */
+@Log4j2
 @SuppressWarnings("serial")
 public class TagCloudButton extends NekoButton {
-	@SuppressWarnings("unused")
-    private static final Logger log = LogManager.getLogger(TagCloudButton.class);
-	private TagModel tagModel;
+	private final TagModel tagModel;
 	private static final int MINIMUM_ENTRIES = 5;
 
 	public TagCloudButton(TagModel tagModel, Rotation r) {
@@ -64,7 +57,7 @@ public class TagCloudButton extends NekoButton {
 	 */
 	private static class CloudLoader extends SwingWorker<List<TagCloudEntry>, Object> {
 
-		private TagModel tagModel;
+		private final TagModel tagModel;
 
 		public CloudLoader(TagModel tagModel) {
 			this.tagModel = tagModel;

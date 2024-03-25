@@ -15,22 +15,16 @@ import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudButton2;
 
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Provides controls that open up dialogs allowing the user to manipulate tags through Drag and Drop.
  */
 public class TagDnDPanel extends NowPlayingControl {
-    private TagCloudButton2 tagCloudButton;
-    private UnifiedTagEditorDialog editTags;
-    private DatabaseUtilities dbUtils;
+    private final TagCloudButton2 tagCloudButton;
+    private final UnifiedTagEditorDialog editTags;
+    private final DatabaseUtilities dbUtils;
 
     public TagDnDPanel(MediaPlayer mediaPlayer, TagModel tagModel) {
 		// find the top level frame

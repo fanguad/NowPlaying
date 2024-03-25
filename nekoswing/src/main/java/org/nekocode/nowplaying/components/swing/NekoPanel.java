@@ -6,9 +6,6 @@
 
 package org.nekocode.nowplaying.components.swing;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -18,19 +15,15 @@ import java.awt.*;
  * 
  * @author dan.clark@nekocode.org
  */
-@SuppressWarnings("serial")
 public class NekoPanel extends JPanel {
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(NekoPanel.class);
-
 	public enum BorderPositions {
 		PAGE_START(BorderLayout.PAGE_START, Rotation.NONE),
 		PAGE_END(BorderLayout.PAGE_END, Rotation.FLIPPED),
 		LINE_START(BorderLayout.LINE_START, Rotation.COUNTER_CLOCKWISE),
 		LINE_END(BorderLayout.LINE_END, Rotation.CLOCKWISE);
 
-		private String position;
-		private Rotation rotation;
+		private final String position;
+		private final Rotation rotation;
 		private BorderPositions(String layoutPosition, Rotation rotation) {
 			this.position = layoutPosition;
 			this.rotation = rotation;

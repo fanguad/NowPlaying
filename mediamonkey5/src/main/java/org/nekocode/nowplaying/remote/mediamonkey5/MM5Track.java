@@ -1,8 +1,7 @@
 package org.nekocode.nowplaying.remote.mediamonkey5;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.objects.Track;
 
@@ -12,8 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Log4j2
 public class MM5Track implements Track {
-    private static final Logger LOG = LogManager.getLogger(MM5Track.class);
     private final MM5Connection connection;
     private final int persistentId;
     private final String title;
@@ -32,7 +31,7 @@ public class MM5Track implements Track {
             Map<String, Object> trackProperties = connection.evaluate("app.player.getCurrentTrack()");
             return createMM5Track(connection, trackProperties);
         } catch (Exception e) {
-            LOG.error("Error parsing property map", e);
+            log.error("Error parsing property map", e);
             return ErrorTrack.ERROR_TRACK;
         }
     }
@@ -43,7 +42,7 @@ public class MM5Track implements Track {
                     "app.getObject('track', { id: %d })".formatted(trackId));
             return createMM5Track(connection, trackProperties);
         } catch (Exception e) {
-            LOG.error("Error parsing property map", e);
+            log.error("Error parsing property map", e);
             return ErrorTrack.ERROR_TRACK;
         }
     }
@@ -241,7 +240,7 @@ public class MM5Track implements Track {
         try {
             connection.evaluateAsync(getCover);
         } catch (ScriptException e) {
-            LOG.error("Error loading cover art", e);
+            log.error("Error loading cover art", e);
         }
         return Collections.emptyList();
     }

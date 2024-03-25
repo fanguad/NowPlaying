@@ -237,8 +237,8 @@ public class RemainingTimeMonitor implements Disposable {
         private long  duration;
         private float advance;
 
-        private long  startTime;
-        private float startRatio;
+        private final long  startTime;
+        private final float startRatio;
         private long endTime;
 
         public Sample(float ratio) {

@@ -1,7 +1,6 @@
 package org.nekocode.nowplaying.remote.mediamonkey5;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nekocode.nowplaying.AbstractMediaPlayer;
@@ -9,19 +8,17 @@ import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.objects.Playlist;
 import org.nekocode.nowplaying.objects.Track;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.ART_CHANGE;
-import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.CURRENT_SONG_CHANGE;
-import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.PLAY_STATE_CHANGE;
+import static org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType.*;
 
+@Log4j2
 public class MM5RemoteModel extends AbstractMediaPlayer {
 
-    private static final Logger LOG = LogManager.getLogger(MM5RemoteModel.class);
     private final MM5Connection connection;
     private Track currentTrack;
 
@@ -56,7 +53,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
 //                    fireTrackChanged(new TrackChangeEvent(MM5RemoteModel.this.currentTrack, CURRENT_SONG_CHANGE));
 //                }
                 case "thumbnail" -> {
-                    LOG.debug("thumbnail update for track {}: {}", e.getOldValue(), e.getNewValue());
+                    log.debug("thumbnail update for track {}: {}", e.getOldValue(), e.getNewValue());
                     String trackId = (String) e.getOldValue();
                     Track currentTrack = getCurrentTrack();
                     if (currentTrack instanceof MM5Track mmTrack) {
@@ -67,7 +64,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
                             filterTemp = filterTemp.replace("file:///", "");
                             Path mmPath = Path.of(filterTemp);
                             Path fullPath = Path.of(System.getProperty("java.io.tmpdir")).resolve(mmPath);
-                            LOG.info("thumbnail for track {} available at: {}", trackId, fullPath);
+                            log.info("thumbnail for track {} available at: {}", trackId, fullPath);
                             mmTrack.addArtwork(new ImageIcon(fullPath.toString()));
                             fireTrackChanged(new TrackChangeEvent(currentTrack, ART_CHANGE));
                         }
@@ -89,7 +86,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
         try {
             connection.evaluateAsync("app.player.%sAsync()".formatted(command));
         } catch (ScriptException e) {
-            LOG.error("Error in '%s':".formatted(command), e);
+            log.error("Error in '%s':".formatted(command), e);
         }
     }
 
@@ -129,7 +126,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
                     """;
             connection.evaluateAsyncAndWait(ratingCommand.formatted(track.getTrackId(), newRating));
         } catch (ScriptException e) {
-            LOG.error("Error updating rating:", e);
+            log.error("Error updating rating:", e);
         }
     }
 
@@ -138,7 +135,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
         try {
             return (Integer) connection.evaluate("app.player.trackPositionMS") / 1000.0;
         } catch (ScriptException e) {
-            LOG.error("Error in 'getCurrentTrackPosition':", e);
+            log.error("Error in 'getCurrentTrackPosition':", e);
             return 0;
         }
     }
@@ -169,7 +166,7 @@ public class MM5RemoteModel extends AbstractMediaPlayer {
                     ? PlayerState.PLAYING
                     : PlayerState.STOPPED;
         } catch (ScriptException e) {
-            LOG.error("Error in 'getPlayerState':", e);
+            log.error("Error in 'getPlayerState':", e);
             return PlayerState.STOPPED;
         }
     }

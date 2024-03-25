@@ -53,7 +53,7 @@ public abstract class AbstractBusyLayerUI extends LockableUI implements BusyLaye
 
     /** Refer to the last state known of the bounded model
      */
-    private AtomicBoolean lastBusyState = new AtomicBoolean(false);
+    private final AtomicBoolean lastBusyState = new AtomicBoolean(false);
     
     /** Default constructor
      */

@@ -14,12 +14,9 @@ import org.nekocode.nowplaying.internals.NamedThreadFactory;
 import org.nekocode.nowplaying.tags.TagModel;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,11 +33,11 @@ import java.util.stream.Collectors;
 public class FindUnusedTags extends JBusyComponent<JPanel> {
 
     private final SpinningDialBusyIcon busyIcon;
-    private ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("FindUnusedTags", false));
-    private BusyModel busyModel;
-    private TagModel tagModel;
-    private DefaultTableModel tableModel;
-    private JTable tagTable;
+    private final ExecutorService workerThread = Executors.newSingleThreadExecutor(new NamedThreadFactory("FindUnusedTags", false));
+    private final BusyModel busyModel;
+    private final TagModel tagModel;
+    private final DefaultTableModel tableModel;
+    private final JTable tagTable;
 
     public FindUnusedTags(TagModel tagModel) {
         this.tagModel = tagModel;

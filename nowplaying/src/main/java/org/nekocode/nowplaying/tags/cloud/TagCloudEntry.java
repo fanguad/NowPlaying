@@ -6,16 +6,9 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import java.awt.Color;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.awt.*;
 
 public class TagCloudEntry implements Comparable<TagCloudEntry> {
-
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(TagCloudEntry.class);
-
 	public static final int NUM_LEVELS = 20;
 
 	private String tag;

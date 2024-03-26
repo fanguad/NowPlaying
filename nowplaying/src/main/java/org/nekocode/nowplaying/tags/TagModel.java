@@ -4,7 +4,6 @@
 
 package org.nekocode.nowplaying.tags;
 
-import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.NowPlayingProperties;
 import org.nekocode.nowplaying.events.TagChangeListener;
 import org.nekocode.nowplaying.internals.NamedThreadFactory;
@@ -14,16 +13,60 @@ import org.nekocode.nowplaying.objects.Track;
 import org.nekocode.nowplaying.tags.cloud.TagCloudEntry;
 import org.nekocode.nowplaying.tags.cloud.TagCloudGroup;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static org.nekocode.nowplaying.tags.TagModel.StatementName.*;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.addTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.addTrackTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.addTrackTagBatch;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackFromDuplicates;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackFromGroups;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackIdToUUID;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.deleteTrackTags;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getAllTrackIds;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getDuplicateId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getDuplicates;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getGroupId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getGroups;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getMaxDuplicateId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getMaxGroupId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getMaxTagCount;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTagCounts;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTagId;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTagIdsForTrack;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTrackIdUUIDSelect;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTrackUUIDInsert;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.getTrackUUIDSelect;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.removeTag;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.setDuplicate;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.setGroup;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.setTrackGroup;
+import static org.nekocode.nowplaying.tags.TagModel.StatementName.updateTagCount;
 
 /**
  * Tag model. Keeps track of tags.
@@ -675,7 +718,8 @@ public class TagModel
         if (trackId == null) {
             String message = "Track did not have a persistent id: " + track;
             log.warn(message);
-            throw new IllegalArgumentException(message);
+			return null;
+//            throw new IllegalArgumentException(message);
         }
 
         // first, try to get the UUID from the MRU cache

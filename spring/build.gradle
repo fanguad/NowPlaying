@@ -9,11 +9,16 @@ dependencies {
     implementation project(':nowplaying')
     implementation project(':mediamonkey5')
 
-    dependencies {
-        implementation 'org.springframework.boot:spring-boot'
-    }
+    implementation 'org.springframework.boot:spring-boot'
 }
 
 bootRun {
     mainClass = 'org.nekocode.nowplaying.Main'
+    jvmArgs([
+            "--enable-preview"
+    ])
+}
+
+compileJava {
+    options.compilerArgs += ['--enable-preview']
 }

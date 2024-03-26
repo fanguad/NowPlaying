@@ -1,17 +1,26 @@
+/*
+ * Copyright (c) 2024. Dan Clark
+ */
+
 package org.nekocode.nowplaying.remote.mediamonkey5;
 
+import org.nekocode.nowplaying.objects.Track;
+
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.jetbrains.annotations.NotNull;
-import org.nekocode.nowplaying.objects.Track;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Log4j2
+@Getter
 public class MM5Track implements Track {
     private final MM5Connection connection;
     private final int persistentId;
@@ -23,61 +32,10 @@ public class MM5Track implements Track {
     private final String comment;
     private final String grouping1;
     private final double duration;
+    private final int trackNumber;
     private final Object artworkLock = new Object();
     private final Collection<ImageIcon> artwork = new ArrayList<>();
-
-    public static Track getCurrentTrack(MM5Connection connection) {
-        try {
-            Map<String, Object> trackProperties = connection.evaluate("app.player.getCurrentTrack()");
-            return createMM5Track(connection, trackProperties);
-        } catch (Exception e) {
-            log.error("Error parsing property map", e);
-            return ErrorTrack.ERROR_TRACK;
-        }
-    }
-
-    public static Track getTrack(MM5Connection connection, int trackId) {
-        try {
-            Map<String, Object> trackProperties = connection.evaluate(
-                    "app.getObject('track', { id: %d })".formatted(trackId));
-            return createMM5Track(connection, trackProperties);
-        } catch (Exception e) {
-            log.error("Error parsing property map", e);
-            return ErrorTrack.ERROR_TRACK;
-        }
-    }
-
-    @NotNull
-    private static MM5Track createMM5Track(MM5Connection connection, Map<String, Object> trackProperties) {
-        String title = (String) trackProperties.get("title");
-        String artist = (String) trackProperties.get("artist");
-        String album = (String) trackProperties.get("album");
-        String genre = (String) trackProperties.get("genre");
-        String comment = (String) trackProperties.get("commentShort");
-//        String path = trackProperties.get("path");
-        String grouping1 = (String) trackProperties.get("custom1"); // anime series
-//        String custom2 = trackProperties.get("custom2"); // anime
-        Integer id = (Integer) trackProperties.get("id"); // idsong and persistentID contain the same value
-        int rating = (Integer) trackProperties.get("rating");
-        double songLength = (Integer) trackProperties.get("songLength") / 1000d; // units are MS
-
-        return new MM5Track(connection, id, title, artist, album, rating, genre, comment, grouping1, songLength);
-    }
-
-    @Override
-    public String getAlbum() {
-        return album;
-    }
-
-    @Override
-    public String getArtist() {
-        return artist;
-    }
-
-    @Override
-    public String getComment() {
-        return comment;
-    }
+    private final Collection<String> artworkDescription = new ArrayList<>();
 
     @Override
     public boolean isCompilation() {
@@ -105,11 +63,6 @@ public class MM5Track implements Track {
     }
 
     @Override
-    public String getGenre() {
-        return genre;
-    }
-
-    @Override
     public String getGrouping() {
         return grouping1;
     }
@@ -125,22 +78,7 @@ public class MM5Track implements Track {
     }
 
     @Override
-    public int getRating() {
-        return rating;
-    }
-
-    @Override
-    public String getTitle() {
-        return title;
-    }
-
-    @Override
     public int getTrackCount() {
-        return 0;
-    }
-
-    @Override
-    public int getTrackNumber() {
         return 0;
     }
 
@@ -167,11 +105,6 @@ public class MM5Track implements Track {
     @Override
     public Date getDateAdded() {
         return null;
-    }
-
-    @Override
-    public double getDuration() {
-        return duration;
     }
 
     @Override
@@ -245,6 +178,13 @@ public class MM5Track implements Track {
         return Collections.emptyList();
     }
 
+    @Override
+    public Collection<String> getArtworkDescriptions() {
+        synchronized (artworkLock) {
+            return artworkDescription;
+        }
+    }
+
     /**
      * only scales down
      */
@@ -264,9 +204,10 @@ public class MM5Track implements Track {
         }
     }
 
-    public void addArtwork(ImageIcon imageIcon) {
+    public void addArtwork(String description, ImageIcon imageIcon) {
         synchronized (artworkLock) {
             artwork.add(imageIcon);
+            artworkDescription.add(description);
         }
     }
 }

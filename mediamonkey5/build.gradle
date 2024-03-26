@@ -1,6 +1,15 @@
-apply plugin: 'java-library'
+plugins {
+    id 'org.springframework.boot' version '3.2.4'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'java-library'
+}
 
 dependencies {
     implementation project(':nowplaying')
     implementation(libs.bundles.chrome.devtools)
+//    implementation("org.springframework:spring-context")
+}
+
+compileJava {
+    options.compilerArgs += ['--enable-preview']
 }

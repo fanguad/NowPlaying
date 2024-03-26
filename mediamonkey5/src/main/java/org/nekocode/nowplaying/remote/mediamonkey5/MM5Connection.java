@@ -4,7 +4,10 @@
 
 package org.nekocode.nowplaying.remote.mediamonkey5;
 
+import org.nekocode.nowplaying.NowPlayingProperties;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.protocol.events.runtime.ExceptionThrown;
@@ -15,11 +18,12 @@ import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
 import com.github.kklisura.cdt.services.impl.ChromeServiceImpl;
 import lombok.extern.log4j.Log4j2;
-import org.nekocode.nowplaying.NowPlayingProperties;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -32,6 +36,7 @@ public class MM5Connection {
     private final ObjectMapper objectMapper;
 
     private final PropertyChangeSupport playbackStateListeners;
+    private final PropertyChangeSupport bindingListeners;
 
     private final Object notificationLock = new Object();
     /**
@@ -42,7 +47,6 @@ public class MM5Connection {
     private long lastNotificationTime;
     private String lastNotificationValue;
 
-
     public MM5Connection() {
         Properties properties = NowPlayingProperties.loadProperties();
         String host = properties.getProperty(NowPlayingProperties.REMOTE_MACHINE.name());
@@ -50,6 +54,7 @@ public class MM5Connection {
 
         objectMapper = new ObjectMapper();
         playbackStateListeners = new PropertyChangeSupport(this);
+        bindingListeners = new PropertyChangeSupport(this);
 
         ChromeService chromeService = new ChromeServiceImpl(host, port);
         Optional<ChromeDevToolsService> devToolsServiceOptional = chromeService.getTabs()
@@ -77,6 +82,26 @@ public class MM5Connection {
     }
 
     /**
+     * valid property names: getTrack
+     * <p>
+     * the "new" value will contain the payload
+     *
+     * @param listener the PropertyChangeListener to be added
+     */
+    void addBindingListener(PropertyChangeListener listener) {
+        bindingListeners.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * Removes a PropertyChangeListener from the bindingListeners.
+     *
+     * @param listener the PropertyChangeListener to be removed
+     */
+    void removeBindingListener(PropertyChangeListener listener) {
+        bindingListeners.removePropertyChangeListener(listener);
+    }
+
+    /**
      * Use the console to receive events
      */
     private void registerCallbacks() {
@@ -85,28 +110,27 @@ public class MM5Connection {
                     var seekChange = e => console.debug('seekChange:' + e);
                     var playbackState = e => console.debug('playbackState:' + e);
                     var playbackEnd = e => console.debug('playbackEnd:' + e);
+                    var trackModified = e => console.debug('trackModified:' + e.id);
                                         
                     app.listen(app.player, 'seekChange', seekChange);
                     app.listen(app.player, 'playbackState', playbackState);
                     app.listen(app.player, 'playbackEnd', playbackEnd);
+                    app.listen(app, 'trackModified', trackModified);
                     """;
 
             evaluateAsync(callbacks);
             runtime.onConsoleAPICalled(e -> {
                 e.getArgs().forEach(a -> {
                     String value = a.getValue().toString();
-                    if (isUniqueNotification(value))
+                    if (isUniqueNotification(value)) {
                         setLastNotification(value);
-                    else
+                    } else {
                         return;
+                    }
 
                     String[] chunks = value.split(":");
                     switch (chunks[0]) {
-                        case "seekChange" -> {
-                            log.info("event [{}] with value [{}]", chunks[0], chunks[1]);
-                            playbackStateListeners.firePropertyChange(chunks[0], null, chunks[1]);
-                        }
-                        case "playbackState" -> {
+                        case "seekChange", "playbackState", "trackModified" -> {
                             log.info("event [{}] with value [{}]", chunks[0], chunks[1]);
                             playbackStateListeners.firePropertyChange(chunks[0], null, chunks[1]);
                         }
@@ -114,8 +138,33 @@ public class MM5Connection {
                             String url = String.join(":", List.of(chunks).subList(2, chunks.length));
                             playbackStateListeners.firePropertyChange(chunks[0], chunks[1], url);
                         }
+                        case "findTracks" -> {
+                            playbackStateListeners.firePropertyChange(chunks[0], chunks[1], chunks[2]);
+                        }
                     }
                 });
+            });
+
+            runtime.addBinding("getTrack");
+            runtime.onBindingCalled(event -> {
+                try {
+                    JsonNode jsonNode = objectMapper.readTree(event.getPayload());
+                    Map<String, Object> trackProperties = new HashMap<>();
+                    jsonNode.fields().forEachRemaining(field -> {
+                        if (field.getValue().isFloatingPointNumber()) {
+                            trackProperties.put(field.getKey(), field.getValue().doubleValue());
+                        }
+                        if (field.getValue().isIntegralNumber()) {
+                            trackProperties.put(field.getKey(), field.getValue().longValue());
+                        }
+                        if (field.getValue().isTextual()) {
+                            trackProperties.put(field.getKey(), field.getValue().textValue());
+                        }
+                    });
+                    bindingListeners.firePropertyChange(event.getName(), null, trackProperties);
+                } catch (JsonProcessingException e) {
+                    log.error(STR."Error parsing getTrack payload: \{event.getPayload()}", e);
+                }
             });
 
         } catch (ScriptException e) {
@@ -186,10 +235,9 @@ public class MM5Connection {
         handleException(evaluate.getExceptionDetails());
         RemoteObject evaluateResult = evaluate.getResult();
 
-        T result = (T) evaluateResult.getValue();
+        @SuppressWarnings("unchecked") T result = (T) evaluateResult.getValue();
         return result;
     }
-
 
     public void evaluateAsyncAndWait(String promiseScript) throws ScriptException {
         Evaluate evaluate = runtime.evaluate(

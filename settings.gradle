@@ -20,7 +20,7 @@ dependencyResolutionManagement {
             library("log4j_core", 'org.apache.logging.log4j', 'log4j-core').versionRef("log4j_version")
 
             library("jetbrains_annotations", 'org.jetbrains:annotations:22.0.0');
-            library('lombok', 'org.projectlombok:lombok:1.18.24')
+            library('lombok', 'org.projectlombok:lombok:1.18.32')
         }
     }
 }

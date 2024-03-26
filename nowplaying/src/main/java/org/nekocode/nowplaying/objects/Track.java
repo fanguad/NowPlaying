@@ -19,6 +19,7 @@ public interface Track {
 
 	String getArtist();
 
+	Collection<String> getArtworkDescriptions();
 	Collection<ImageIcon> getArtwork(int size);
 
 	String getComment();

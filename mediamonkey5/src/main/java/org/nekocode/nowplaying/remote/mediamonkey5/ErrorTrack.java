@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * A track that indicates nothing is currently playing.
@@ -27,6 +28,11 @@ public class ErrorTrack implements Track {
     @Override
     public String getArtist() {
         return "";
+    }
+
+    @Override
+    public Collection<String> getArtworkDescriptions() {
+        return Set.of();
     }
 
     @Override

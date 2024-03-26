@@ -4,7 +4,6 @@
 
 package org.nekocode.nowplaying.components.modes.control;
 
-import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.Controls;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.RatingChangeEvent;
@@ -12,6 +11,8 @@ import org.nekocode.nowplaying.components.RatingDisplay;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.events.TrackChangeEvent.ChangeType;
 import org.nekocode.nowplaying.resources.images.Icons;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -34,7 +35,7 @@ import java.util.Set;
 public class ControlPanel extends NowPlayingControl {
 
 	private final static EnumSet<ChangeType> shouldUpdate = EnumSet.of(
-			ChangeType.CURRENT_SONG_CHANGE, ChangeType.FILE_CHANGE);
+			ChangeType.CURRENT_SONG_CHANGE, ChangeType.FILE_CHANGE, ChangeType.METADATA_CHANGE);
 
 	private final Set<ChangeListener> ratingChangeListeners;
 	private final Set<ChangeListener> controlListeners;

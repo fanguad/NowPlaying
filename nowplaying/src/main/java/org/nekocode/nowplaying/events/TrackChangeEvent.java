@@ -4,8 +4,9 @@
 
 package org.nekocode.nowplaying.events;
 
-import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.objects.Track;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Fired when the currently playing track has changed. This includes changes to
@@ -20,6 +21,10 @@ public class TrackChangeEvent {
 		PLAY_STATE_CHANGE,
 		CURRENT_SONG_CHANGE,
 		FILE_CHANGE,
+		/**
+		 * Non-art metadata has changed
+		 */
+		METADATA_CHANGE,
 		TAG_CHANGE,
 		/**
 		 * Art for the current track became available.  Track did not actually change

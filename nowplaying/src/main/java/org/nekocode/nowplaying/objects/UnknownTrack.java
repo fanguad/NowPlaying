@@ -7,6 +7,7 @@ package org.nekocode.nowplaying.objects;
 import javax.swing.*;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * This class represents a Track that we've been told about, but we can't seem to find information on it.
@@ -20,6 +21,11 @@ public class UnknownTrack implements Track {
     @Override
     public String getArtist() {
         return null;
+    }
+
+    @Override
+    public Collection<String> getArtworkDescriptions() {
+        return Set.of();
     }
 
     @Override

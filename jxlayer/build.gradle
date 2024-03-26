@@ -1,0 +1,4 @@
+plugins {
+    id 'nowplaying.java-conventions'
+    id 'java-library'
+}

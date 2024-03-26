@@ -1,5 +1,7 @@
-apply plugin: 'java-library'
-
+plugins {
+    id 'nowplaying.java-conventions'
+    id 'java-library'
+}
 dependencies {
     implementation project(':nekoswing')
     implementation project(':nowplaying-ui')

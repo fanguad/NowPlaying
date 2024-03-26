@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group 'org.nekocode.nowplaying'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url "../lib"
+    }
+}
+
+dependencies {
+    implementation(libs.log4j.api)
+    runtimeOnly(libs.log4j.core)
+    implementation(libs.jetbrains.annotations)
+
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+}
+
+compileJava {
+    options.compilerArgs += ['--enable-preview']
+}

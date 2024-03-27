@@ -4,14 +4,15 @@
 
 package org.nekocode.nowplaying.components.modes.tagsdnd;
 
-import org.jetbrains.annotations.NotNull;
 import org.nekocode.nowplaying.MediaPlayer;
 import org.nekocode.nowplaying.components.NowPlayingControl;
 import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.events.TrackChangeEvent;
 import org.nekocode.nowplaying.tags.TagModel;
-import org.nekocode.nowplaying.tags.cloud.TagCloudButton2;
+import org.nekocode.nowplaying.tags.cloud.TagCloudButton;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ import java.awt.*;
  * Provides controls that open up dialogs allowing the user to manipulate tags through Drag and Drop.
  */
 public class TagDnDPanel extends NowPlayingControl {
-    private final TagCloudButton2 tagCloudButton;
+    private final TagCloudButton tagCloudButton;
     private final UnifiedTagEditorDialog editTags;
     private final DatabaseUtilities dbUtils;
 
@@ -45,7 +46,7 @@ public class TagDnDPanel extends NowPlayingControl {
         dbUtils = new DatabaseUtilities(frame, mediaPlayer, tagModel);
         setUpDialog(dbUtilsButton, dbUtils);
 
-        tagCloudButton = new TagCloudButton2(tagModel, Rotation.NONE);
+        tagCloudButton = new TagCloudButton(tagModel, Rotation.NONE);
 
         // need to manually create rows (boo)
         JPanel buttonRow1 = new JPanel();
@@ -64,7 +65,7 @@ public class TagDnDPanel extends NowPlayingControl {
 
     private void setUpDialog(NekoButton displayButton, final JDialog dialog) {
         // set up the button to open the dialog
-        displayButton.addActionListener(e -> dialog.setVisible(true));
+        displayButton.addActionListener(_ -> dialog.setVisible(true));
         displayButton.setHorizontalAlignment(SwingConstants.CENTER);
 
         // set up the dialog

@@ -6,6 +6,7 @@ dependencyResolutionManagement {
             library("swingx", 'org.swinglabs.swingx:swingx-core:1.6.5-1')
             library("furbelow", 'furbelow:furbelow:1.0')
             library("divxdede_commons", 'org.divxdede:commons:0.2.3')
+            library("kumo", 'com.kennycason:kumo-core:1.28')
 
             // https://github.com/kklisura/chrome-devtools-java-client
             library("cdt_java_client", 'com.github.kklisura.cdt:cdt-java-client:4.0.0')

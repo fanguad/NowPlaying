@@ -4,18 +4,15 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
-import lombok.extern.log4j.Log4j2;
 import org.nekocode.nowplaying.components.swing.NekoButton;
 import org.nekocode.nowplaying.components.swing.Rotation;
 import org.nekocode.nowplaying.tags.TagModel;
-import org.nekocode.nowplaying.tags.cloud.TagCloud.TagCloudEntryRenderer;
+
+import lombok.extern.log4j.Log4j2;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.*;
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -26,22 +23,19 @@ import java.util.concurrent.ExecutionException;
  * @author dan.clark@nekocode.org
  */
 @Log4j2
-@SuppressWarnings("serial")
 public class TagCloudButton extends NekoButton {
 	private final TagModel tagModel;
 	private static final int MINIMUM_ENTRIES = 5;
+	private static final int TAG_CLOUD_SIZE = 800;
 
 	public TagCloudButton(TagModel tagModel, Rotation r) {
 		super("tag cloud", r);
 		this.setHorizontalAlignment(JLabel.CENTER);
 		this.tagModel = tagModel;
 
-		addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                log.debug("Preparing to display tag cloud...");
-                new CloudLoader(TagCloudButton.this.tagModel).execute();
-            }
+		addActionListener(_ -> {
+            log.debug("Preparing to display tag cloud...");
+            new CloudLoader(TagCloudButton.this.tagModel).execute();
         }
         );
 	}
@@ -53,7 +47,7 @@ public class TagCloudButton extends NekoButton {
     /**
 	 * Loads tags in the background and displays them when ready.
 	 */
-	private static class CloudLoader extends SwingWorker<List<TagCloudEntry>, Object> {
+	private static class CloudLoader extends SwingWorker<ImageIcon, Object> {
 
 		private final TagModel tagModel;
 
@@ -62,26 +56,19 @@ public class TagCloudButton extends NekoButton {
 		}
 
 		@Override
-		protected List<TagCloudEntry> doInBackground() throws Exception {
+		protected ImageIcon doInBackground() {
             Collection<TagCloudEntry> allTags = tagModel.getAllTags(MINIMUM_ENTRIES);
-			List<TagCloudEntry> sorted = new ArrayList<>(allTags);
-			Collections.sort(sorted, new Comparator<TagCloudEntry>() {
-				public int compare(TagCloudEntry o1, TagCloudEntry o2) {
-					return o1.getTag().compareTo(o2.getTag());
-				}
-			});
-			return sorted;
+			return KumoCloud.createCloud(allTags, TAG_CLOUD_SIZE);
 		}
 
 		@Override
 		protected void done() {
-			TagCloudEntryRenderer renderer = entry -> String.format("%s (%d)", entry.getTag(), entry.getCount());
-
 			try {
+				ImageIcon imageIcon = get();
 				JFrame frame = new JFrame("tag cloud");
-				frame.getContentPane().add(new TagCloud(renderer, get()));
+				frame.getContentPane().add(new JLabel(imageIcon));
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				frame.setMinimumSize(new Dimension(550,550));
+				frame.setMinimumSize(new Dimension(TAG_CLOUD_SIZE,TAG_CLOUD_SIZE));
 				frame.pack();
 				frame.setLocationByPlatform(true);
 				frame.setVisible(true);

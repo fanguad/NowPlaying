@@ -12,4 +12,5 @@ dependencies {
     implementation(libs.swingx)
     implementation(libs.sqlite.jdbc)
     implementation(libs.furbelow)
+    implementation(libs.kumo)
 }

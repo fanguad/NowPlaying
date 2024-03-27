@@ -4,21 +4,22 @@
 
 package org.nekocode.nowplaying.tags.cloud;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.awt.*;
 
+@Getter
 public class TagCloudEntry implements Comparable<TagCloudEntry> {
 	public static final int NUM_LEVELS = 20;
 
+	@Setter
 	private String tag;
+	@Setter
 	private String metadata;
+	@Setter
 	private int count;
 	private int scale;
-
-	public String getTag() { return tag; }
-	public void setTag(String tag) { this.tag = tag; }
-
-	public int getCount() { return count; }
-	public void setCount(int count) { this.count = count; }
 
 	/**
 	 * Constructor.
@@ -43,10 +44,6 @@ public class TagCloudEntry implements Comparable<TagCloudEntry> {
 		this(tag, "", count, maximumCount);
 	}
 
-	public int getScale() {
-		return scale;
-	}
-
 	public void setScale(int scale) {
 		if (scale < 0)
 			scale = 0;
@@ -58,18 +55,7 @@ public class TagCloudEntry implements Comparable<TagCloudEntry> {
 	public int compareTo(TagCloudEntry o) {
 		return tag.compareTo(o.tag);
 	}
-	/**
-	 * @return the metadata
-	 */
-	public String getMetadata() {
-		return metadata;
-	}
-	/**
-	 * @param metadata the metadata to set
-	 */
-	public void setMetadata(String metadata) {
-		this.metadata = metadata;
-	}
+
 	@Override
 	public String toString() {
 		return getTag();
